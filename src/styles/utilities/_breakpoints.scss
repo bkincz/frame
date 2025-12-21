@@ -1,0 +1,36 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
+@use 'sass:map';
+
+/*
+ *   RESPONSIVENESS
+ ***************************************************************************************************/
+$breakpoints: (
+	'mobile': 768px,
+	'tablet': 1024px,
+	'desktop': 1400px,
+);
+
+@function breakpoint($name) {
+	@return map.get($breakpoints, $name);
+}
+
+@mixin respond-to($breakpoint) {
+	@media (min-width: breakpoint($breakpoint)) {
+		@content;
+	}
+}
+
+/*
+ *   GRID
+ ***************************************************************************************************/
+$grid-columns: (
+	'mobile': 4,
+	'tablet': 8,
+	'desktop': 12,
+);
+
+@function grid-columns($breakpoint) {
+	@return map-get($grid-columns, $breakpoint);
+}

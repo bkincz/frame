@@ -1,0 +1,272 @@
+/**
+ * Frame Documentation Theme
+ * Matching the Frame application design system
+ */
+
+/* Import JetBrains Mono font */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap');
+
+/* Light Mode - Frame Design System */
+:root {
+  /* Primary colors - using Frame's text colors for minimal aesthetic */
+  --ifm-color-primary: #3b3b3b;
+  --ifm-color-primary-dark: #2e2e2e;
+  --ifm-color-primary-darker: #252525;
+  --ifm-color-primary-darkest: #1a1a1a;
+  --ifm-color-primary-light: #4d4b4b;
+  --ifm-color-primary-lighter: #585757;
+  --ifm-color-primary-lightest: #6d6b6b;
+
+  /* Surface colors - Frame palette */
+  --ifm-background-color: #f7f7f7;
+  --ifm-background-surface-color: #ffffff;
+
+  /* Text colors */
+  --ifm-color-content: #3b3b3b;
+  --ifm-color-content-secondary: #4d4b4b;
+
+  /* Borders */
+  --ifm-color-emphasis-300: #e0e0e0;
+  --ifm-color-emphasis-400: #dbdbdb;
+  --ifm-color-emphasis-500: #cccccc;
+  --ifm-color-emphasis-600: #bebebe;
+
+  /* Code */
+  --ifm-code-font-size: 90%;
+  --ifm-code-background: #f0eeee;
+  --ifm-code-border-radius: 6px;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
+
+  /* Typography */
+  --ifm-font-family-base: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  --ifm-heading-font-weight: 800;
+
+  /* Spacing */
+  --ifm-spacing-horizontal: 1.5rem;
+
+  /* Navbar */
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-navbar-shadow: 0 1px 0 0 #e0e0e0;
+  --ifm-navbar-height: 3.75rem;
+
+  /* Cards & Admonitions */
+  --ifm-card-border-radius: 12px;
+  --ifm-alert-border-radius: 8px;
+
+  /* Links */
+  --ifm-link-color: #3b3b3b;
+  --ifm-link-hover-color: #4d4b4b;
+
+  /* Button/Action colors */
+  --action-background: transparent;
+  --action-border: #3b3b3b;
+  --action-text: #3b3b3b;
+  --action-background-hover: #4d4b4b;
+  --action-border-hover: #4d4b4b;
+  --action-text-hover: #f7f7f7;
+}
+
+/* Dark Mode */
+[data-theme='dark'] {
+  /* Primary colors - adjusted for dark mode */
+  --ifm-color-primary: #f7f7f7;
+  --ifm-color-primary-dark: #e7e6e6;
+  --ifm-color-primary-darker: #e0dede;
+  --ifm-color-primary-darkest: #d1d0d0;
+  --ifm-color-primary-light: #ffffff;
+  --ifm-color-primary-lighter: #ffffff;
+  --ifm-color-primary-lightest: #ffffff;
+
+  /* Surfaces */
+  --ifm-background-color: #1a1a1a;
+  --ifm-background-surface-color: #2e2e2e;
+
+  /* Text */
+  --ifm-color-content: #f7f7f7;
+  --ifm-color-content-secondary: #e7e6e6;
+
+  /* Borders */
+  --ifm-color-emphasis-300: #3b3b3b;
+  --ifm-color-emphasis-400: #4d4b4b;
+  --ifm-color-emphasis-500: #585757;
+  --ifm-color-emphasis-600: #6d6b6b;
+
+  /* Code */
+  --ifm-code-background: #2e2e2e;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+
+  /* Navbar */
+  --ifm-navbar-background-color: #2e2e2e;
+  --ifm-navbar-shadow: 0 1px 0 0 #3b3b3b;
+
+  /* Links */
+  --ifm-link-color: #f7f7f7;
+  --ifm-link-hover-color: #e7e6e6;
+
+  /* Action colors */
+  --action-background: transparent;
+  --action-border: #f7f7f7;
+  --action-text: #f7f7f7;
+  --action-background-hover: #f7f7f7;
+  --action-border-hover: #f7f7f7;
+  --action-text-hover: #2e2e2e;
+}
+
+/* Typography Customization */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Navbar Styling */
+.navbar {
+  border-bottom: 2px solid var(--ifm-color-emphasis-300);
+  font-weight: 800;
+}
+
+.navbar__title {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.navbar__link {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+}
+
+/* Buttons */
+.button {
+  font-family: var(--ifm-font-family-base);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--action-border);
+  background-color: var(--action-background);
+  color: var(--action-text);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: var(--action-background-hover);
+  border-color: var(--action-border-hover);
+  color: var(--action-text-hover);
+  box-shadow: 0 2px 8px rgba(172, 172, 172, 0.3);
+}
+
+.button--primary {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary);
+  color: var(--ifm-background-color);
+}
+
+/* Cards/Content Cards */
+.card {
+  border: 2px solid var(--ifm-color-emphasis-400);
+  border-radius: 12px;
+  box-shadow: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  border-color: var(--ifm-color-emphasis-500);
+  box-shadow: 0 2px 8px rgba(172, 172, 172, 0.2);
+}
+
+/* Code blocks */
+code {
+  font-family: var(--ifm-font-family-monospace);
+  border: 1px solid var(--ifm-color-emphasis-400);
+  padding: 0.1rem 0.3rem;
+}
+
+/* Inline code */
+:not(pre) > code {
+  background-color: var(--ifm-code-background);
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+/* Admonitions */
+.admonition {
+  border: 2px solid var(--ifm-color-emphasis-400);
+  border-radius: 8px;
+}
+
+.admonition-heading h5 {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+/* Table of Contents */
+.table-of-contents {
+  font-size: 0.875rem;
+}
+
+.table-of-contents__link {
+  font-weight: 600;
+}
+
+.table-of-contents__link--active {
+  font-weight: 800;
+  color: var(--ifm-color-primary);
+}
+
+/* Sidebar */
+.menu__link {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.menu__link--active {
+  font-weight: 800;
+}
+
+/* Footer */
+.footer {
+  border-top: 2px solid var(--ifm-color-emphasis-300);
+  font-weight: 600;
+}
+
+.footer__title {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+/* Pagination */
+.pagination-nav__label {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+/* Breadcrumbs */
+.breadcrumbs__link {
+  font-weight: 600;
+}
+
+/* Custom heading line decoration (like Frame index.html) */
+.markdown h2::after,
+.markdown h3::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background-color: var(--ifm-color-emphasis-400);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}

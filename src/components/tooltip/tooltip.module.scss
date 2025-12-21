@@ -1,0 +1,35 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
+@use 'palette' as *;
+
+@layer components {
+    .tooltip {
+        background: $surface04;
+        color: $text04;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        line-height: 1.4;
+        font-weight: 500;
+        font-family: "Noto Sans", sans-serif;
+        white-space: normal;
+        word-wrap: break-word;
+        border: 1px solid $border01;
+        backdrop-filter: blur(4px);
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba($black, 0.3);
+
+        &.warning {
+            background: rgba(255, 165, 0, 0.15);
+            color: $statusOrange;
+            border-color: rgba(255, 165, 0, 0.4);
+        }
+
+        &.error {
+            background: rgba(231, 76, 60, 0.15);
+            color: $statusRed;
+            border-color: rgba(231, 76, 60, 0.4);
+        }
+    }
+}

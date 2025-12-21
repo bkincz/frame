@@ -1,0 +1,17 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
+@use 'utilities/variables';
+@use 'sass:color';
+
+/*
+ *   MIXINS
+ ***************************************************************************************************/
+@mixin glass {
+	background: color.adjust(variables.$surface0a, $alpha: -0.92);
+	border: 2px solid transparent;
+	box-shadow:
+		0 0 0 2px rgba(variables.$shadow02, 0.6),
+		0 4px 32px rgba(variables.$surface0b, 0.5);
+	backdrop-filter: blur(4px);
+}

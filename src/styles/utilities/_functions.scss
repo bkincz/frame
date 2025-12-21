@@ -1,0 +1,18 @@
+@use 'sass:math';
+@use 'sass:string';
+
+@function strip-unit($number) {
+    @return $number / ($number * 0 + 1);
+}
+
+@function rem($size) {
+    @return strip-unit($size) / 16px * 1rem;
+}
+
+@function em($pixels) {
+    @return math.div($pixels, 16) * 1em;
+}
+
+@function capitalize($string) {
+    @return string.to-upper-case(string.slice($string, 1, 1))+string.slice($string, 2);
+}

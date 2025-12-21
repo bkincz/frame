@@ -1,0 +1,180 @@
+/*
+ *   IMPORTS
+ **********************************************************************************************************/
+@use 'palette' as *;
+@use 'sass:map';
+@use 'sass:meta';
+
+/*
+ *   STYLES
+ **********************************************************************************************************/
+@layer components {
+    $colorConfigs: (
+        'primary': (
+            'solid': (
+                'base': $magenta,
+                'hover': $magenta-d1,
+                'border': $magenta,
+                'border-hover': $magenta-d1,
+                'label': $white,
+                'label-hover': $white,
+            ),
+            'outlined': (
+                'base': transparent,
+                'hover': $magenta,
+                'border': $magenta,
+                'border-hover': $magenta-d1,
+                'label': $magenta,
+                'label-hover': $white,
+            ),
+        ),
+        'success': (
+            'solid': (
+                'base': $green,
+                'hover': $green-d1,
+                'border': $green,
+                'border-hover': $green-d1,
+                'label': $white,
+                'label-hover': $white,
+            ),
+            'outlined': (
+                'base': transparent,
+                'hover': $green,
+                'border': $green,
+                'border-hover': $green-d1,
+                'label': $green,
+                'label-hover': $white,
+            ),
+        ),
+        'error': (
+            'solid': (
+                'base': $red,
+                'hover': $red-d1,
+                'border': $red,
+                'border-hover': $red-d1,
+                'label': $white,
+                'label-hover': $white,
+            ),
+            'outlined': (
+                'base': transparent,
+                'hover': $red,
+                'border': $red,
+                'border-hover': $red-d1,
+                'label': $red,
+                'label-hover': $white,
+            ),
+        ),
+        'disabled': (
+            'solid': (
+                'base': $grey,
+                'hover': $grey,
+                'border': $grey,
+                'border-hover': $grey,
+                'label': $grey-d1,
+                'label-hover': $grey-d1,
+            ),
+            'outlined': (
+                'base': transparent,
+                'hover': transparent,
+                'border': $grey,
+                'border-hover': $grey,
+                'label': $grey,
+                'label-hover': $grey,
+            ),
+        )
+    );
+
+    .action {
+        position: relative;
+        cursor: pointer;
+        background-color: transparent;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        display: inline-flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 44px;
+        width: fit-content;
+        padding-inline: 24px;
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
+
+        &:focus,
+        &:focus-visible {
+            outline: none;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+
+        &.hasAdornment {
+            padding-left: 8px;
+        }
+
+        &.iconOnly {
+            width: 44px;
+            min-width: 44px;
+            padding: 0;
+        }
+
+        &.inline {
+            padding-inline: 18px;
+            height: 38px;
+        }
+    }
+
+    .adornment {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+
+        &.inline {
+            width: unset;
+            height: unset;
+        }
+    }
+
+    .label {
+        font-size: 16px;
+        letter-spacing: 0em;
+        font-weight: 400;
+        line-height: 24px;
+        white-space: nowrap;
+
+        &.inline {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 20px;
+        }
+    }
+
+    // Generate color variant classes dynamically
+    @each $colorName, $variants in $colorConfigs {
+        @each $variantName, $variantConfig in $variants {
+            .color#{capitalize($colorName)}#{capitalize($variantName)} {
+                color: map.get($variantConfig, 'label');
+                border: 1px solid map.get($variantConfig, 'border');
+                background-color: map.get($variantConfig, 'base');
+
+                &:hover,
+                &:focus {
+                    color: map.get($variantConfig, 'label-hover');
+                    border-color: map.get($variantConfig, 'border-hover');
+                    background-color: map.get($variantConfig, 'hover');
+
+                    & > span,
+                    & * {
+                        color: map.get($variantConfig, 'label-hover');
+                    }
+                }
+            }
+        }
+    }
+}

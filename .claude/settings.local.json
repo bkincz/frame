@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(dir:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(if exist node_modules rmdir /s /q node_modules)",
+      "Bash(cmd /c \"if exist node_modules rmdir /s /q node_modules\")",
+      "Bash(cmd /c \"if exist package-lock.json del package-lock.json\")",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm lint:fix:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm format:check:*)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm view:*)",
+      "Bash(if not exist .vscode mkdir .vscode)",
+      "Bash(cmd /c \"if not exist .vscode mkdir .vscode\")",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build)",
+      "Bash(del \"src\\\\hooks\\\\useFrameRouter.ts\")",
+      "Bash(ren \"src\\\\hooks\\\\useFrameRouter.new.ts\" \"useFrameRouter.ts\")",
+      "Bash(timeout 30 pnpm tsc:*)",
+      "Bash(pnpm create:*)",
+      "Bash(ls:*)",
+      "Bash(del \"src\\\\core\\\\flow.renderer.tsx\")",
+      "Bash(del \"f:\\\\Web Development\\\\Cache\\\\frame\\\\src\\\\flows\\\\checkout.flow.tsx\" \"f:\\\\Web Development\\\\Cache\\\\frame\\\\src\\\\flows\\\\signup.flow.tsx\")",
+      "Bash(pnpm dev)"
+    ]
+  }
+}

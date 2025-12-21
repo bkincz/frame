@@ -1,0 +1,111 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
+@use 'sass:color';
+
+/*
+ *   BASE
+ ***************************************************************************************************/
+$white: #ffffff;
+$black: #000000;
+
+/*
+ *   SURFACE
+ ***************************************************************************************************/
+$surface00: #f7f7f7;
+$surface01: #f0eeee;
+$surface02: #e7e6e6;
+$surface03: #e0dede;
+$surface04: #d1d0d0;
+
+$border0a: #e0e0e0;
+$border00: #dbdbdb;
+$border01: #cccccc;
+$border02: #bebebe;
+
+$shadow00: #acacac;
+$shadow01: #808080;
+$shadow02: #5d5e5f;
+
+/*
+ *   TYPEOGRAPHY
+ ***************************************************************************************************/
+$text00: #3b3b3b;
+$text01: #4d4b4b;
+$text02: #585757;
+$text03: #6d6b6b;
+$text04: #959697;
+$text05: #ffffff;
+
+/*
+ *   STATUS
+ ***************************************************************************************************/
+$statusBlue: #4360af;
+$statusBlueHover: #37539e;
+$statusBlueActive: #37539e;
+$statusGreen: #65b662;
+$statusGreenHover: #50904e;
+$statusGreenActive: #478145;
+$statusRed: #c54854;
+$statusRedHover: #a83742;
+$statusRedActive: #94303a;
+$statusOrange: #e08d3f;
+$statusOrangeHover: #c47530;
+$statusOrangeActive: #b46927;
+
+/*
+ *   COMPANY COLORS
+ ***************************************************************************************************/
+$magenta-d2: #6E0A46;
+$magenta-d1: #9C1767;
+$magenta: #C42A87;
+$magenta-l1: #DD71B2;
+$magenta-l2: #F1BBDC;
+
+$pink-d2: #800C59;
+$pink-d1: #BF1D83;
+$pink: #FC35AC;
+$pink-l1: #FF77CA;
+$pink-l2: #FFBEE7;
+
+$grey-d2: #6E6E73;
+$grey-d1: #A5A5AC;
+$grey: #DDDDE5;
+$grey-l1: #E9E9EE;
+$grey-l2: #F5F5F7;
+
+$navy-d2: #07093A;
+$navy-d1: #0E1152;
+$navy: #191C68;
+$navy-l1: #676A9F;
+$navy-l2: #B8B9D4;
+
+$yellow-d2: #807000;
+$yellow-d1: #BFA000;
+$yellow: #FFCB11;
+$yellow-l1: #FFE15E;
+$yellow-l2: #FFF3B3;
+
+$blue-d2: #006180;
+$blue-d1: #078CBA;
+$blue: #19B3E8;
+$blue-l1: #64D0F5;
+$blue-l2: #B5EBFD;
+
+$green-d2: #00735F;
+$green-d1: #00A286;
+$green: #03C9A9;
+$green-l1: #59E1CB;
+$green-l2: #B3F4E8;
+
+$orange-d2: #803E02;
+$orange-d1: #B85E0F;
+$orange: #E67E22;
+$orange-l1: #F4AB6A;
+$orange-l2: #FCD8B8;
+
+$red-d2: #800000;
+$red-d1: #d71500;
+$red: #E71700;
+$red-l1: #F56359;
+$red-l2: #FDB5B3;
