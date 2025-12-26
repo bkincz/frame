@@ -36,5 +36,5 @@ export interface BaseInterface {
  *   INTERACTIVE
  **********************************************************************************************************/
 export type InteractiveSizes = 'small' | 'medium' | 'large'
-export type InteractiveVariants = 'solid' | 'outlined'
+export type InteractiveVariants = 'solid' | 'outlined' | 'text' | 'icon'
 export type InteractiveColors = 'primary' | 'success' | 'error'

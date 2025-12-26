@@ -1,21 +1,16 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef, useState } from 'react'
 
 /*
  *   SHARED
  ***************************************************************************************************/
 import { Frame } from './frame.component'
-import {
-	animateFrameIn,
-	animateFrameOut,
-	animateFullFrameIn,
-	animateFullFrameOut,
-} from './frame.animations'
-
 import { useFrameRouter } from '@/hooks/useFrameRouter'
+import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import FrameState from '@/state/frame.state'
+import StepState from '@/state/step.state'
 
 /*
  *   TYPES
@@ -34,16 +29,42 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	})
 
 	// Refs for animation
-	const overlayRef = useRef<HTMLDivElement>(null)
-	const contentRef = useRef<HTMLDivElement>(null)
-	const isAnimatingOut = useRef(false)
+	const overlayRef = useRef<HTMLDivElement | null>(null)
+	const contentRef = useRef<HTMLDivElement | null>(null)
+	const stepWrapperRef = useRef<HTMLDivElement | null>(null)
+
+	// Track the current rendered step and flow for transitions
+	const [renderedStepKey, setRenderedStepKey] = useState<string | null>(currentStepKey)
+	const [renderedFlow, setRenderedFlow] = useState<string | null>(currentFlow)
+	const [flowOpenCount, setFlowOpenCount] = useState(0)
+
+	// Animation hook
+	const { animateFrameEntrance, animateFrameExit, animateFlowTransition } = useFrameAnimations(
+		stepWrapperRef,
+		overlayRef,
+		contentRef,
+		{
+			debug,
+			onStepChange: setRenderedStepKey,
+			onFlowChange: (flowName, stepKey) => {
+				setRenderedFlow(flowName)
+				if (stepKey) setRenderedStepKey(stepKey)
+			},
+		}
+	)
 
 	// Get flow definition from state cache
-	const flowDefinition = currentFlow ? FrameState.getFlowDefinition(currentFlow) : null
+	// Use currentFlow for definition lookup (that's what's cached)
+	// But use renderedFlow/renderedStepKey for determining what to display
+	const currentFlowDefinition = currentFlow ? FrameState.getFlowDefinition(currentFlow) : null
+	const renderedFlowDefinition = renderedFlow ? FrameState.getFlowDefinition(renderedFlow) : null
 
-	// Get current step
+	// Use rendered flow definition for display, fall back to current if not available
+	const flowDefinition = renderedFlowDefinition || currentFlowDefinition
+
+	// Get current step (use renderedStepKey for smooth transitions)
 	const currentStep =
-		flowDefinition && currentStepKey ? flowDefinition.flow[currentStepKey] : null
+		flowDefinition && renderedStepKey ? flowDefinition.flow[renderedStepKey] : null
 
 	// Determine variant (step config > flow config > default 'fullscreen')
 	const variant = currentStep?.config?.variant || flowDefinition?.config?.variant || 'fullscreen'
@@ -121,10 +142,13 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		const runStepEnter = async () => {
 			if (step.onEnter) {
 				try {
+					StepState.startEntering()
 					await step.onEnter()
 					FrameState.markStepEntered()
+					StepState.endEntering()
 				} catch (error) {
 					console.error(`[FrameContainer] Error in step onEnter:`, error)
+					StepState.endEntering()
 				}
 			}
 		}
@@ -136,10 +160,13 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 			const runStepExit = async () => {
 				if (step.onExit) {
 					try {
+						StepState.startExiting()
 						await step.onExit()
 						FrameState.markStepExited()
+						StepState.endExiting()
 					} catch (error) {
 						console.error(`[FrameContainer] Error in step onExit:`, error)
+						StepState.endExiting()
 					}
 				}
 			}
@@ -155,48 +182,72 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	 * Handle frame entrance animation
 	 */
 	useEffect(() => {
-		if (!isOpen || !contentRef.current) return
+		if (!isOpen) return
 
-		// For modal variant, wait for overlay ref to be ready
-		if (variant === 'modal' && !overlayRef.current) return
+		const cleanup = animateFrameEntrance(variant)
+		return cleanup
+	}, [isOpen, variant, animateFrameEntrance])
 
-		// Set animating state
-		FrameState.setAnimating(true)
+	/**
+	 * Track flow changes to detect reopens
+	 */
+	const previousFlowRef = useRef<string | null>(null)
 
-		// Animate in - only animate overlay if it exists (modal variant)
-		const timeline = overlayRef.current
-			? animateFullFrameIn(overlayRef.current, contentRef.current)
-			: animateFrameIn(contentRef.current)
-
-		timeline.eventCallback('onComplete', () => {
-			FrameState.setAnimating(false)
-		})
-
-		return () => {
-			timeline.kill()
+	useEffect(() => {
+		// Detect when flow actually changes or reopens (not just step changes)
+		if (currentFlow && currentFlow !== previousFlowRef.current) {
+			setFlowOpenCount(prev => prev + 1)
+			previousFlowRef.current = currentFlow
+		} else if (!currentFlow && previousFlowRef.current) {
+			// Flow closed, reset the previous flow
+			previousFlowRef.current = null
 		}
-	}, [isOpen, variant])
+	}, [currentFlow])
+
+	/**
+	 * Handle flow transitions with fade and scale animation
+	 */
+	useEffect(() => {
+		// Detect flow change or same-flow reopen (but not initial mount or close)
+		const isFlowChange = currentFlow && renderedFlow && currentFlow !== renderedFlow
+		const isSameFlowReopen = currentFlow && renderedFlow === currentFlow && flowOpenCount > 1
+
+		if (isFlowChange || isSameFlowReopen) {
+			if (debug) {
+				console.log('[FrameContainer] Flow transition triggered:', {
+					type: isFlowChange ? 'flow change' : 'same flow reopen',
+					from: renderedFlow,
+					to: currentFlow,
+				})
+			}
+
+			// Use hook to animate flow transition
+			animateFlowTransition(currentFlow, currentStepKey)
+		} else if (currentFlow !== renderedFlow) {
+			// Only sync without animation if one of them is null (initial open or close)
+			const isInitialOpen = !renderedFlow && currentFlow
+			const isClosing = renderedFlow && !currentFlow
+
+			if (isInitialOpen || isClosing) {
+				if (debug) {
+					console.log('[FrameContainer] Flow state sync (no animation):', {
+						from: renderedFlow,
+						to: currentFlow,
+						reason: isInitialOpen ? 'initial open' : 'closing',
+					})
+				}
+				setRenderedFlow(currentFlow)
+				setRenderedStepKey(currentStepKey)
+			}
+		}
+	}, [currentFlow, renderedFlow, currentStepKey, flowOpenCount, debug, animateFlowTransition])
 
 	/**
 	 * Trigger close with animation
 	 */
 	const triggerClose = useCallback(() => {
-		if (isAnimatingOut.current || !contentRef.current) return
-
-		isAnimatingOut.current = true
-		FrameState.setAnimating(true)
-
-		// Animate out - only animate overlay if it exists (modal variant)
-		const timeline = overlayRef.current
-			? animateFullFrameOut(overlayRef.current, contentRef.current)
-			: animateFrameOut(contentRef.current)
-
-		timeline.eventCallback('onComplete', () => {
-			isAnimatingOut.current = false
-			FrameState.setAnimating(false)
-			closeFlow()
-		})
-	}, [closeFlow])
+		animateFrameExit(closeFlow)
+	}, [animateFrameExit, closeFlow])
 
 	/**
 	 * Handle keyboard events
@@ -205,7 +256,6 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		if (!isOpen) return
 
 		const handleKeyDown = (event: KeyboardEvent) => {
-			// ESC key to close with animation
 			if (event.key === 'Escape') {
 				triggerClose()
 			}
@@ -252,23 +302,26 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 			<Frame.Content
 				ref={contentRef}
 				onClick={handleContentClick}
-				data-step-key={currentStepKey}
+				data-step-key={renderedStepKey || ''}
 				variant={variant}
 			>
 				<Frame.Close />
-				{currentStep ? (
-					<>
-						{currentStep.heading && (
-							<Frame.Heading>{currentStep.heading}</Frame.Heading>
-						)}
-						{currentStep.subheading && (
-							<Frame.Subheading>{currentStep.subheading}</Frame.Subheading>
-						)}
-						<Frame.Step step={currentStep} />
-					</>
-				) : (
-					<Frame.NotFound stepKey={currentStepKey} />
-				)}
+				<div ref={stepWrapperRef}>
+					{currentStep ? (
+						<>
+							{currentStep.heading && (
+								<Frame.Heading>{currentStep.heading}</Frame.Heading>
+							)}
+							{currentStep.subheading && (
+								<Frame.Subheading>{currentStep.subheading}</Frame.Subheading>
+							)}
+							<Frame.Step step={currentStep} />
+						</>
+					) : (
+						<Frame.NotFound stepKey={renderedStepKey || ''} />
+					)}
+				</div>
+				<Frame.Navigation />
 			</Frame.Content>
 		</Frame>
 	)

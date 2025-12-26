@@ -21,7 +21,7 @@ export interface UseTooltipOptions {
 
 export interface TooltipState {
 	visible: boolean
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 	content: any
 }
 

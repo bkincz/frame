@@ -1,26 +1,40 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'url'
-import { dirname, resolve } from 'path'
+import { resolve } from 'path'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
+/*
+ *   VITEST CONFIG
+ ***************************************************************************************************/
 export default defineConfig({
 	plugins: [react()],
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		setupFiles: './src/__tests__/setup.ts',
+		setupFiles: './src/test/setup.ts',
 		css: {
 			modules: {
 				classNameStrategy: 'non-scoped',
 			},
 		},
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'json', 'html'],
+			exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*', '**/mockData/**'],
+		},
 	},
 	resolve: {
 		alias: {
-			'@': resolve(__dirname, './src'),
+			'@': resolve('./src'),
+		},
+	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				loadPaths: ['./src/styles'],
+			},
 		},
 	},
 })

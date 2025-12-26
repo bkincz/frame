@@ -11,7 +11,7 @@ import { customEventManager } from '@/lib/event'
 /*
  *   TYPES
  ***************************************************************************************************/
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition, FrameVariant } from '@/flows/flow.types'
 
 export interface FlowLifecycleState {
 	enteredFlows: string[]
@@ -56,6 +56,7 @@ interface FrameActions {
 	selectStepKeys: () => string[]
 	selectIsFlowEntered: (flowName: string) => boolean
 	selectHasHistory: () => boolean
+	selectVariant: () => FrameVariant
 }
 
 export interface FrameStateProps extends FrameActions, FrameStateData {}
@@ -184,6 +185,7 @@ const initialState: FrameStateProps = {
 	selectStepKeys: () => [],
 	selectIsFlowEntered: () => false,
 	selectHasHistory: () => false,
+	selectVariant: () => 'fullscreen',
 }
 
 class FrameStateMachine extends StateMachine<FrameStateProps> {
@@ -238,6 +240,22 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 	 */
 	public selectHasHistory(): boolean {
 		return this.state.flowHistory.length > 0
+	}
+
+	/**
+	 * Selector: Get current frame variant (derived from step/flow config)
+	 */
+	public selectVariant(): FrameVariant {
+		const { currentFlow, currentStepKey, flowDefinitionCache } = this.state
+		if (!currentFlow || !currentStepKey) return 'fullscreen'
+
+		const flowDef = flowDefinitionCache[currentFlow]
+		if (!flowDef) return 'fullscreen'
+
+		const currentStep = flowDef.flow[currentStepKey]
+
+		// Priority: step config > flow config > default 'fullscreen'
+		return currentStep?.config?.variant || flowDef.config?.variant || 'fullscreen'
 	}
 
 	/**

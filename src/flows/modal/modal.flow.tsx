@@ -12,8 +12,6 @@ export const createModalFlow = (): FlowDefinition => {
 		variant: 'modal' as const,
 		footer: {
 			hidePricing: true,
-			hideNext: true,
-			hideBack: true,
 			hideStepIndicator: true,
 		},
 		sidebar: false,
@@ -24,7 +22,7 @@ export const createModalFlow = (): FlowDefinition => {
 			heading: 'Modal Example',
 			subheading: 'This is displayed in a centered modal with an overlay.',
 			components: [
-				<div key="modal-content" style={{ padding: '24px 0' }}>
+				<div key="modal-content">
 					<p style={{ marginBottom: '16px' }}>
 						This flow uses the <strong>modal</strong> variant, which displays the
 						content in a centered modal dialog with:
@@ -44,7 +42,7 @@ export const createModalFlow = (): FlowDefinition => {
 			heading: 'Step Two',
 			subheading: 'Navigation works the same in modal mode.',
 			components: [
-				<div key="modal-content-2" style={{ padding: '24px 0' }}>
+				<div key="modal-content-2">
 					<p>
 						You can navigate between steps using the Back/Next buttons. Each step can
 						override the variant if needed.

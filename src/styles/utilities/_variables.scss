@@ -10,50 +10,6 @@ $white: #ffffff;
 $black: #000000;
 
 /*
- *   SURFACE
- ***************************************************************************************************/
-$surface00: #f7f7f7;
-$surface01: #f0eeee;
-$surface02: #e7e6e6;
-$surface03: #e0dede;
-$surface04: #d1d0d0;
-
-$border0a: #e0e0e0;
-$border00: #dbdbdb;
-$border01: #cccccc;
-$border02: #bebebe;
-
-$shadow00: #acacac;
-$shadow01: #808080;
-$shadow02: #5d5e5f;
-
-/*
- *   TYPEOGRAPHY
- ***************************************************************************************************/
-$text00: #3b3b3b;
-$text01: #4d4b4b;
-$text02: #585757;
-$text03: #6d6b6b;
-$text04: #959697;
-$text05: #ffffff;
-
-/*
- *   STATUS
- ***************************************************************************************************/
-$statusBlue: #4360af;
-$statusBlueHover: #37539e;
-$statusBlueActive: #37539e;
-$statusGreen: #65b662;
-$statusGreenHover: #50904e;
-$statusGreenActive: #478145;
-$statusRed: #c54854;
-$statusRedHover: #a83742;
-$statusRedActive: #94303a;
-$statusOrange: #e08d3f;
-$statusOrangeHover: #c47530;
-$statusOrangeActive: #b46927;
-
-/*
  *   COMPANY COLORS
  ***************************************************************************************************/
 $magenta-d2: #6E0A46;
@@ -109,3 +65,75 @@ $red-d1: #d71500;
 $red: #E71700;
 $red-l1: #F56359;
 $red-l2: #FDB5B3;
+
+/*
+ *   SURFACE
+ ***************************************************************************************************/
+$surface0a: #fefefe;
+$surface00: #f7f7f7;
+$surface01: #f0eeee;
+$surface02: #e7e6e6;
+$surface03: #e0dede;
+$surface04: #d1d0d0;
+
+$border0a: #e0e0e0;
+$border00: #dbdbdb;
+$border01: #cccccc;
+$border02: #bebebe;
+
+$shadow00: #acacac;
+$shadow01: #808080;
+$shadow02: #5d5e5f;
+
+/*
+ *   TYPEOGRAPHY
+ ***************************************************************************************************/
+$text00: #3b3b3b;
+$text01: #4d4b4b;
+$text02: #585757;
+$text03: #6d6b6b;
+$text04: #959697;
+$text05: #ffffff;
+
+/*
+ *   STATUS
+ ***************************************************************************************************/
+$statusBlue: #4360af;
+$statusBlueHover: #37539e;
+$statusBlueActive: #37539e;
+$statusGreen: #65b662;
+$statusGreenHover: #50904e;
+$statusGreenActive: #478145;
+$statusRed: #c54854;
+$statusRedHover: #a83742;
+$statusRedActive: #94303a;
+$statusOrange: #e08d3f;
+$statusOrangeHover: #c47530;
+$statusOrangeActive: #b46927;
+
+/*
+ *   BUTTON
+ ***************************************************************************************************/
+$button-primary: $magenta;
+$button-primary-hover: $magenta-l1;
+$button-primary-focus: $magenta-d1;
+$button-primary-label: $white;
+$button-primary-label-hover: $white;
+$button-primary-label-focus: $white;
+
+$button-success: $statusGreen;
+$button-success-hover: $statusGreenHover;
+$button-success-focus: $statusGreenActive;
+$button-success-label: $white;
+$button-success-label-hover: $white;
+$button-success-label-focus: $white;
+
+$button-error: $statusRed;
+$button-error-hover: $statusRedHover;
+$button-error-focus: $statusRedActive;
+$button-error-label: $white;
+$button-error-label-hover: $white;
+$button-error-label-focus: $white;
+
+$button-disabled: #e3dede;
+$button-disabled-text: #aaa7a7;

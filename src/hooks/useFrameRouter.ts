@@ -6,7 +6,8 @@ import { useEffect, useCallback, useRef, useState } from 'react'
 /*
  *   SHARED
  ***************************************************************************************************/
-import FrameState from '@/state/frame.state'
+import FrameState, { FRAME_EVENTS } from '@/state/frame.state'
+import AnimationState from '@/state/animation.state'
 import { flowExists, createFlowDefinition } from '@/core/frame.functions'
 
 import { customEventManager } from '@/lib/event'
@@ -198,34 +199,69 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	 * Advance to the next step
 	 */
 	const nextStep = useCallback(() => {
+		// Check if frame is currently animating
+		if (AnimationState.selectIsAnimating()) {
+			if (debug) console.log('[FrameRouter] Skipping next step - frame is animating')
+			return
+		}
+
 		if (updateUrl) {
-			// When URL syncing is enabled, update URL and let param watcher handle state
+			// When URL syncing is enabled, emit event then update URL
 			const currentStepIndex = FrameState.selectCurrentStepIndex()
 			const stepKeys = FrameState.selectStepKeys()
-			if (currentStepIndex < stepKeys.length - 1) {
+			const { currentFlow, currentStepKey } = FrameState.getState()
+
+			if (currentStepIndex < stepKeys.length - 1 && currentFlow && currentStepKey) {
+				const nextStepKey = stepKeys[currentStepIndex + 1]
+
+				// Emit navigation event before URL change
+				customEventManager.emit(FRAME_EVENTS.NEXT_STEP, {
+					flow: currentFlow,
+					fromStepKey: currentStepKey,
+					toStepKey: nextStepKey,
+				})
+
 				router.setParam(stepParam, String(currentStepIndex + 2)) // +2 because 1-based and +1 for next
 			}
 		} else {
 			// When URL syncing is disabled, update state directly
 			FrameState.nextStep()
 		}
-	}, [stepParam, updateUrl, router])
+	}, [stepParam, updateUrl, router, debug])
 
 	/**
 	 * Go back to the previous step
 	 */
 	const previousStep = useCallback(() => {
+		// Check if frame is currently animating
+		if (AnimationState.selectIsAnimating()) {
+			if (debug) console.log('[FrameRouter] Skipping previous step - frame is animating')
+			return
+		}
+
 		if (updateUrl) {
-			// When URL syncing is enabled, update URL and let param watcher handle state
+			// When URL syncing is enabled, emit event then update URL
 			const currentStepIndex = FrameState.selectCurrentStepIndex()
-			if (currentStepIndex > 0) {
+			const stepKeys = FrameState.selectStepKeys()
+			const { currentFlow, currentStepKey } = FrameState.getState()
+
+			if (currentStepIndex > 0 && currentFlow && currentStepKey) {
+				const prevStepKey = stepKeys[currentStepIndex - 1]
+
+				// Emit navigation event before URL change
+				customEventManager.emit(FRAME_EVENTS.PREVIOUS_STEP, {
+					flow: currentFlow,
+					fromStepKey: currentStepKey,
+					toStepKey: prevStepKey,
+				})
+
 				router.setParam(stepParam, String(currentStepIndex)) // currentStepIndex is already 0-based, so no -1 needed for 1-based URL
 			}
 		} else {
 			// When URL syncing is disabled, update state directly
 			FrameState.previousStep()
 		}
-	}, [stepParam, updateUrl, router])
+	}, [stepParam, updateUrl, router, debug])
 
 	/**
 	 * Go back to previous flow in history
@@ -283,6 +319,10 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			// Validate flow exists
 			if (!flowExists(flowValue)) {
 				console.error(`[FrameRouter] Flow "${flowValue}" not found in registry. Ignoring.`)
+				// Clear the invalid params from URL
+				if (updateUrl) {
+					router.clearParams([flowParam, stepParam])
+				}
 				return
 			}
 

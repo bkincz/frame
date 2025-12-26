@@ -188,6 +188,15 @@ describe('Tooltip Component', () => {
 		it('should apply visible class when visible', async () => {
 			render(<Tooltip visible={true}>Visibility Test Content</Tooltip>)
 
+			// Trigger mouse move to position the tooltip
+			const mouseMoveEvent = new MouseEvent('mousemove', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 100,
+				clientY: 100,
+			})
+			window.dispatchEvent(mouseMoveEvent)
+
 			await waitFor(() => {
 				const tooltip = screen.getByTestId('tooltip')
 				expect(tooltip).toHaveClass('visible')

@@ -1,0 +1,336 @@
+/*
+ *   IMPORTS
+ **********************************************************************************************************/
+@use 'palette' as *;
+@use 'sass:math';
+@use 'sass:map';
+@use 'sass:string';
+
+/*
+ *   STYLES
+ **********************************************************************************************************/
+@layer components {
+    $colorConfigs: (
+        'primary': ('solid': ('base': $button-primary,
+                'hover': $button-primary-hover,
+                'focus': $button-primary-focus,
+                'border': $button-primary,
+                'border-hover': $button-primary-hover,
+                'border-focus': $button-primary-focus,
+                'label': $button-primary-label,
+                'label-hover': $button-primary-label-hover,
+                'label-focus': $button-primary-label-focus,
+            ),
+            'outlined': ('base': transparent,
+                'hover': $button-primary-hover,
+                'focus': $button-primary-focus,
+                'border': $button-primary,
+                'border-hover': $button-primary-hover,
+                'border-focus': $button-primary-focus,
+                'label': $button-primary,
+                'label-hover': $button-primary-label-hover,
+                'label-focus': $button-primary-label-focus,
+            ),
+            'text': ('base': transparent,
+                'hover': rgba($button-primary-hover, 0.2),
+                'focus': rgba($button-primary-focus, 0.3),
+                'border': transparent,
+                'border-hover': transparent,
+                'border-focus': transparent,
+                'label': $button-primary,
+                'label-hover': $button-primary-hover,
+                'label-focus': $button-primary-focus,
+            ),
+            'icon': ('base': $button-primary,
+                'hover': $button-primary-hover,
+                'focus': $button-primary-focus,
+                'border': $button-primary,
+                'border-hover': $button-primary-hover,
+                'border-focus': $button-primary-focus,
+                'label': $button-primary-label,
+                'label-hover': $button-primary-label-hover,
+                'label-focus': $button-primary-label-focus,
+            ),
+        ),
+        'success': ('solid': ('base': $button-success,
+                'hover': $button-success-hover,
+                'focus': $button-success-focus,
+                'border': $button-success,
+                'border-hover': $button-success-hover,
+                'border-focus': $button-success-focus,
+                'label': $white,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+            'outlined': ('base': transparent,
+                'hover': $button-success-hover,
+                'focus': $button-success-focus,
+                'border': $button-success,
+                'border-hover': $button-success-hover,
+                'border-focus': $button-success-focus,
+                'label': $button-success,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+            'text': ('base': transparent,
+                'hover': rgba($button-success-hover, 0.1),
+                'focus': rgba($button-success-focus, 0.1),
+                'border': transparent,
+                'border-hover': transparent,
+                'border-focus': transparent,
+                'label': $button-success,
+                'label-hover': $button-success-hover,
+                'label-focus': $button-success-focus,
+            ),
+            'icon': ('base': $button-success,
+                'hover': $button-success-hover,
+                'focus': $button-success-focus,
+                'border': $button-success,
+                'border-hover': $button-success-hover,
+                'border-focus': $button-success-focus,
+                'label': $white,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+        ),
+        'error': ('solid': ('base': $button-error,
+                'hover': $button-error-hover,
+                'focus': $button-error-focus,
+                'border': $button-error,
+                'border-hover': $button-error-hover,
+                'border-focus': $button-error-focus,
+                'label': $white,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+            'outlined': ('base': transparent,
+                'hover': $button-error-hover,
+                'focus': $button-error-focus,
+                'border': $button-error,
+                'border-hover': $button-error-hover,
+                'border-focus': $button-error-focus,
+                'label': $button-error,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+            'text': ('base': transparent,
+                'hover': rgba($button-error-hover, 0.1),
+                'focus': rgba($button-error-focus, 0.1),
+                'border': transparent,
+                'border-hover': transparent,
+                'border-focus': transparent,
+                'label': $button-error,
+                'label-hover': $button-error-hover,
+                'label-focus': $button-error-focus,
+            ),
+            'icon': ('base': $button-error,
+                'hover': $button-error-hover,
+                'focus': $button-error-focus,
+                'border': $button-error,
+                'border-hover': $button-error-hover,
+                'border-focus': $button-error-focus,
+                'label': $button-error-label,
+                'label-hover': $button-error-label-hover,
+                'label-focus': $button-error-label-focus,
+            ),
+        ),
+        'disabled': ('solid': ('base': rgba($button-disabled, 0.35),
+                'hover': rgba($button-disabled, 0.35),
+                'focus': rgba($button-disabled, 0.35),
+                'border': $button-disabled,
+                'border-hover': $button-disabled,
+                'border-focus': $button-disabled,
+                'label': $button-disabled-text,
+                'label-hover': $button-disabled-text,
+                'label-focus': $button-disabled-text,
+            ),
+            'outlined': ('base': rgba($button-disabled, 0.2),
+                'hover': rgba($button-disabled, 0.2),
+                'focus': rgba($button-disabled, 0.2),
+                'border': $button-disabled,
+                'border-hover': $button-disabled,
+                'border-focus': $button-disabled,
+                'label': $button-disabled-text,
+                'label-hover': $button-disabled-text,
+                'label-focus': $button-disabled-text,
+            ),
+            'text': ('base': rgba($button-disabled, 0.1),
+                'hover': rgba($button-disabled, 0.1),
+                'focus': rgba($button-disabled, 0.1),
+                'border': transparent,
+                'border-hover': transparent,
+                'border-focus': transparent,
+                'label': $button-disabled,
+                'label-hover': $button-disabled,
+                'label-focus': $button-disabled,
+            ),
+            'icon': ('base': $button-disabled,
+                'hover': $button-disabled,
+                'focus': $button-disabled,
+                'border': $button-disabled,
+                'border-hover': $button-disabled,
+                'border-focus': $button-disabled,
+                'label': $white,
+                'label-hover': $white,
+                'label-focus': $white,
+            ),
+        )
+    );
+
+.adornmentItem {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.buttonLabel {
+    // font-size: em(14);
+    // letter-spacing: 0.01em;
+    // font-weight: 600;
+    // line-height: 24px;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.buttonWrapper {
+    position: relative;
+    cursor: pointer;
+    background-color: transparent;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+
+    & span {
+        transition: all 0.3s ease-in-out;
+    }
+
+    &:focus,
+    &:focus-visible {
+        outline: none;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    &.sizeSmall {
+        font-size: 0.85rem;
+        height: 38px;
+        padding-inline: 16px;
+
+        &.hasStartAdornment {
+            padding-left: 16px;
+        }
+
+        &.hasEndAdornment {
+            padding-right: 16px;
+        }
+
+        &.icon {
+            width: 38px;
+            min-width: 38px;
+            padding: 0;
+        }
+    }
+
+    &.sizeMedium {
+        font-size: 1rem;
+        height: 44px;
+        padding-inline: 24px;
+
+        &.hasStartAdornment {
+            padding-left: 16px;
+        }
+
+        &.hasEndAdornment {
+            padding-right: 24px;
+        }
+
+        &.icon {
+            width: 44px;
+            min-width: 44px;
+            padding: 0;
+        }
+    }
+
+    &.sizeLarge {
+        font-size: 1rem;
+        height: 52px;
+        padding-inline: 24px;
+
+        &.hasStartAdornment {
+            padding-left: 24px;
+        }
+
+        &.hasEndAdornment {
+            padding-right: 24px;
+        }
+
+        &.icon {
+            width: 52px;
+            min-width: 52px;
+            padding: 0;
+        }
+    }
+}
+
+@function capitalize($string) {
+    @return string.to-upper-case(string.slice($string, 1, 1))+string.slice($string, 2);
+}
+
+@function em($pixels) {
+    @return math.div($pixels, 16) * 1em;
+}
+
+@each $colorName, $variants in $colorConfigs {
+    @each $variantName, $variantConfig in $variants {
+        .color#{capitalize($colorName)}#{capitalize($variantName)} {
+            color: map.get($variantConfig, 'label');
+            border: 1px solid map.get($variantConfig, 'border');
+            background-color: map.get($variantConfig, 'base');
+
+            @if $variantName =='icon' {
+                padding: 0;
+                border-radius: 50%;
+            }
+
+            &>span,
+            & * {
+                color: map.get($variantConfig, 'label');
+            }
+
+            &:hover {
+                color: map.get($variantConfig, 'label-hover');
+                border-color: map.get($variantConfig, 'border-hover');
+                background-color: map.get($variantConfig, 'hover');
+
+                &>span,
+                & * {
+                    color: map.get($variantConfig, 'label-hover');
+                }
+            }
+
+            &:focus {
+                color: map.get($variantConfig, 'label-focus');
+                border-color: map.get($variantConfig, 'border-focus');
+                background-color: map.get($variantConfig, 'focus');
+
+                &>span,
+                & * {
+                    color: map.get($variantConfig, 'label-focus');
+                }
+            }
+        }
+    }
+}
+}

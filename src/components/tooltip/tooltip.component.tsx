@@ -196,6 +196,8 @@ export const Tooltip: FC<TooltipProps> = ({
 				{
 					[styles.warning]: variant === 'warning',
 					[styles.error]: variant === 'error',
+					[styles.visible]: visible && isPositioned && showAfterDelay,
+					[styles.hidden]: !visible || !isPositioned || !showAfterDelay,
 				},
 				className
 			)}

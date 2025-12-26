@@ -11,6 +11,8 @@ export interface FrameAnimationConfig {
 	ease?: string
 }
 
+export type StepDirection = 'forward' | 'backward'
+
 /*
  *   DEFAULT CONFIG
  ***************************************************************************************************/
@@ -161,4 +163,118 @@ export function animateFullFrameOut(
 	masterTimeline.add(animateOverlayOut(overlayElement, config), 0)
 
 	return masterTimeline
+}
+
+/**
+ * Animate step exit based on direction
+ * @param element - The step element to animate out
+ * @param direction - The direction of navigation (forward = slide left, backward = slide right)
+ * @param config - Animation configuration
+ * @returns GSAP timeline
+ */
+export function animateStepOut(
+	element: HTMLElement,
+	direction: StepDirection,
+	config: FrameAnimationConfig = {}
+): gsap.core.Timeline {
+	const { duration } = { ...DEFAULT_CONFIG, ...config }
+
+	const timeline = gsap.timeline()
+
+	// Forward: slide out to the left, backward: slide out to the right
+	const xOffset = direction === 'forward' ? -30 : 30
+
+	timeline.to(element, {
+		opacity: 0,
+		x: xOffset,
+		duration,
+		ease: 'power2.in',
+	})
+
+	return timeline
+}
+
+/**
+ * Animate step entrance based on direction
+ * @param element - The step element to animate in
+ * @param direction - The direction of navigation (forward = slide from right, backward = slide from left)
+ * @param config - Animation configuration
+ * @returns GSAP timeline
+ */
+export function animateStepIn(
+	element: HTMLElement,
+	direction: StepDirection,
+	config: FrameAnimationConfig = {}
+): gsap.core.Timeline {
+	const { duration, ease } = { ...DEFAULT_CONFIG, ...config }
+
+	const timeline = gsap.timeline()
+
+	// Forward: slide in from the right, backward: slide in from the left
+	const xFrom = direction === 'forward' ? 30 : -30
+
+	// Set initial state
+	gsap.set(element, { opacity: 0, x: xFrom })
+
+	// Animate in
+	timeline.to(element, {
+		opacity: 1,
+		x: 0,
+		duration,
+		ease,
+	})
+
+	return timeline
+}
+
+/**
+ * Animate flow exit (fade out and scale down)
+ * @param element - The content element to animate out
+ * @param config - Animation configuration
+ * @returns GSAP timeline
+ */
+export function animateFlowOut(
+	element: HTMLElement,
+	config: FrameAnimationConfig = {}
+): gsap.core.Timeline {
+	const { duration } = { ...DEFAULT_CONFIG, ...config }
+
+	const timeline = gsap.timeline()
+
+	timeline.to(element, {
+		opacity: 0,
+		scale: 0.99,
+		duration,
+		ease: 'power2.in',
+	})
+
+	return timeline
+}
+
+/**
+ * Animate flow entrance (fade in and scale up)
+ * @param element - The content element to animate in
+ * @param config - Animation configuration
+ * @returns GSAP timeline
+ */
+export function animateFlowIn(
+	element: HTMLElement,
+	config: FrameAnimationConfig = {}
+): gsap.core.Timeline {
+	const { duration, ease } = { ...DEFAULT_CONFIG, ...config }
+
+	const timeline = gsap.timeline()
+
+	// Set initial state
+	gsap.set(element, { opacity: 0, scale: 0.99 })
+
+	// Animate in
+	timeline.to(element, {
+		opacity: 1,
+		scale: 1,
+		duration,
+		ease,
+	})
+
+	return timeline
 }

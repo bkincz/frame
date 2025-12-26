@@ -27,7 +27,11 @@
       "Bash(ls:*)",
       "Bash(del \"src\\\\core\\\\flow.renderer.tsx\")",
       "Bash(del \"f:\\\\Web Development\\\\Cache\\\\frame\\\\src\\\\flows\\\\checkout.flow.tsx\" \"f:\\\\Web Development\\\\Cache\\\\frame\\\\src\\\\flows\\\\signup.flow.tsx\")",
-      "Bash(pnpm dev)"
+      "Bash(pnpm dev)",
+      "Bash(cat:*)",
+      "WebSearch",
+      "Bash(echo:*)",
+      "Bash(pnpm add:*)"
     ]
   }
 }

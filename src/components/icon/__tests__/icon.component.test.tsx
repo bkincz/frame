@@ -149,26 +149,26 @@ describe('Icon Component', () => {
 
 	describe('Colors', () => {
 		it('should apply default color', () => {
-			const { container } = render(<Icon />)
+			const { container } = render(<Icon noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			// Without onClick and with default color, it gets 'primary' as effectiveColor
 			expect(iconContainer.className).toContain('primary')
 		})
 
 		it('should apply primary color', () => {
-			const { container } = render(<Icon color="primary" />)
+			const { container } = render(<Icon color="primary" noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('primary')
 		})
 
 		it('should apply success color', () => {
-			const { container } = render(<Icon color="success" />)
+			const { container } = render(<Icon color="success" noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('success')
 		})
 
 		it('should apply error color', () => {
-			const { container } = render(<Icon color="error" />)
+			const { container } = render(<Icon color="error" noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('error')
 		})
@@ -176,14 +176,16 @@ describe('Icon Component', () => {
 
 	describe('Variants', () => {
 		it('should apply filled variant by default', () => {
-			const { container } = render(<Icon color="primary" />)
+			const { container } = render(<Icon color="primary" noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('primary')
 			expect(iconContainer.className).not.toContain('Outlined')
 		})
 
 		it('should apply outlined variant', () => {
-			const { container } = render(<Icon color="primary" variant="outlined" />)
+			const { container } = render(
+				<Icon color="primary" variant="outlined" noDefaultStyling={false} />
+			)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('primaryOutlined')
 		})
@@ -201,20 +203,22 @@ describe('Icon Component', () => {
 		})
 
 		it('should apply interactive class when clickable with default color', () => {
-			const { container } = render(<Icon onClick={vi.fn()} />)
+			const { container } = render(<Icon onClick={vi.fn()} noDefaultStyling={false} />)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('interactive')
 		})
 
 		it('should apply interactiveColored class when clickable with color', () => {
-			const { container } = render(<Icon onClick={vi.fn()} color="primary" />)
+			const { container } = render(
+				<Icon onClick={vi.fn()} color="primary" noDefaultStyling={false} />
+			)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('interactiveColored')
 		})
 
 		it('should apply interactiveOutlined class when clickable with outlined variant', () => {
 			const { container } = render(
-				<Icon onClick={vi.fn()} color="primary" variant="outlined" />
+				<Icon onClick={vi.fn()} color="primary" variant="outlined" noDefaultStyling={false} />
 			)
 			const iconContainer = container.firstChild as HTMLElement
 			expect(iconContainer.className).toContain('interactiveOutlined')

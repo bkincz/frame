@@ -6,6 +6,7 @@ import { StepTwoA, StepTwoB } from './components/step.two'
 import { StepThree } from './components/step.three'
 import { StepFour } from './components/step.four'
 import { FlowChainingDemo } from './components/flow.chaining.demo'
+import { IconActionDemo } from './components/icon.action.demo'
 
 /*
  *   TYPES
@@ -48,8 +49,6 @@ export const createExampleFlow = (): FlowDefinition => {
 	const config = {
 		footer: {
 			hidePricing: true,
-			hideNext: true,
-			hideBack: true,
 			hideStepIndicator: true,
 		},
 		sidebar: {
@@ -83,23 +82,24 @@ export const createExampleFlow = (): FlowDefinition => {
 		'step-three': {
 			onEnter: handleStepThreeEnter,
 			heading: 'Step Three',
-			subheading: 'This is a subheading for step three.',
+			subheading: 'This is a subheading for step three. It will not animate.',
 			components: [<StepThree key="step-three-component" />],
 			onExit: handleStepThreeExit,
-		},
-		'step-four': {
-			heading: 'Step Four - Flow Chaining Demo',
-			subheading: 'Test flow chaining and navigation features.',
-			components: [
-				<StepFour key="step-four-component" />,
-				<FlowChainingDemo key="flow-chaining-demo" />,
-			],
 			config: {
 				animations: {
 					// We can disable/manage the animations for when we enter, or leave this step specifically.
 					animateSteps: false,
 				},
 			},
+		},
+		'step-four': {
+			heading: 'Step Four - Component Demos',
+			subheading: 'Test various component features and navigation.',
+			components: [
+				<StepFour key="step-four-component" />,
+				<FlowChainingDemo key="flow-chaining-demo" />,
+				<IconActionDemo key="icon-action-demo" />,
+			],
 		},
 	}
 

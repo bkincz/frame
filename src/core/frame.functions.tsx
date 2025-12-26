@@ -87,6 +87,9 @@ export function getOrCreateFlowDefinition(flowName: string): FlowDefinition | nu
 /*
  *   STEP HELPERS
  ***************************************************************************************************/
+export function getCurrentFlowStepKeys(): string[] {
+	return FrameState.selectStepKeys()
+}
 
 /**
  * Get all step keys for a flow (uses cache if available)
@@ -139,4 +142,51 @@ export function getPreviousStepKey(flowName: string, currentStepKey: string): st
 	}
 
 	return stepKeys[currentIndex - 1]
+}
+
+/*
+ *   NAVIGATION EDGE CASE HELPERS
+ ***************************************************************************************************/
+
+/**
+ * Check if we're on the first step of the root flow (no flow history)
+ * This means going back should close the frame instead of navigate
+ */
+export function isFirstStepOfRootFlow(): boolean {
+	const { currentFlow, currentStepKey, flowHistory } = FrameState.getState()
+
+	// Not in a flow at all
+	if (!currentFlow || !currentStepKey) {
+		return false
+	}
+
+	// Has flow history means we're in a chained flow, not the root
+	if (flowHistory.length > 0) {
+		return false
+	}
+
+	// Check if we're on the first step
+	const stepKeys = getFlowStepKeys(currentFlow)
+	const currentIndex = stepKeys.indexOf(currentStepKey)
+
+	return currentIndex === 0
+}
+
+/**
+ * Check if we're on the last step of the leaf flow (no more steps)
+ * This means going next should close the frame instead of navigate
+ */
+export function isLastStepOfLeafFlow(): boolean {
+	const { currentFlow, currentStepKey } = FrameState.getState()
+
+	// Not in a flow at all
+	if (!currentFlow || !currentStepKey) {
+		return false
+	}
+
+	// Check if we're on the last step
+	const stepKeys = getFlowStepKeys(currentFlow)
+	const currentIndex = stepKeys.indexOf(currentStepKey)
+
+	return currentIndex === stepKeys.length - 1
 }
