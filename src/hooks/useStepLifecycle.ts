@@ -1,0 +1,70 @@
+/*
+ *   IMPORTS
+ ***************************************************************************************************/
+import { useEffect } from 'react'
+
+/*
+ *   STATE
+ ***************************************************************************************************/
+import FrameState from '@/state/frame.state'
+import StepState from '@/state/step.state'
+
+/*
+ *   TYPES
+ ***************************************************************************************************/
+import type { FlowDefinition } from '@/flows/flow.types'
+
+/*
+ *   HOOK
+ ***************************************************************************************************/
+/**
+ * Manages step lifecycle (onEnter/onExit) based on step state
+ */
+export function useStepLifecycle(
+	currentStepKey: string | null,
+	flowDefinition: FlowDefinition | null
+) {
+	useEffect(() => {
+		if (!currentStepKey) return
+
+		const step = flowDefinition?.flow[currentStepKey]
+		if (!step) return
+
+		const runStepEnter = async () => {
+			if (step.onEnter) {
+				try {
+					StepState.startEntering()
+					await step.onEnter()
+					FrameState.markStepEntered()
+					StepState.endEntering()
+				} catch (error) {
+					console.error(`[useStepLifecycle] Error in step onEnter:`, error)
+					StepState.endEntering()
+				}
+			}
+		}
+
+		runStepEnter()
+
+		return () => {
+			const runStepExit = async () => {
+				if (step.onExit) {
+					try {
+						StepState.startExiting()
+						await step.onExit()
+						FrameState.markStepExited()
+						StepState.endExiting()
+					} catch (error) {
+						console.error(`[useStepLifecycle] Error in step onExit:`, error)
+						StepState.endExiting()
+					}
+				}
+			}
+
+			runStepExit()
+		}
+		// Only depend on currentStepKey - prevents re-runs if flow definition reference changes
+		// flowDefinition is cached and stable, so accessing it inside effect is safe
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentStepKey])
+}

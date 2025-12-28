@@ -27,6 +27,7 @@ export interface FrameStateData {
 	isOpen: boolean
 	isAnimating: boolean
 	hasFrameInit: boolean
+	flowOpenCount: number
 	variant: FrameVariant
 	currentFlow: string | null
 	currentStepKey: string | null
@@ -158,6 +159,7 @@ const initialState: FrameStateProps = {
 	isOpen: false,
 	isAnimating: false,
 	hasFrameInit: false,
+	flowOpenCount: 0,
 	variant: 'fullscreen',
 	currentFlow: null,
 	currentStepKey: null,
@@ -419,6 +421,13 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.previousFlow = currentFlow
 			draft.currentFlow = flow
 			draft.currentStepKey = targetStepKey
+
+			// Track flow open count
+			if (draft.currentFlow === flow) {
+				draft.flowOpenCount += 1
+			} else {
+				draft.flowOpenCount = 1
+			}
 		}, 'Open Frame')
 
 		// Update variant based on new flow/step
@@ -498,6 +507,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		this.mutate(draft => {
 			draft.isOpen = false
 			draft.hasFrameInit = false
+			draft.flowOpenCount = 0
 			draft.previousFlow = currentFlow
 			draft.previousStepKey = currentStepKey
 			draft.currentFlow = null

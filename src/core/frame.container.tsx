@@ -2,7 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef, useState } from 'react'
-import { useStateSlice } from '@bkincz/clutch'
+import { useStateMachine } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -10,8 +10,9 @@ import { useStateSlice } from '@bkincz/clutch'
 import { Frame } from './frame.component'
 import { useFrameRouter } from '@/hooks/useFrameRouter'
 import { useFrameAnimations } from '@/hooks/useFrameAnimations'
+import { useFlowLifecycle } from '@/hooks/useFlowLifecycle'
+import { useStepLifecycle } from '@/hooks/useStepLifecycle'
 import FrameState from '@/state/frame.state'
-import StepState from '@/state/step.state'
 import { customEventManager } from '@/lib/event'
 
 /*
@@ -30,8 +31,9 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		debug,
 	})
 
-	// Subscribe to frame init state
-	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
+	// Subscribe to frame state
+	const { state: frameState } = useStateMachine(FrameState)
+	const { hasFrameInit, flowOpenCount } = frameState || {}
 
 	// Refs for animation
 	const overlayRef = useRef<HTMLDivElement | null>(null)
@@ -41,31 +43,30 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	// Track the current rendered step and flow for transitions
 	const [renderedStepKey, setRenderedStepKey] = useState<string | null>(currentStepKey)
 	const [renderedFlow, setRenderedFlow] = useState<string | null>(currentFlow)
-	const [flowOpenCount, setFlowOpenCount] = useState(0)
 
-	// Animation hook
+	// Animation hook with memoized callbacks
+	const handleStepChange = (stepKey: string) => setRenderedStepKey(stepKey)
+	const handleFlowChange = (flowName: string | null, stepKey: string | null) => {
+		setRenderedFlow(flowName)
+		if (stepKey) setRenderedStepKey(stepKey)
+	}
+
 	const { animateFrameEntrance, animateFrameExit, animateFlowTransition } = useFrameAnimations(
 		stepWrapperRef,
 		overlayRef,
 		contentRef,
 		{
 			debug,
-			onStepChange: setRenderedStepKey,
-			onFlowChange: (flowName, stepKey) => {
-				setRenderedFlow(flowName)
-				if (stepKey) setRenderedStepKey(stepKey)
-			},
+			onStepChange: handleStepChange,
+			onFlowChange: handleFlowChange,
 		}
 	)
 
-	// Get flow definition from state cache
-	// Use currentFlow for definition lookup (that's what's cached)
-	// But use renderedFlow/renderedStepKey for determining what to display
-	const currentFlowDefinition = currentFlow ? FrameState.getFlowDefinition(currentFlow) : null
-	const renderedFlowDefinition = renderedFlow ? FrameState.getFlowDefinition(renderedFlow) : null
-
-	// Use rendered flow definition for display, fall back to current if not available
-	const flowDefinition = renderedFlowDefinition || currentFlowDefinition
+	// Get flow definition from state cache (optimized lookup)
+	const flowDefinition =
+		(renderedFlow && FrameState.getFlowDefinition(renderedFlow)) ||
+		(currentFlow && FrameState.getFlowDefinition(currentFlow)) ||
+		null
 
 	// Get current step (use renderedStepKey for smooth transitions)
 	const currentStep =
@@ -79,113 +80,9 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	const sidebarConfig = currentStep?.config?.sidebar ?? flowDefinition?.config?.sidebar ?? true
 	const showSidebar = sidebarConfig !== false
 
-	/**
-	 * Handle flow lifecycle: onEnter when flow opens
-	 */
-	useEffect(() => {
-		if (!isOpen || !currentFlow || !flowDefinition) {
-			return
-		}
-
-		// Check if flow already entered via selector
-		const isFlowEntered = FrameState.selectIsFlowEntered(currentFlow)
-
-		if (isFlowEntered) {
-			return
-		}
-
-		const runFlowEnter = async () => {
-			if (flowDefinition.onEnter) {
-				try {
-					await flowDefinition.onEnter()
-					FrameState.markFlowEntered(currentFlow)
-				} catch (error) {
-					console.error(`[FrameContainer] Error in flow onEnter:`, error)
-				}
-			} else {
-				FrameState.markFlowEntered(currentFlow)
-			}
-		}
-
-		runFlowEnter()
-	}, [isOpen, currentFlow, flowDefinition])
-
-	/**
-	 * Handle flow lifecycle: onExit when flow closes
-	 */
-	useEffect(() => {
-		return () => {
-			if (!currentFlow || !flowDefinition?.onExit) return
-
-			// Check if flow was entered via selector
-			const isFlowEntered = FrameState.selectIsFlowEntered(currentFlow)
-
-			// Only call onExit if the flow was entered
-			if (isFlowEntered) {
-				const runFlowExit = async () => {
-					try {
-						if (flowDefinition.onExit) {
-							await flowDefinition.onExit()
-						}
-						FrameState.markFlowExited(currentFlow)
-					} catch (error) {
-						console.error(`[FrameContainer] Error in flow onExit:`, error)
-					}
-				}
-
-				runFlowExit()
-			}
-		}
-	}, [currentFlow, flowDefinition])
-
-	/**
-	 * Handle step lifecycle: onEnter when step changes
-	 */
-	useEffect(() => {
-		if (!currentStepKey) return
-
-		// Get fresh step from state on each run
-		const step = flowDefinition?.flow[currentStepKey]
-		if (!step) return
-
-		const runStepEnter = async () => {
-			if (step.onEnter) {
-				try {
-					StepState.startEntering()
-					await step.onEnter()
-					FrameState.markStepEntered()
-					StepState.endEntering()
-				} catch (error) {
-					console.error(`[FrameContainer] Error in step onEnter:`, error)
-					StepState.endEntering()
-				}
-			}
-		}
-
-		runStepEnter()
-
-		// Handle step lifecycle: onExit when step unmounts
-		return () => {
-			const runStepExit = async () => {
-				if (step.onExit) {
-					try {
-						StepState.startExiting()
-						await step.onExit()
-						FrameState.markStepExited()
-						StepState.endExiting()
-					} catch (error) {
-						console.error(`[FrameContainer] Error in step onExit:`, error)
-						StepState.endExiting()
-					}
-				}
-			}
-
-			runStepExit()
-		}
-		// Only depend on currentStepKey - prevents re-runs if flow definition reference changes
-		// flowDefinition is cached and stable, so accessing it inside effect is safe
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentStepKey])
+	// Handle flow and step lifecycle with custom hooks
+	useFlowLifecycle(isOpen, currentFlow, flowDefinition)
+	useStepLifecycle(currentStepKey, flowDefinition)
 
 	/**
 	 * Handle frame entrance animation
@@ -196,23 +93,6 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		const cleanup = animateFrameEntrance(variant)
 		return cleanup
 	}, [isOpen, variant, animateFrameEntrance])
-
-	/**
-	 * Track flow changes to detect reopens
-	 */
-	const previousFlowRef = useRef<string | null>(null)
-
-	useEffect(() => {
-		// Detect when flow actually changes or reopens (not just step changes)
-		if (currentFlow && currentFlow !== previousFlowRef.current) {
-			setFlowOpenCount(prev => prev + 1)
-			previousFlowRef.current = currentFlow
-		} else if (!currentFlow && previousFlowRef.current) {
-			// Flow closed, reset the previous flow and count
-			previousFlowRef.current = null
-			setFlowOpenCount(0)
-		}
-	}, [currentFlow])
 
 	/**
 	 * Handle flow transitions with fade and scale animation
@@ -264,49 +144,38 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	}, [animateFrameExit, closeFlow])
 
 	/**
-	 * Handle frame:request:close event to trigger animated close
+	 * Handle frame:request:close event and keyboard events
 	 */
 	useEffect(() => {
 		if (!isOpen) return
 
-		const closeSubscription = customEventManager.subscribe('frame:request:close', () => {
-			triggerClose()
-		})
-
-		return () => {
-			closeSubscription.unsubscribe()
-		}
-	}, [isOpen, triggerClose])
-
-	/**
-	 * Handle keyboard events
-	 */
-	useEffect(() => {
-		if (!isOpen) return
+		const closeSubscription = customEventManager.subscribe('frame:request:close', triggerClose)
 
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				triggerClose()
-			}
+			if (event.key === 'Escape') triggerClose()
 		}
 
 		window.addEventListener('keydown', handleKeyDown)
-		return () => window.removeEventListener('keydown', handleKeyDown)
+
+		return () => {
+			closeSubscription.unsubscribe()
+			window.removeEventListener('keydown', handleKeyDown)
+		}
 	}, [isOpen, triggerClose])
 
 	/**
 	 * Handle background overlay click
 	 */
-	const handleOverlayClick = useCallback(() => {
+	const handleOverlayClick = () => {
 		triggerClose()
-	}, [triggerClose])
+	}
 
 	/**
 	 * Prevent clicks inside content from closing
 	 */
-	const handleContentClick = useCallback((event: React.MouseEvent) => {
+	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation()
-	}, [])
+	}
 
 	// Don't render if not open
 	if (!isOpen || !currentFlow) {
