@@ -17,7 +17,7 @@ const useExampleSubFlow = () => {
 		'sub-step-one': {
 			heading: 'Step One',
 			subheading: `This is a subheading for step one.`,
-			components: [() => <StepSub />],
+			components: [StepSub],
 		},
 	}
 

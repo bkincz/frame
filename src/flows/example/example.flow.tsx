@@ -62,7 +62,7 @@ export const createExampleFlow = (): FlowDefinition => {
 		'step-one': {
 			heading: 'Step One',
 			subheading: 'This is a subheading for step one.',
-			components: [<StepOne key="step-one-component" />],
+			components: [StepOne],
 			config: {
 				// We can override any of the config that was defined above but at a step level instead.
 				// Step configs will always override the flow level config.
@@ -74,13 +74,13 @@ export const createExampleFlow = (): FlowDefinition => {
 			onEnter: handleStepTwoEnter,
 			heading: 'Step Two',
 			subheading: 'This is a subheading for step two.',
-			components: [<StepTwoA key="step-two-a" />, <StepTwoB key="step-two-b" />],
+			components: [StepTwoA, StepTwoB],
 		},
 		'step-three': {
 			onEnter: handleStepThreeEnter,
 			heading: 'Step Three',
 			subheading: 'This is a subheading for step three. It will not animate.',
-			components: [<StepThree key="step-three-component" />],
+			components: [StepThree],
 			onExit: handleStepThreeExit,
 			config: {
 				animations: {
@@ -92,11 +92,7 @@ export const createExampleFlow = (): FlowDefinition => {
 		'step-four': {
 			heading: 'Step Four - Component Demos',
 			subheading: 'Test various component features and navigation.',
-			components: [
-				<StepFour key="step-four-component" />,
-				<FlowChainingDemo key="flow-chaining-demo" />,
-				<IconActionDemo key="icon-action-demo" />,
-			],
+			components: [StepFour, FlowChainingDemo, IconActionDemo],
 		},
 	}
 

@@ -70,8 +70,8 @@ export interface Step {
 	/** Step subheading - string only for simplicity and performance */
 	subheading: string
 
-	/** Array of components or JSX elements to render for this step */
-	components: Array<React.ComponentType | React.ReactElement>
+	/** Array of component types to render for this step (use component references, not JSX elements) */
+	components: Array<React.ComponentType>
 
 	/** Step-level config overrides */
 	config?: StepConfig
