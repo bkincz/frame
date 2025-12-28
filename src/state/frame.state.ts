@@ -26,6 +26,8 @@ export interface FlowHistoryEntry {
 export interface FrameStateData {
 	isOpen: boolean
 	isAnimating: boolean
+	hasFrameInit: boolean
+	variant: FrameVariant
 	currentFlow: string | null
 	currentStepKey: string | null
 	previousFlow: string | null
@@ -155,6 +157,8 @@ export interface FrameHistoryBackEventData {
 const initialState: FrameStateProps = {
 	isOpen: false,
 	isAnimating: false,
+	hasFrameInit: false,
+	variant: 'fullscreen',
 	currentFlow: null,
 	currentStepKey: null,
 	previousFlow: null,
@@ -256,6 +260,25 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 		// Priority: step config > flow config > default 'fullscreen'
 		return currentStep?.config?.variant || flowDef.config?.variant || 'fullscreen'
+	}
+
+	/**
+	 * Selector: Check if frame has been initialized
+	 */
+	public selectHasFrameInit(): boolean {
+		return this.state.hasFrameInit
+	}
+
+	/**
+	 * Update variant in state based on current flow/step
+	 */
+	private updateVariant(): void {
+		const newVariant = this.selectVariant()
+		if (this.state.variant !== newVariant) {
+			this.mutate(draft => {
+				draft.variant = newVariant
+			}, 'Update Variant')
+		}
 	}
 
 	/**
@@ -398,6 +421,9 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentStepKey = targetStepKey
 		}, 'Open Frame')
 
+		// Update variant based on new flow/step
+		this.updateVariant()
+
 		// Emit events
 		customEventManager.emit<FrameOpenEventData>(FRAME_EVENTS.OPEN, {
 			flow,
@@ -442,6 +468,9 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentStepKey = previousEntry.stepKey
 		}, 'Go Back In History')
 
+		// Update variant based on new flow/step
+		this.updateVariant()
+
 		// Emit flow change event
 		customEventManager.emit<FrameFlowChangeEventData>(FRAME_EVENTS.FLOW_CHANGE, {
 			flow: previousEntry.flow,
@@ -468,12 +497,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 		this.mutate(draft => {
 			draft.isOpen = false
+			draft.hasFrameInit = false
 			draft.previousFlow = currentFlow
 			draft.previousStepKey = currentStepKey
 			draft.currentFlow = null
 			draft.currentStepKey = null
 			draft.flowHistory = []
 			draft.flowLifecycle.currentStepEntered = false
+			draft.variant = 'fullscreen' // Reset to default
 		}, 'Close Frame')
 
 		customEventManager.emit(FRAME_EVENTS.CLOSE, {})
@@ -496,6 +527,9 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentStepKey = stepKey
 			draft.flowLifecycle.currentStepEntered = false
 		}, 'Set Step Key')
+
+		// Update variant based on new step
+		this.updateVariant()
 
 		customEventManager.emit<FrameStepChangeEventData>(FRAME_EVENTS.STEP_CHANGE, {
 			stepKey,
@@ -556,6 +590,15 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		this.mutate(draft => {
 			draft.isAnimating = isAnimating
 		}, 'Set Animating')
+	}
+
+	/**
+	 * Mark frame as initialized (after initial animation completes)
+	 */
+	public markFrameInit(): void {
+		this.mutate(draft => {
+			draft.hasFrameInit = true
+		}, 'Mark Frame Init')
 	}
 
 	/**

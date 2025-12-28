@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { useState, useEffect } from 'react'
+import { useStateSlice } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -30,33 +30,9 @@ export interface NavigationState {
 export function useNavigationState(config: NavigationStateConfig): NavigationState {
 	const { direction } = config
 
-	const [isAnimating, setIsAnimating] = useState(AnimationState.selectIsAnimating())
-	const [isInLifecycle, setIsInLifecycle] = useState(StepState.selectIsInLifecycle())
-	const [frameState, setFrameState] = useState(FrameState.getState())
-
-	// Subscribe to animation state changes
-	useEffect(() => {
-		const unsubscribe = AnimationState.subscribe(() => {
-			setIsAnimating(AnimationState.selectIsAnimating())
-		})
-		return unsubscribe
-	}, [])
-
-	// Subscribe to step lifecycle state changes
-	useEffect(() => {
-		const unsubscribe = StepState.subscribe(() => {
-			setIsInLifecycle(StepState.selectIsInLifecycle())
-		})
-		return unsubscribe
-	}, [])
-
-	// Subscribe to frame state changes (for config)
-	useEffect(() => {
-		const unsubscribe = FrameState.subscribe(() => {
-			setFrameState(FrameState.getState())
-		})
-		return unsubscribe
-	}, [])
+	const isAnimating = useStateSlice(AnimationState, () => AnimationState.selectIsAnimating())
+	const isInLifecycle = useStateSlice(StepState, () => StepState.selectIsInLifecycle())
+	const frameState = useStateSlice(FrameState, state => state)
 
 	// Get current flow and step configuration
 	const { currentFlow, currentStepKey } = frameState

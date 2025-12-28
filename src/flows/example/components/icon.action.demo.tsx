@@ -317,19 +317,19 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							onClick={() => console.log('Primary icon')}
 						>
 							<Icon icon="IconHeart" />
 						</Button>
 						<Button
 							color="success"
-							variant="icon"
+							variant="iconSolid"
 							onClick={() => console.log('Success icon')}
 						>
 							<Icon icon="IconCheck" />
 						</Button>
-						<Button color="error" variant="icon" onClick={() => console.log('Error icon')}>
+						<Button color="error" variant="iconSolid" onClick={() => console.log('Error icon')}>
 							<Icon icon="IconX" />
 						</Button>
 					</div>
@@ -338,13 +338,13 @@ export const IconActionDemo = () => {
 				<div style={{ marginBottom: '16px' }}>
 					<h4>Sizes (Traditional Syntax)</h4>
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-						<Button color="primary" variant="icon" size="small">
+						<Button color="primary" variant="iconSolid" size="small">
 							<Icon icon="IconSettings" size={18} />
 						</Button>
-						<Button color="primary" variant="icon" size="medium">
+						<Button color="primary" variant="iconSolid" size="medium">
 							<Icon icon="IconSettings" size={24} />
 						</Button>
-						<Button color="primary" variant="icon" size="large">
+						<Button color="primary" variant="iconSolid" size="large">
 							<Icon icon="IconSettings" size={28} />
 						</Button>
 					</div>
@@ -353,28 +353,28 @@ export const IconActionDemo = () => {
 				<div style={{ marginBottom: '16px' }}>
 					<h4>Various Icons (Traditional Syntax)</h4>
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconPlus" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconMinus" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconEdit" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconTrash" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconDownload" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconUpload" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconSearch" />
 						</Button>
-						<Button color="primary" variant="icon">
+						<Button color="primary" variant="iconSolid">
 							<Icon icon="IconSettings" />
 						</Button>
 					</div>
@@ -383,13 +383,13 @@ export const IconActionDemo = () => {
 				<div style={{ marginBottom: '16px' }}>
 					<h4>Disabled State (Traditional Syntax)</h4>
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-						<Button color="primary" variant="icon" disabled>
+						<Button color="primary" variant="iconSolid" disabled>
 							<Icon icon="IconSettings" />
 						</Button>
-						<Button color="success" variant="icon" disabled>
+						<Button color="success" variant="iconSolid" disabled>
 							<Icon icon="IconCheck" />
 						</Button>
-						<Button color="error" variant="icon" disabled>
+						<Button color="error" variant="iconSolid" disabled>
 							<Icon icon="IconX" />
 						</Button>
 					</div>
@@ -400,7 +400,7 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconHeart',
@@ -411,7 +411,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="success"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconCheck',
@@ -422,7 +422,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="error"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconX',
@@ -439,7 +439,7 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							size="small"
 							adornment={{
 								position: 'start',
@@ -450,7 +450,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							size="medium"
 							adornment={{
 								position: 'start',
@@ -461,7 +461,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							size="large"
 							adornment={{
 								position: 'start',
@@ -478,7 +478,7 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconArrowLeft',
@@ -489,7 +489,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconArrowRight',
@@ -500,7 +500,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconArrowUp',
@@ -511,7 +511,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconArrowDown',
@@ -522,7 +522,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconHome',
@@ -539,7 +539,7 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							disabled
 							adornment={{
 								position: 'start',
@@ -550,7 +550,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="success"
-							variant="icon"
+							variant="iconSolid"
 							disabled
 							adornment={{
 								position: 'start',
@@ -561,7 +561,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="error"
-							variant="icon"
+							variant="iconSolid"
 							disabled
 							adornment={{
 								position: 'start',
@@ -599,7 +599,7 @@ export const IconActionDemo = () => {
 									flexWrap: 'wrap',
 								}}
 							>
-								<Button color="primary" variant="icon">
+								<Button color="primary" variant="iconSolid">
 									<Icon icon="IconPlus" />
 								</Button>
 								<Button color="primary" startAdornment={<Icon icon="IconPlus" />}>
@@ -622,7 +622,7 @@ export const IconActionDemo = () => {
 							>
 								<Button
 									color="primary"
-									variant="icon"
+									variant="iconSolid"
 									adornment={{
 										position: 'start',
 										name: 'IconPlus',
@@ -680,7 +680,7 @@ export const IconActionDemo = () => {
 					<div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconEdit',
@@ -690,7 +690,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconCopy',
@@ -700,7 +700,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="error"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconTrash',
@@ -711,7 +711,7 @@ export const IconActionDemo = () => {
 						<div style={{ width: '1px', height: '24px', background: '#ccc' }} />
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconDownload',
@@ -721,7 +721,7 @@ export const IconActionDemo = () => {
 						/>
 						<Button
 							color="primary"
-							variant="icon"
+							variant="iconSolid"
 							adornment={{
 								position: 'start',
 								name: 'IconShare',

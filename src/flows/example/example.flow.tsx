@@ -51,10 +51,7 @@ export const createExampleFlow = (): FlowDefinition => {
 			hidePricing: true,
 			hideStepIndicator: true,
 		},
-		sidebar: {
-			hidePromo: true,
-			hideTotal: true,
-		},
+		sidebar: false,
 		animations: {
 			animateSidebar: false,
 		},

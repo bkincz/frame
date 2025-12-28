@@ -17,6 +17,7 @@ import {
 	animateFlowOut,
 } from '@/core/frame.animations'
 import AnimationState from '@/state/animation.state'
+import FrameState from '@/state/frame.state'
 import { customEventManager } from '@/lib/event'
 import type { FrameNextStepEventData, FramePreviousStepEventData } from '@/state/frame.state'
 
@@ -165,6 +166,7 @@ export function useFrameAnimations(
 
 			timeline.eventCallback('onComplete', () => {
 				AnimationState.endAnimation()
+				FrameState.markFrameInit()
 			})
 
 			return () => {

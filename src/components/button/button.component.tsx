@@ -117,8 +117,9 @@ export const Button: FC<ButtonProps> = ({
 		className
 	)
 
-	// For icon variant with adornment prop, render the icon directly
-	const iconContent = variant === 'icon' && adornment ? iconAdornment : children
+	// For icon variants with adornment prop, render the icon directly
+	const isIconVariant = variant === 'iconSolid' || variant === 'iconOutlined'
+	const iconContent = isIconVariant && adornment ? iconAdornment : children
 
 	return (
 		<button
@@ -131,10 +132,10 @@ export const Button: FC<ButtonProps> = ({
 			aria-label={label}
 		>
 			{renderAdornments(effectiveStartAdornment)}
-			{(label || iconContent) && variant !== 'icon' ? (
+			{(label || iconContent) && !isIconVariant ? (
 				<span className={styles.buttonLabel}>{label || iconContent}</span>
 			) : (
-				variant === 'icon' && iconContent
+				isIconVariant && iconContent
 			)}
 			{renderAdornments(effectiveEndAdornment)}
 		</button>
@@ -157,34 +158,47 @@ Button.displayName = 'Button'
  *      Button Label
  *    </Button>
  *
- *    // Icon button with children (traditional)
+ *    // Solid icon button (circular, filled)
  *    <Button
  *      color="primary"
- *      variant="icon"
- *    >
- *      <Icon icon="IconPlus" />
- *    </Button>
- *
- *    // Icon button with adornment prop (new pattern)
- *    <Button
- *      color="primary"
- *      variant="icon"
+ *      variant="iconSolid"
  *      adornment={{
  *        position: 'start',
- *        name: 'IconArrowLeft',
- *        size: 24,
+ *        name: 'IconPlus',
+ *        size: 20,
  *        stroke: 2,
  *      }}
  *    />
  *
- *    // Outlined icon button
+ *    // Outlined icon button (circular, with border)
+ *    <Button
+ *      color="success"
+ *      variant="iconOutlined"
+ *      adornment={{
+ *        position: 'start',
+ *        name: 'IconCheck',
+ *        size: 20,
+ *        stroke: 2,
+ *      }}
+ *    />
+ *
+ *    // Icon button with children (works with both variants)
  *    <Button
  *      color="error"
- *      variant="outlined"
+ *      variant="iconSolid"
+ *    >
+ *      <Icon icon="IconTrash" />
+ *    </Button>
+ *
+ *    // Button with label and icon adornment
+ *    <Button
+ *      color="primary"
+ *      variant="solid"
+ *      label="Delete"
  *      adornment={{
  *        position: 'start',
  *        name: 'IconTrash',
- *        size: 20,
+ *        size: 18,
  *        stroke: 2,
  *      }}
  *    />

@@ -112,28 +112,233 @@ $statusOrangeHover: #c47530;
 $statusOrangeActive: #b46927;
 
 /*
- *   BUTTON
+ *   BUTTON - PRIMARY
  ***************************************************************************************************/
-$button-primary: $magenta;
-$button-primary-hover: $magenta-l1;
-$button-primary-focus: $magenta-d1;
-$button-primary-label: $white;
-$button-primary-label-hover: $white;
-$button-primary-label-focus: $white;
+// Primary Solid
+$button-primary-solid-bg: $magenta;
+$button-primary-solid-bg-hover: $magenta-l1;
+$button-primary-solid-bg-focus: $magenta-d1;
+$button-primary-solid-border: $magenta;
+$button-primary-solid-border-hover: $magenta-l1;
+$button-primary-solid-border-focus: $magenta-d1;
+$button-primary-solid-label: $white;
+$button-primary-solid-label-hover: $white;
+$button-primary-solid-label-focus: $white;
 
-$button-success: $statusGreen;
-$button-success-hover: $statusGreenHover;
-$button-success-focus: $statusGreenActive;
-$button-success-label: $white;
-$button-success-label-hover: $white;
-$button-success-label-focus: $white;
+// Primary Outlined
+$button-primary-outlined-bg: transparent;
+$button-primary-outlined-bg-hover: $magenta-l1;
+$button-primary-outlined-bg-focus: $magenta-d1;
+$button-primary-outlined-border: $magenta;
+$button-primary-outlined-border-hover: $magenta-l1;
+$button-primary-outlined-border-focus: $magenta-d1;
+$button-primary-outlined-label: $magenta;
+$button-primary-outlined-label-hover: $white;
+$button-primary-outlined-label-focus: $white;
 
-$button-error: $statusRed;
-$button-error-hover: $statusRedHover;
-$button-error-focus: $statusRedActive;
-$button-error-label: $white;
-$button-error-label-hover: $white;
-$button-error-label-focus: $white;
+// Primary Text
+$button-primary-text-bg: transparent;
+$button-primary-text-bg-hover: rgba($magenta-l1, 0.2);
+$button-primary-text-bg-focus: rgba($magenta-d1, 0.3);
+$button-primary-text-border: transparent;
+$button-primary-text-border-hover: transparent;
+$button-primary-text-border-focus: transparent;
+$button-primary-text-label: $magenta;
+$button-primary-text-label-hover: $magenta-l1;
+$button-primary-text-label-focus: $magenta-d1;
 
-$button-disabled: #e3dede;
-$button-disabled-text: #aaa7a7;
+// Primary Icon Solid
+$button-primary-icon-solid-bg: $magenta;
+$button-primary-icon-solid-bg-hover: $magenta-l1;
+$button-primary-icon-solid-bg-focus: $magenta-d1;
+$button-primary-icon-solid-border: $magenta;
+$button-primary-icon-solid-border-hover: $magenta-l1;
+$button-primary-icon-solid-border-focus: $magenta-d1;
+$button-primary-icon-solid-label: $white;
+$button-primary-icon-solid-label-hover: $white;
+$button-primary-icon-solid-label-focus: $white;
+
+// Primary Icon Outlined
+$button-primary-icon-outlined-bg: transparent;
+$button-primary-icon-outlined-bg-hover: $magenta-l1;
+$button-primary-icon-outlined-bg-focus: $magenta-d1;
+$button-primary-icon-outlined-border: $magenta;
+$button-primary-icon-outlined-border-hover: $magenta-l1;
+$button-primary-icon-outlined-border-focus: $magenta-d1;
+$button-primary-icon-outlined-label: $magenta;
+$button-primary-icon-outlined-label-hover: $white;
+$button-primary-icon-outlined-label-focus: $white;
+
+/*
+ *   BUTTON - SUCCESS
+ ***************************************************************************************************/
+// Success Solid
+$button-success-solid-bg: $statusGreen;
+$button-success-solid-bg-hover: $statusGreenHover;
+$button-success-solid-bg-focus: $statusGreenActive;
+$button-success-solid-border: $statusGreen;
+$button-success-solid-border-hover: $statusGreenHover;
+$button-success-solid-border-focus: $statusGreenActive;
+$button-success-solid-label: $white;
+$button-success-solid-label-hover: $white;
+$button-success-solid-label-focus: $white;
+
+// Success Outlined
+$button-success-outlined-bg: transparent;
+$button-success-outlined-bg-hover: $statusGreenHover;
+$button-success-outlined-bg-focus: $statusGreenActive;
+$button-success-outlined-border: $statusGreen;
+$button-success-outlined-border-hover: $statusGreenHover;
+$button-success-outlined-border-focus: $statusGreenActive;
+$button-success-outlined-label: $statusGreen;
+$button-success-outlined-label-hover: $white;
+$button-success-outlined-label-focus: $white;
+
+// Success Text
+$button-success-text-bg: transparent;
+$button-success-text-bg-hover: rgba($statusGreenHover, 0.1);
+$button-success-text-bg-focus: rgba($statusGreenActive, 0.1);
+$button-success-text-border: transparent;
+$button-success-text-border-hover: transparent;
+$button-success-text-border-focus: transparent;
+$button-success-text-label: $statusGreen;
+$button-success-text-label-hover: $statusGreenHover;
+$button-success-text-label-focus: $statusGreenActive;
+
+// Success Icon Solid
+$button-success-icon-solid-bg: $statusGreen;
+$button-success-icon-solid-bg-hover: $statusGreenHover;
+$button-success-icon-solid-bg-focus: $statusGreenActive;
+$button-success-icon-solid-border: $statusGreen;
+$button-success-icon-solid-border-hover: $statusGreenHover;
+$button-success-icon-solid-border-focus: $statusGreenActive;
+$button-success-icon-solid-label: $white;
+$button-success-icon-solid-label-hover: $white;
+$button-success-icon-solid-label-focus: $white;
+
+// Success Icon Outlined
+$button-success-icon-outlined-bg: transparent;
+$button-success-icon-outlined-bg-hover: $statusGreenHover;
+$button-success-icon-outlined-bg-focus: $statusGreenActive;
+$button-success-icon-outlined-border: $statusGreen;
+$button-success-icon-outlined-border-hover: $statusGreenHover;
+$button-success-icon-outlined-border-focus: $statusGreenActive;
+$button-success-icon-outlined-label: $statusGreen;
+$button-success-icon-outlined-label-hover: $white;
+$button-success-icon-outlined-label-focus: $white;
+
+/*
+ *   BUTTON - ERROR
+ ***************************************************************************************************/
+// Error Solid
+$button-error-solid-bg: $statusRed;
+$button-error-solid-bg-hover: $statusRedHover;
+$button-error-solid-bg-focus: $statusRedActive;
+$button-error-solid-border: $statusRed;
+$button-error-solid-border-hover: $statusRedHover;
+$button-error-solid-border-focus: $statusRedActive;
+$button-error-solid-label: $white;
+$button-error-solid-label-hover: $white;
+$button-error-solid-label-focus: $white;
+
+// Error Outlined
+$button-error-outlined-bg: transparent;
+$button-error-outlined-bg-hover: $statusRedHover;
+$button-error-outlined-bg-focus: $statusRedActive;
+$button-error-outlined-border: $statusRed;
+$button-error-outlined-border-hover: $statusRedHover;
+$button-error-outlined-border-focus: $statusRedActive;
+$button-error-outlined-label: $statusRed;
+$button-error-outlined-label-hover: $white;
+$button-error-outlined-label-focus: $white;
+
+// Error Text
+$button-error-text-bg: transparent;
+$button-error-text-bg-hover: rgba($statusRedHover, 0.1);
+$button-error-text-bg-focus: rgba($statusRedActive, 0.1);
+$button-error-text-border: transparent;
+$button-error-text-border-hover: transparent;
+$button-error-text-border-focus: transparent;
+$button-error-text-label: $statusRed;
+$button-error-text-label-hover: $statusRedHover;
+$button-error-text-label-focus: $statusRedActive;
+
+// Error Icon Solid
+$button-error-icon-solid-bg: $statusRed;
+$button-error-icon-solid-bg-hover: $statusRedHover;
+$button-error-icon-solid-bg-focus: $statusRedActive;
+$button-error-icon-solid-border: $statusRed;
+$button-error-icon-solid-border-hover: $statusRedHover;
+$button-error-icon-solid-border-focus: $statusRedActive;
+$button-error-icon-solid-label: $white;
+$button-error-icon-solid-label-hover: $white;
+$button-error-icon-solid-label-focus: $white;
+
+// Error Icon Outlined
+$button-error-icon-outlined-bg: transparent;
+$button-error-icon-outlined-bg-hover: $statusRedHover;
+$button-error-icon-outlined-bg-focus: $statusRedActive;
+$button-error-icon-outlined-border: $statusRed;
+$button-error-icon-outlined-border-hover: $statusRedHover;
+$button-error-icon-outlined-border-focus: $statusRedActive;
+$button-error-icon-outlined-label: $statusRed;
+$button-error-icon-outlined-label-hover: $white;
+$button-error-icon-outlined-label-focus: $white;
+
+/*
+ *   BUTTON - DISABLED
+ ***************************************************************************************************/
+// Disabled Solid
+$button-disabled-solid-bg: rgba(#e3dede, 0.35);
+$button-disabled-solid-bg-hover: rgba(#e3dede, 0.35);
+$button-disabled-solid-bg-focus: rgba(#e3dede, 0.35);
+$button-disabled-solid-border: #e3dede;
+$button-disabled-solid-border-hover: #e3dede;
+$button-disabled-solid-border-focus: #e3dede;
+$button-disabled-solid-label: #aaa7a7;
+$button-disabled-solid-label-hover: #aaa7a7;
+$button-disabled-solid-label-focus: #aaa7a7;
+
+// Disabled Outlined
+$button-disabled-outlined-bg: rgba(#e3dede, 0.2);
+$button-disabled-outlined-bg-hover: rgba(#e3dede, 0.2);
+$button-disabled-outlined-bg-focus: rgba(#e3dede, 0.2);
+$button-disabled-outlined-border: #e3dede;
+$button-disabled-outlined-border-hover: #e3dede;
+$button-disabled-outlined-border-focus: #e3dede;
+$button-disabled-outlined-label: #aaa7a7;
+$button-disabled-outlined-label-hover: #aaa7a7;
+$button-disabled-outlined-label-focus: #aaa7a7;
+
+// Disabled Text
+$button-disabled-text-bg: rgba(#e3dede, 0.1);
+$button-disabled-text-bg-hover: rgba(#e3dede, 0.1);
+$button-disabled-text-bg-focus: rgba(#e3dede, 0.1);
+$button-disabled-text-border: transparent;
+$button-disabled-text-border-hover: transparent;
+$button-disabled-text-border-focus: transparent;
+$button-disabled-text-label: #e3dede;
+$button-disabled-text-label-hover: #e3dede;
+$button-disabled-text-label-focus: #e3dede;
+
+// Disabled Icon Solid
+$button-disabled-icon-solid-bg: #e3dede;
+$button-disabled-icon-solid-bg-hover: #e3dede;
+$button-disabled-icon-solid-bg-focus: #e3dede;
+$button-disabled-icon-solid-border: #e3dede;
+$button-disabled-icon-solid-border-hover: #e3dede;
+$button-disabled-icon-solid-border-focus: #e3dede;
+$button-disabled-icon-solid-label: $white;
+$button-disabled-icon-solid-label-hover: $white;
+$button-disabled-icon-solid-label-focus: $white;
+
+// Disabled Icon Outlined
+$button-disabled-icon-outlined-bg: rgba(#e3dede, 0.2);
+$button-disabled-icon-outlined-bg-hover: rgba(#e3dede, 0.2);
+$button-disabled-icon-outlined-bg-focus: rgba(#e3dede, 0.2);
+$button-disabled-icon-outlined-border: #e3dede;
+$button-disabled-icon-outlined-border-hover: #e3dede;
+$button-disabled-icon-outlined-border-focus: #e3dede;
+$button-disabled-icon-outlined-label: #aaa7a7;
+$button-disabled-icon-outlined-label-hover: #aaa7a7;
+$button-disabled-icon-outlined-label-focus: #aaa7a7;

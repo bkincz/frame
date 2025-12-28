@@ -1,9 +1,10 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { isValidElement, forwardRef, useState, useEffect, type ReactNode } from 'react'
+import { isValidElement, forwardRef, type ReactNode } from 'react'
 import clsx from 'clsx'
 import { customEventManager } from '@/lib/event'
+import { useStateSlice } from '@bkincz/clutch'
 
 import type { FrameVariant } from '@/flows/flow.types'
 
@@ -134,6 +135,32 @@ Frame.Subheading = ({ className, children, ...rest }: BaseInterface) => {
 	)
 }
 
+Frame.Grid = ({ className, children, ...rest }: BaseInterface) => {
+	return (
+		<div className={clsx(styles.grid, className)} {...rest}>
+			{children}
+		</div>
+	)
+}
+
+Frame.Main = forwardRef<HTMLDivElement, BaseInterface>(({ className, children, ...rest }, ref) => {
+	return (
+		<div ref={ref} className={clsx(styles.main, className)} {...rest}>
+			{children}
+		</div>
+	)
+})
+
+Frame.Main.displayName = 'Frame.Main'
+
+Frame.Sidebar = ({ className, children, ...rest }: BaseInterface) => {
+	return (
+		<aside className={clsx(styles.sidebar, className)} {...rest}>
+			{children}
+		</aside>
+	)
+}
+
 Frame.Step = ({ step }: { step: Step }) => {
 	return (
 		<>
@@ -179,9 +206,10 @@ Frame.NotFound = ({
 
 Frame.Back = ({ className, loading }: FrameNavigationProps) => {
 	const { isDisabled, isHidden } = useNavigationState({ direction: 'previous' })
+	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
 
 	function handleBack() {
-		if (isDisabled) return
+		if (isDisabled || !hasFrameInit) return
 
 		if (isFirstStepOfRootFlow()) {
 			customEventManager.emit('frame:request:close', { source: 'user' })
@@ -196,9 +224,9 @@ Frame.Back = ({ className, loading }: FrameNavigationProps) => {
 		<Button
 			className={clsx(styles.navigationBack, className)}
 			onClick={handleBack}
-			disabled={isDisabled}
+			disabled={isDisabled || !hasFrameInit}
 			loading={loading}
-			variant={'icon'}
+			variant={'iconSolid'}
 		>
 			<Icon icon="IconArrowLeft" size={24} />
 		</Button>
@@ -219,9 +247,10 @@ Frame.Next = ({
 	...rest
 }: FrameNavigationProps) => {
 	const { isDisabled, isHidden } = useNavigationState({ direction: 'next' })
+	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
 
 	function handleNext() {
-		if (isDisabled) return
+		if (isDisabled || !hasFrameInit) return
 		if (isLastStepOfLeafFlow()) {
 			customEventManager.emit('frame:request:close', { source: 'user' })
 		} else {
@@ -235,15 +264,15 @@ Frame.Next = ({
 	const defaultEndAdornment = endAdornment ?? <Icon icon="IconArrowRight" size={24} />
 
 	// Icon-only variant for no label
-	if (!resolvedLabel && variant === 'icon') {
+	if (!resolvedLabel && (variant === 'iconSolid' || variant === 'iconOutlined')) {
 		return (
 			<Button
 				className={clsx(styles.navigationNext, className)}
 				style={style}
 				onClick={handleNext}
-				disabled={isDisabled}
+				disabled={isDisabled || !hasFrameInit}
 				loading={loading}
-				variant="icon"
+				variant={variant}
 				color={color}
 				{...rest}
 			>
@@ -258,7 +287,7 @@ Frame.Next = ({
 			className={clsx(styles.navigationNext, className)}
 			style={style}
 			onClick={handleNext}
-			disabled={isDisabled}
+			disabled={isDisabled || !hasFrameInit}
 			loading={loading}
 			variant={variant}
 			color={color}
@@ -273,34 +302,22 @@ Frame.Next = ({
 }
 
 Frame.Navigation = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
-	const [variant, setVariant] = useState<FrameVariant>(FrameState.selectVariant())
-
-	useEffect(() => {
-		const unsubscribe = FrameState.subscribe(() => {
-			setVariant(FrameState.selectVariant())
-		})
-		return unsubscribe
-	}, [])
+	const variant = useStateSlice(FrameState, state => state.variant)
 
 	const navClassName = variant === 'modal' ? styles.navigationModal : styles.navigation
 
 	return (
 		<div className={clsx(navClassName, className)} {...rest}>
-			<Frame.Back />
-			<Frame.Next />
+			<div>
+				<Frame.Back />
+				<Frame.Next />
+			</div>
 		</div>
 	)
 }
 
 Frame.Close = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
-	const [variant, setVariant] = useState<FrameVariant>(FrameState.selectVariant())
-
-	useEffect(() => {
-		const unsubscribe = FrameState.subscribe(() => {
-			setVariant(FrameState.selectVariant())
-		})
-		return unsubscribe
-	}, [])
+	const variant = useStateSlice(FrameState, state => state.variant)
 
 	function closeFrame() {
 		customEventManager.emit('frame:request:close', { source: 'user' })

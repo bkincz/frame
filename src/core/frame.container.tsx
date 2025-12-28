@@ -2,6 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef, useState } from 'react'
+import { useStateSlice } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -11,6 +12,7 @@ import { useFrameRouter } from '@/hooks/useFrameRouter'
 import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import FrameState from '@/state/frame.state'
 import StepState from '@/state/step.state'
+import { customEventManager } from '@/lib/event'
 
 /*
  *   TYPES
@@ -27,6 +29,9 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
 	})
+
+	// Subscribe to frame init state
+	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
 
 	// Refs for animation
 	const overlayRef = useRef<HTMLDivElement | null>(null)
@@ -69,6 +74,10 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	// Determine variant (step config > flow config > default 'fullscreen')
 	const variant = currentStep?.config?.variant || flowDefinition?.config?.variant || 'fullscreen'
 	const showOverlay = variant === 'modal'
+
+	// Determine if sidebar should be shown (step config > flow config > default true)
+	const sidebarConfig = currentStep?.config?.sidebar ?? flowDefinition?.config?.sidebar ?? true
+	const showSidebar = sidebarConfig !== false
 
 	/**
 	 * Handle flow lifecycle: onEnter when flow opens
@@ -199,8 +208,9 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 			setFlowOpenCount(prev => prev + 1)
 			previousFlowRef.current = currentFlow
 		} else if (!currentFlow && previousFlowRef.current) {
-			// Flow closed, reset the previous flow
+			// Flow closed, reset the previous flow and count
 			previousFlowRef.current = null
+			setFlowOpenCount(0)
 		}
 	}, [currentFlow])
 
@@ -208,7 +218,27 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	 * Handle flow transitions with fade and scale animation
 	 */
 	useEffect(() => {
-		// Detect flow change or same-flow reopen (but not initial mount or close)
+		// Only sync without animation if one of them is null (initial open or close)
+		const isInitialOpen = !renderedFlow && currentFlow
+		const isClosing = renderedFlow && !currentFlow
+
+		if (isInitialOpen || isClosing) {
+			if (debug) {
+				console.log('[FrameContainer] Flow state sync (no animation):', {
+					from: renderedFlow,
+					to: currentFlow,
+					reason: isInitialOpen ? 'initial open' : 'closing',
+				})
+			}
+			setRenderedFlow(currentFlow)
+			setRenderedStepKey(currentStepKey)
+			return
+		}
+
+		// Don't run transition animations until frame has been initialized
+		if (!hasFrameInit) return
+
+		// Detect flow change or same-flow reopen (after initialization)
 		const isFlowChange = currentFlow && renderedFlow && currentFlow !== renderedFlow
 		const isSameFlowReopen = currentFlow && renderedFlow === currentFlow && flowOpenCount > 1
 
@@ -223,24 +253,8 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 
 			// Use hook to animate flow transition
 			animateFlowTransition(currentFlow, currentStepKey)
-		} else if (currentFlow !== renderedFlow) {
-			// Only sync without animation if one of them is null (initial open or close)
-			const isInitialOpen = !renderedFlow && currentFlow
-			const isClosing = renderedFlow && !currentFlow
-
-			if (isInitialOpen || isClosing) {
-				if (debug) {
-					console.log('[FrameContainer] Flow state sync (no animation):', {
-						from: renderedFlow,
-						to: currentFlow,
-						reason: isInitialOpen ? 'initial open' : 'closing',
-					})
-				}
-				setRenderedFlow(currentFlow)
-				setRenderedStepKey(currentStepKey)
-			}
 		}
-	}, [currentFlow, renderedFlow, currentStepKey, flowOpenCount, debug, animateFlowTransition])
+	}, [currentFlow, renderedFlow, currentStepKey, flowOpenCount, hasFrameInit, debug, animateFlowTransition])
 
 	/**
 	 * Trigger close with animation
@@ -248,6 +262,21 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	const triggerClose = useCallback(() => {
 		animateFrameExit(closeFlow)
 	}, [animateFrameExit, closeFlow])
+
+	/**
+	 * Handle frame:request:close event to trigger animated close
+	 */
+	useEffect(() => {
+		if (!isOpen) return
+
+		const closeSubscription = customEventManager.subscribe('frame:request:close', () => {
+			triggerClose()
+		})
+
+		return () => {
+			closeSubscription.unsubscribe()
+		}
+	}, [isOpen, triggerClose])
 
 	/**
 	 * Handle keyboard events
@@ -306,22 +335,25 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 				variant={variant}
 			>
 				<Frame.Close />
-				<div ref={stepWrapperRef}>
-					{currentStep ? (
-						<>
-							{currentStep.heading && (
-								<Frame.Heading>{currentStep.heading}</Frame.Heading>
-							)}
-							{currentStep.subheading && (
-								<Frame.Subheading>{currentStep.subheading}</Frame.Subheading>
-							)}
-							<Frame.Step step={currentStep} />
-						</>
-					) : (
-						<Frame.NotFound stepKey={renderedStepKey || ''} />
-					)}
-				</div>
-				<Frame.Navigation />
+				<Frame.Grid className={!showSidebar ? 'noSidebar' : undefined}>
+					<Frame.Main ref={stepWrapperRef}>
+						{currentStep ? (
+							<>
+								{currentStep.heading && (
+									<Frame.Heading>{currentStep.heading}</Frame.Heading>
+								)}
+								{currentStep.subheading && (
+									<Frame.Subheading>{currentStep.subheading}</Frame.Subheading>
+								)}
+								<Frame.Step step={currentStep} />
+							</>
+						) : (
+							<Frame.NotFound stepKey={renderedStepKey || ''} />
+						)}
+					</Frame.Main>
+					{showSidebar && <Frame.Sidebar />}
+					<Frame.Navigation />
+				</Frame.Grid>
 			</Frame.Content>
 		</Frame>
 	)

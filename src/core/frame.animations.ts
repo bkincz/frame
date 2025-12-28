@@ -67,7 +67,7 @@ export function animateFrameOut(
 	// Animate out
 	timeline.to(element, {
 		opacity: 0,
-		scale: 0.99,
+		scale: 0.95,
 		duration,
 		ease: 'power2.in',
 	})
@@ -243,7 +243,7 @@ export function animateFlowOut(
 
 	timeline.to(element, {
 		opacity: 0,
-		scale: 0.99,
+		scale: 0.97,
 		duration,
 		ease: 'power2.in',
 	})

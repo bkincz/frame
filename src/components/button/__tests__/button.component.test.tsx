@@ -75,7 +75,7 @@ describe('Button Component', () => {
 		})
 
 		it('should apply icon variant', () => {
-			render(<Button variant="icon">Icon</Button>)
+			render(<Button variant="iconSolid">Icon</Button>)
 			const button = screen.getByRole('button')
 			expect(button.className).toContain('Icon')
 		})
@@ -250,7 +250,7 @@ describe('Button Component', () => {
 	describe('Icon Variant', () => {
 		it('should render only children in icon variant', () => {
 			render(
-				<Button variant="icon" label="Label">
+				<Button variant="iconSolid" label="Label">
 					<span data-testid="icon-child">Icon</span>
 				</Button>
 			)
@@ -263,7 +263,7 @@ describe('Button Component', () => {
 
 		it('should not render button label wrapper in icon variant', () => {
 			render(
-				<Button variant="icon" label="Test">
+				<Button variant="iconSolid" label="Test">
 					Icon Content
 				</Button>
 			)

@@ -1,7 +1,8 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { useEffect, useCallback, useRef, useState } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
+import { useStateSlice } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -48,7 +49,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		debug,
 	})
 
-	const [frameState, setFrameState] = useState(FrameState.getState())
+	const frameState = useStateSlice(FrameState, state => state)
 	const lastProcessedParams = useRef<{ flow: string | null; step: string | null }>({
 		flow: null,
 		step: null,
@@ -60,14 +61,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	const nextStepRef = useRef<() => void>(() => {})
 	const previousStepRef = useRef<() => void>(() => {})
 	const goBackRef = useRef<() => void>(() => {})
-
-	// Subscribe to frame state changes
-	useEffect(() => {
-		const unsubscribe = FrameState.subscribe(() => {
-			setFrameState(FrameState.getState())
-		})
-		return unsubscribe
-	}, [])
 
 	/**
 	 * Log debug messages
@@ -350,11 +343,21 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				FrameState.closeFrame()
 			}
 		}
-	}, [router.params, flowParam, stepParam, frameState.isOpen, log, ensureFlowCached])
+	}, [
+		router,
+		router.params,
+		flowParam,
+		stepParam,
+		updateUrl,
+		frameState.isOpen,
+		log,
+		ensureFlowCached,
+	])
 
 	/**
-	 * Listen for custom events to open/close/navigate frame
+	 * Listen for custom events to open/navigate frame
 	 * Using refs to avoid recreating subscriptions on every render
+	 * Note: frame:request:close is handled in FrameContainer to trigger exit animation
 	 */
 	useEffect(() => {
 		const openSubscription = customEventManager.subscribe<{
@@ -363,10 +366,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			chain?: boolean
 		}>('frame:request:open', (data: { flow: string; stepKey?: string; chain?: boolean }) => {
 			openFlowRef.current(data.flow, data.stepKey)
-		})
-
-		const closeSubscription = customEventManager.subscribe('frame:request:close', () => {
-			closeFlowRef.current()
 		})
 
 		const nextSubscription = customEventManager.subscribe('frame:request:next', () => {
@@ -383,7 +382,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 
 		return () => {
 			openSubscription.unsubscribe()
-			closeSubscription.unsubscribe()
 			nextSubscription.unsubscribe()
 			previousSubscription.unsubscribe()
 			backSubscription.unsubscribe()

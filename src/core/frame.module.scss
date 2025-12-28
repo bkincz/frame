@@ -46,28 +46,28 @@
         width: fit-content;
         max-width: 1200px;
         max-height: 85vh;
-        padding: 32px;
-        padding-bottom: 136px;
         border-radius: 16px;
         box-shadow: 0 20px 60px rgba($black, 0.3);
         z-index: 1002;
 
         /* Initial state for animation */
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.99);
+        transform: translate(-50%, -50%) scale(0.95);
     }
 
     /* Fullscreen variant: full viewport (default) */
     .contentFullscreen {
         position: relative;
+        display: flex;
+        justify-content: center;
         background-color: $surface0a;
         height: 100%;
-        padding: 24px;
+        width: 100%;
         z-index: 1002;
 
         /* Initial state for animation */
         opacity: 0;
-        transform: scale(0.99);
+        transform: scale(0.95);
     }
 
     .close {
@@ -117,36 +117,135 @@
     }
 
     .navigation {
-        position: absolute;
-        bottom: 76px;
-        left: 24px;
-        height: 76px;
-        width: calc(100% - 96px);
+        position: relative;
+        width: 100%;
         background-color: $surface0a;
         display: flex;
+        grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
         flex-flow: row nowrap;
         align-items: center;
         gap: 12px;
         padding: 12px 24px;
-        border-radius: 12px;
-        border: 1px solid $border00;
-        box-shadow: 0 4px 18px rgba($shadow00, 0.35);
+        border-top: 1px solid $border00;
+        box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
+        z-index: 1004;
+
+        >div {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            max-width: 1600px;
+            margin-inline: auto;
+        }
     }
 
     .navigationModal {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 76px;
-        width: calc(100% - 50px);
+        position: relative;
+        width: calc(100% - 48px);
         background-color: $surface0a;
         display: flex;
+        grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
         flex-flow: row nowrap;
         align-items: center;
         gap: 12px;
         padding: 12px 24px;
+        z-index: 1004;
+
+        border-radius: 0 0 12px 12px;
+        border-top: 1px solid $border00;
+        box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
+
+        >div {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            max-width: 1600px;
+            margin-inline: auto;
+        }
+    }
+
+    .sidebar {
+        position: relative;
+        background-color: $surface00;
+        border: 1px solid $border02;
         border-radius: 12px;
-        border: 1px solid $border00;
-        box-shadow: 0 4px 18px rgba($shadow00, 0.35);
+        z-index: 1002;
+        display: flex;
+        grid-area: 1 / 4 / 3 / 5; // Column 4 (sidebar column)
+        padding: 24px;
+        align-self: start; // Fit content height instead of stretching
+        height: fit-content;
+
+        // Hide sidebar on tablet and mobile (below 1100px)
+        @media (max-width: 1099px) {
+            display: none;
+        }
+    }
+
+    .main {
+        position: relative;
+        display: flex;
+        flex-flow: column nowrap;
+        grid-area: 1 / 2 / 3 / 4; // Columns 2-3 (main columns)
+        overflow: auto;
+        padding: 24px;
+
+        // Performance optimizations for scrolling
+        -webkit-overflow-scrolling: touch; // iOS momentum scrolling
+        overscroll-behavior: contain; // Prevent scroll chaining
+
+        // Custom scrollbar styling
+        scrollbar-width: thin;
+        scrollbar-color: rgba($text00, 0.2) transparent;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba($text00, 0.2);
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: rgba($text00, 0.3);
+            }
+        }
+    }
+
+    .grid {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+        padding-top: 24px;
+
+        // With sidebar: main max 1200px, sidebar 400px
+        // Use minmax(auto, 600px) so each column can shrink but won't exceed 600px (total 1200px)
+        grid-template-columns: 1fr minmax(auto, 600px) minmax(auto, 600px) 400px 1fr;
+        grid-template-rows: repeat(2, 1fr) 76px;
+
+        // On tablet and mobile, switch to noSidebar layout (below 1100px)
+        @media (max-width: 1099px) {
+            grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
+            grid-template-rows: repeat(2, 1fr) 76px;
+        }
+
+        &.noSidebar {
+            // Without sidebar: main max 1600px
+            // Use minmax(auto, 800px) so each column can shrink but won't exceed 800px (total 1600px)
+            grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
+            grid-template-rows: repeat(2, 1fr) 76px;
+        }
     }
 }

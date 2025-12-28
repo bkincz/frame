@@ -30,6 +30,11 @@ export interface AnimationConfig {
 }
 
 /**
+ * Configuration for main content area
+ */
+export interface MainConfig {}
+
+/**
  * Frame variant types
  */
 export type FrameVariant = 'modal' | 'fullscreen'
@@ -42,6 +47,7 @@ export interface StepConfig {
 	footer?: Partial<FooterConfig>
 	sidebar?: Partial<SidebarConfig> | boolean // false = completely hide sidebar, true = show with defaults
 	animations?: Partial<AnimationConfig>
+	main?: Partial<MainConfig>
 	variant?: FrameVariant // 'modal' = centered modal with overlay, 'fullscreen' = full viewport
 	// Extensible for future config options
 	[key: string]: unknown
