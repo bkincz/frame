@@ -30,12 +30,12 @@ export interface NavigationState {
 export function useNavigationState(config: NavigationStateConfig): NavigationState {
 	const { direction } = config
 
-	const isAnimating = useStateSlice(AnimationState, () => AnimationState.selectIsAnimating())
-	const isInLifecycle = useStateSlice(StepState, () => StepState.selectIsInLifecycle())
-	const frameState = useStateSlice(FrameState, state => state)
+	const isAnimating = useStateSlice(AnimationState, state => state.isAnimating)
+	const isInLifecycle = useStateSlice(StepState, state => state.isExiting || state.isEntering)
+	const currentFlow = useStateSlice(FrameState, state => state.currentFlow)
+	const currentStepKey = useStateSlice(FrameState, state => state.currentStepKey)
 
 	// Get current flow and step configuration
-	const { currentFlow, currentStepKey } = frameState
 	const flowDefinition = currentFlow ? FrameState.getFlowDefinition(currentFlow) : null
 	const currentStep =
 		flowDefinition && currentStepKey ? flowDefinition.flow[currentStepKey] : null

@@ -2,7 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef } from 'react'
-import { useStateSlice } from '@bkincz/clutch'
+import { useStateMachine } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -49,7 +49,8 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		debug,
 	})
 
-	const frameState = useStateSlice(FrameState, state => state)
+	// Subscribe to frame state
+	const { state: frameState } = useStateMachine(FrameState)
 	const lastProcessedParams = useRef<{ flow: string | null; step: string | null }>({
 		flow: null,
 		step: null,

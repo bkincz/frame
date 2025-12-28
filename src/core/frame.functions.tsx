@@ -165,8 +165,11 @@ export function isFirstStepOfRootFlow(): boolean {
 		return false
 	}
 
-	// Check if we're on the first step
-	const stepKeys = getFlowStepKeys(currentFlow)
+	// Check if we're on the first step - use cached flow definition
+	const flowDef = FrameState.getFlowDefinition(currentFlow)
+	if (!flowDef) return false
+
+	const stepKeys = Object.keys(flowDef.flow)
 	const currentIndex = stepKeys.indexOf(currentStepKey)
 
 	return currentIndex === 0
@@ -184,8 +187,11 @@ export function isLastStepOfLeafFlow(): boolean {
 		return false
 	}
 
-	// Check if we're on the last step
-	const stepKeys = getFlowStepKeys(currentFlow)
+	// Check if we're on the last step - use cached flow definition
+	const flowDef = FrameState.getFlowDefinition(currentFlow)
+	if (!flowDef) return false
+
+	const stepKeys = Object.keys(flowDef.flow)
 	const currentIndex = stepKeys.indexOf(currentStepKey)
 
 	return currentIndex === stepKeys.length - 1
