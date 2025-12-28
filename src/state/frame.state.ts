@@ -422,12 +422,15 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentFlow = flow
 			draft.currentStepKey = targetStepKey
 
-			// Track flow open count
-			if (draft.currentFlow === flow) {
-				draft.flowOpenCount += 1
-			} else {
+			// Track flow open count - only increment when flow changes or frame was closed
+			// Don't increment for step navigation within same flow
+			if (currentFlow !== flow) {
 				draft.flowOpenCount = 1
+			} else if (!isOpen) {
+				// Same flow, but frame was closed - this is a reopen
+				draft.flowOpenCount += 1
 			}
+			// else: same flow, frame already open (step navigation) - don't change count
 		}, 'Open Frame')
 
 		// Update variant based on new flow/step
