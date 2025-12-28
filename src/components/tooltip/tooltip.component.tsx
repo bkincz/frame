@@ -24,6 +24,7 @@ export interface TooltipProps {
 	maxWidth?: number
 	delay?: number
 	variant?: 'default' | 'warning' | 'error'
+	anchorElement?: HTMLElement | null
 }
 
 /*
@@ -38,6 +39,7 @@ export const Tooltip: FC<TooltipProps> = ({
 	maxWidth = 200,
 	delay,
 	variant = 'default',
+	anchorElement,
 }) => {
 	const tooltipRef = useRef<HTMLDivElement>(null)
 	const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
@@ -175,17 +177,38 @@ export const Tooltip: FC<TooltipProps> = ({
 		}
 	}, [visible, isPositioned, showAfterDelay])
 
-	// Mouse tracking with direct DOM manipulation
+	// Position based on anchor element or mouse tracking
 	useEffect(() => {
 		if (!visible) return
 
-		const handleMouseMove = (event: MouseEvent) => {
-			calculateAndApplyPosition(event.clientX, event.clientY)
-		}
+		if (anchorElement) {
+			// Position relative to anchor element
+			const updatePosition = () => {
+				const rect = anchorElement.getBoundingClientRect()
+				const centerX = rect.left + rect.width / 2
+				const centerY = rect.top + rect.height / 2
+				calculateAndApplyPosition(centerX, centerY)
+			}
 
-		window.addEventListener('mousemove', handleMouseMove)
-		return () => window.removeEventListener('mousemove', handleMouseMove)
-	}, [visible, calculateAndApplyPosition])
+			updatePosition()
+
+			// Update position on scroll/resize
+			window.addEventListener('scroll', updatePosition, true)
+			window.addEventListener('resize', updatePosition)
+			return () => {
+				window.removeEventListener('scroll', updatePosition, true)
+				window.removeEventListener('resize', updatePosition)
+			}
+		} else {
+			// Track mouse movement
+			const handleMouseMove = (event: MouseEvent) => {
+				calculateAndApplyPosition(event.clientX, event.clientY)
+			}
+
+			window.addEventListener('mousemove', handleMouseMove)
+			return () => window.removeEventListener('mousemove', handleMouseMove)
+		}
+	}, [visible, calculateAndApplyPosition, anchorElement])
 
 	const tooltipElement = (
 		<div

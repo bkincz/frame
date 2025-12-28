@@ -244,10 +244,10 @@
     gap: 8px;
     border: none;
     border-radius: 12px;
-    transition: all 0.3s ease-in-out;
+    transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
     & span {
-        transition: all 0.3s ease-in-out;
+        transition: color 0.3s ease-in-out;
     }
 
     &:focus,
@@ -336,7 +336,8 @@
         .color#{capitalize($colorName)}#{capitalize($variantName)} {
             color: map.get($variantConfig, 'label');
             border: 1px solid map.get($variantConfig, 'border');
-            background-color: map.get($variantConfig, 'base');
+            background: map.get($variantConfig, 'base');
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
 
             @if $variantName =='iconSolid' or $variantName =='iconOutlined' {
                 padding: 0;
@@ -351,7 +352,7 @@
             &:hover {
                 color: map.get($variantConfig, 'label-hover');
                 border-color: map.get($variantConfig, 'border-hover');
-                background-color: map.get($variantConfig, 'hover');
+                background: map.get($variantConfig, 'hover');
 
                 &>span,
                 & * {
@@ -362,7 +363,7 @@
             &:focus {
                 color: map.get($variantConfig, 'label-focus');
                 border-color: map.get($variantConfig, 'border-focus');
-                background-color: map.get($variantConfig, 'focus');
+                background: map.get($variantConfig, 'focus');
 
                 &>span,
                 & * {

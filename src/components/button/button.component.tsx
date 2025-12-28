@@ -2,7 +2,8 @@
  *   IMPORTS
  **********************************************************************************************************/
 import clsx from 'clsx'
-import { Icon } from '@/components/icon'
+import * as TablerIcons from '@tabler/icons-react'
+import { useTooltip } from '@/components/tooltip'
 
 /*
  *   STYLES
@@ -13,6 +14,7 @@ import styles from './button.module.scss'
  *   TYPES
  **********************************************************************************************************/
 import type { FC, MouseEvent, ReactNode } from 'react'
+import { useRef } from 'react'
 import type {
 	BaseInterface,
 	InteractiveColors,
@@ -41,6 +43,7 @@ export interface ButtonProps extends BaseInterface {
 	startAdornment?: Adornment
 	endAdornment?: Adornment
 	adornment?: IconAdornment
+	tooltip?: string | ReactNode
 }
 
 /*
@@ -61,8 +64,20 @@ export const Button: FC<ButtonProps> = ({
 	label,
 	onClick,
 	type = 'button',
+	tooltip,
 	...rest
 }) => {
+	// Button ref for tooltip positioning
+	const buttonRef = useRef<HTMLButtonElement>(null)
+
+	// Initialize tooltip if tooltip prop is provided
+	const tooltipHook = useTooltip({
+		offset: {
+			x: 0,
+			y: -28,
+		},
+	})
+
 	const renderAdornments = (adornments: Adornment | undefined) => {
 		if (!adornments) return null
 
@@ -84,14 +99,19 @@ export const Button: FC<ButtonProps> = ({
 	}
 
 	// Handle adornment prop for icon buttons
-	const iconAdornment = adornment ? (
-		<Icon
-			icon={adornment.name}
-			size={adornment.size ?? 18}
-			stroke={adornment.stroke ?? 2}
-			noDefaultStyling
-		/>
-	) : null
+	const iconAdornment = adornment
+		? (() => {
+				const IconComponent = TablerIcons[
+					adornment.name as keyof typeof TablerIcons
+				] as React.ComponentType<{
+					size?: number
+					stroke?: number
+				}>
+				return IconComponent ? (
+					<IconComponent size={adornment.size ?? 18} stroke={adornment.stroke ?? 2} />
+				) : null
+			})()
+		: null
 
 	// Determine effective adornments based on adornment prop
 	const effectiveStartAdornment =
@@ -122,23 +142,31 @@ export const Button: FC<ButtonProps> = ({
 	const iconContent = isIconVariant && adornment ? iconAdornment : children
 
 	return (
-		<button
-			{...rest}
-			type={type}
-			className={buttonClasses}
-			style={style}
-			onClick={handleClick}
-			disabled={disabled || loading}
-			aria-label={label}
-		>
-			{renderAdornments(effectiveStartAdornment)}
-			{(label || iconContent) && !isIconVariant ? (
-				<span className={styles.buttonLabel}>{label || iconContent}</span>
-			) : (
-				isIconVariant && iconContent
-			)}
-			{renderAdornments(effectiveEndAdornment)}
-		</button>
+		<>
+			<button
+				{...rest}
+				ref={buttonRef}
+				type={type}
+				className={buttonClasses}
+				style={style}
+				onClick={handleClick}
+				disabled={disabled || loading}
+				aria-label={label}
+				onMouseEnter={
+					tooltip ? () => tooltipHook.showTooltip(tooltip, buttonRef.current) : undefined
+				}
+				onMouseLeave={tooltip ? tooltipHook.hideTooltip : undefined}
+			>
+				{!isIconVariant && renderAdornments(effectiveStartAdornment)}
+				{(label || iconContent) && !isIconVariant ? (
+					<span className={styles.buttonLabel}>{label || iconContent}</span>
+				) : (
+					isIconVariant && iconContent
+				)}
+				{!isIconVariant && renderAdornments(effectiveEndAdornment)}
+			</button>
+			{tooltip && tooltipHook.Tooltip}
+		</>
 	)
 }
 

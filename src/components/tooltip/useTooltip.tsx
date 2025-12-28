@@ -17,12 +17,13 @@ export interface UseTooltipOptions {
 	className?: string
 	delay?: number
 	variant?: TooltipProps['variant']
+	anchorElement?: HTMLElement | null
 }
 
 export interface TooltipState {
 	visible: boolean
-
 	content: any
+	anchorElement?: HTMLElement | null
 }
 
 /*
@@ -32,12 +33,14 @@ export function useTooltip<T = ReactNode>(options?: UseTooltipOptions) {
 	const [tooltipState, setTooltipState] = useState<TooltipState>({
 		visible: false,
 		content: null,
+		anchorElement: options?.anchorElement || null,
 	})
 
-	const showTooltip = useCallback((content: T) => {
+	const showTooltip = useCallback((content: T, anchorElement?: HTMLElement | null) => {
 		setTooltipState({
 			visible: true,
 			content,
+			anchorElement: anchorElement || null,
 		})
 	}, [])
 
@@ -45,6 +48,7 @@ export function useTooltip<T = ReactNode>(options?: UseTooltipOptions) {
 		setTooltipState({
 			visible: false,
 			content: null,
+			anchorElement: null,
 		})
 	}, [])
 
@@ -64,6 +68,7 @@ export function useTooltip<T = ReactNode>(options?: UseTooltipOptions) {
 			className={options?.className}
 			delay={options?.delay}
 			variant={options?.variant}
+			anchorElement={tooltipState.anchorElement}
 		>
 			{tooltipState.content}
 		</Tooltip>

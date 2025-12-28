@@ -6,7 +6,6 @@ import { StepTwoA, StepTwoB } from './components/step.two'
 import { StepThree } from './components/step.three'
 import { StepFour } from './components/step.four'
 import { FlowChainingDemo } from './components/flow.chaining.demo'
-import { IconActionDemo } from './components/icon.action.demo'
 
 /*
  *   TYPES
@@ -92,7 +91,10 @@ export const createExampleFlow = (): FlowDefinition => {
 		'step-four': {
 			heading: 'Step Four - Component Demos',
 			subheading: 'Test various component features and navigation.',
-			components: [StepFour, FlowChainingDemo, IconActionDemo],
+			components: [StepFour, FlowChainingDemo],
+			config: {
+				sidebar: true,
+			},
 		},
 	}
 

@@ -327,7 +327,7 @@ Frame.Close = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
 
 	return (
 		<div className={clsx(closeClassName, className)} {...rest} onClick={closeFrame}>
-			<Icon icon="IconX" tooltip="Close" />
+			<Icon icon="IconX" />
 		</div>
 	)
 }

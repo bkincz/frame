@@ -5,7 +5,7 @@
 
 @layer components {
     .tooltip {
-        background: $surface04;
+        background: $surface0a;
         color: $text04;
         padding: 8px 12px;
         border-radius: 6px;
@@ -16,7 +16,7 @@
         white-space: normal;
         word-wrap: break-word;
         border: 1px solid $border01;
-        backdrop-filter: blur(4px);
+        backdrop-filter: blur(6px);
         z-index: 10000;
         box-shadow: 0 4px 12px rgba($black, 0.3);
 

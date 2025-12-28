@@ -13,9 +13,11 @@
         align-items: center;
         padding: 8px;
         border-radius: 6px;
+        transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
         >svg {
             color: $text05;
+            transition: color 0.3s ease-in-out;
         }
     }
 
@@ -102,6 +104,7 @@
 
         >svg {
             color: $statusOrange;
+            transition: color 0.3s ease-in-out;
         }
 
         &:hover {
@@ -115,6 +118,7 @@
 
         >svg {
             color: $statusGreen;
+            transition: color 0.3s ease-in-out;
         }
 
         &:hover {
@@ -128,6 +132,7 @@
 
         >svg {
             color: $statusRed;
+            transition: color 0.3s ease-in-out;
         }
 
         &:hover {
@@ -141,6 +146,7 @@
 
         >svg {
             color: $statusBlue;
+            transition: color 0.3s ease-in-out;
         }
 
         &:hover {

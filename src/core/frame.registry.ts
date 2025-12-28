@@ -3,6 +3,7 @@
  ***************************************************************************************************/
 import { createExampleFlow } from '@/flows/example/example.flow'
 import { createModalFlow } from '@/flows/modal/modal.flow'
+import { createShowcaseFlow } from '@/flows/showcase/showcase.flow'
 
 /*
  *   TYPES
@@ -31,5 +32,10 @@ export const FLOW_REGISTRY: FlowRegistry = {
 		factory: createModalFlow,
 		title: 'Modal Flow',
 		description: 'A demonstration of the modal variant with centered content',
+	},
+	showcase: {
+		factory: createShowcaseFlow,
+		title: 'Component Showcase',
+		description: 'A dedicated space for building and testing components in isolation',
 	},
 }
