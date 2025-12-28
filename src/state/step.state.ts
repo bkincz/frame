@@ -73,9 +73,17 @@ class StepStateMachine extends StateMachine<StepStateData> {
 	/**
 	 * Selectors
 	 */
-	public selectIsExiting = (): boolean => this.state.isExiting
-	public selectIsEntering = (): boolean => this.state.isEntering
-	public selectIsInLifecycle = (): boolean => this.state.isExiting || this.state.isEntering
+	public selectIsExiting(): boolean {
+		return this.state.isExiting
+	}
+
+	public selectIsEntering(): boolean {
+		return this.state.isEntering
+	}
+
+	public selectIsInLifecycle(): boolean {
+		return this.state.isExiting || this.state.isEntering
+	}
 }
 
 const StepState = new StepStateMachine()

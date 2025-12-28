@@ -71,9 +71,17 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 	/**
 	 * Selectors
 	 */
-	public selectIsAnimating = (): boolean => this.state.isAnimating
-	public selectAnimationType = (): AnimationType => this.state.animationType
-	public selectDirection = (): 'forward' | 'backward' | undefined => this.state.direction
+	public selectIsAnimating(): boolean {
+		return this.state.isAnimating
+	}
+
+	public selectAnimationType(): AnimationType {
+		return this.state.animationType
+	}
+
+	public selectDirection(): 'forward' | 'backward' | undefined {
+		return this.state.direction
+	}
 }
 
 const AnimationState = new AnimationStateMachine()

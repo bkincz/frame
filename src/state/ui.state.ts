@@ -6,29 +6,20 @@ import { StateMachine } from '@bkincz/clutch'
 /*
  *   TYPES
  ***************************************************************************************************/
-interface UIActions {
-	validateSession: () => Promise<void>
-	setLoading: (loading: boolean | string) => void
-}
-
 export interface UIStateData {
 	loading: boolean | string
 	authenticated: boolean
 }
 
-export interface UIStateProps extends UIActions, UIStateData {}
-
 /*
  *   STATE
  ***************************************************************************************************/
-const initialState: UIStateProps = {
+const initialState: UIStateData = {
 	loading: false,
 	authenticated: false,
-	validateSession: () => Promise.resolve(),
-	setLoading: () => void 0,
 }
 
-class UIStateMachine extends StateMachine<UIStateProps> {
+class UIStateMachine extends StateMachine<UIStateData> {
 	constructor() {
 		super({
 			initialState,
@@ -39,7 +30,7 @@ class UIStateMachine extends StateMachine<UIStateProps> {
 		return void 0
 	}
 
-	protected async loadFromServer(): Promise<UIStateProps | null> {
+	protected async loadFromServer(): Promise<UIStateData | null> {
 		return null
 	}
 
