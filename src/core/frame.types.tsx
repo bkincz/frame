@@ -1,7 +1,7 @@
 /*
  *   TYPES FOR FRAME CUSTOMIZATION
  ***************************************************************************************************/
-import type { RefObject, ReactNode } from 'react'
+import type { RefObject } from 'react'
 import type { Step, FrameVariant } from '@/types/flow.types'
 import type { Frame as FrameComponent } from './frame.component'
 
@@ -68,4 +68,4 @@ export interface FrameRenderProps {
 /**
  * Render function type for custom layouts
  */
-export type FrameRenderFunction = (props: FrameRenderProps) => ReactNode
+export type FrameRenderFunction = (props: FrameRenderProps) => React.ReactElement | null

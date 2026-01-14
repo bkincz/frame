@@ -83,6 +83,7 @@ describe('FrameState', () => {
 			expect(FrameState.state.previousFlow).toBeNull()
 			expect(FrameState.state.previousStepKey).toBeNull()
 			expect(FrameState.state.flowHistory).toEqual([])
+			expect(FrameState.state.stepHistory).toEqual([])
 			expect(FrameState.state.flowLifecycle.enteredFlows).toEqual([])
 			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(false)
 		})
@@ -495,6 +496,293 @@ describe('FrameState', () => {
 		})
 	})
 
+	describe('goToStep', () => {
+		beforeEach(() => {
+			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
+			FrameState.openFrame('test-flow', 'step1')
+			vi.clearAllMocks()
+		})
+
+		it('should navigate to a specific step', () => {
+			FrameState.goToStep('step3')
+
+			expect(FrameState.state.currentStepKey).toBe('step3')
+			expect(FrameState.state.previousStepKey).toBe('step1')
+		})
+
+		it('should add current step to step history before navigating', () => {
+			expect(FrameState.state.stepHistory).toEqual([])
+
+			FrameState.goToStep('step3')
+
+			expect(FrameState.state.stepHistory).toEqual(['step1'])
+		})
+
+		it('should emit frame:navigation:skip event with forward direction', () => {
+			FrameState.goToStep('step3')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:skip', {
+				flow: 'test-flow',
+				fromStepKey: 'step1',
+				toStepKey: 'step3',
+				direction: 'forward',
+			})
+		})
+
+		it('should emit frame:navigation:skip event with backward direction', () => {
+			FrameState.setStepKey('step3')
+			vi.clearAllMocks()
+
+			FrameState.goToStep('step1')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:skip', {
+				flow: 'test-flow',
+				fromStepKey: 'step3',
+				toStepKey: 'step1',
+				direction: 'backward',
+			})
+		})
+
+		it('should emit frame:step:change event', () => {
+			FrameState.goToStep('step2')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:step:change', {
+				stepKey: 'step2',
+				previousStepKey: 'step1',
+			})
+		})
+
+		it('should not navigate if already at target step', () => {
+			FrameState.goToStep('step1')
+
+			expect(FrameState.state.stepHistory).toEqual([])
+			expect(customEventManager.emit).not.toHaveBeenCalled()
+		})
+
+		it('should not navigate if step key is invalid', () => {
+			const consoleSpy = vi.spyOn(console, 'warn')
+
+			FrameState.goToStep('invalid-step')
+
+			expect(FrameState.state.currentStepKey).toBe('step1')
+			expect(consoleSpy).toHaveBeenCalledWith(
+				'[FrameState] Step key "invalid-step" not found in current flow'
+			)
+
+			consoleSpy.mockRestore()
+		})
+
+		it('should not navigate if no flow is active', () => {
+			FrameState.closeFrame()
+			const consoleSpy = vi.spyOn(console, 'warn')
+
+			FrameState.goToStep('step2')
+
+			expect(consoleSpy).toHaveBeenCalledWith(
+				'[FrameState] Cannot go to step: no flow is currently active'
+			)
+
+			consoleSpy.mockRestore()
+		})
+
+		it('should update variant when step changes', () => {
+			FrameState.goToStep('step2')
+
+			expect(FrameState.state.variant).toBe('fullscreen')
+		})
+
+		it('should reset currentStepEntered flag', () => {
+			FrameState.markStepEntered()
+			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(true)
+
+			FrameState.goToStep('step2')
+			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(false)
+		})
+
+		it('should track multiple step navigations in history', () => {
+			FrameState.goToStep('step2')
+			FrameState.goToStep('step3')
+			FrameState.goToStep('step1')
+
+			expect(FrameState.state.stepHistory).toEqual(['step1', 'step2', 'step3'])
+		})
+	})
+
+	describe('goBackInStepHistory', () => {
+		beforeEach(() => {
+			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
+			FrameState.openFrame('test-flow', 'step1')
+			vi.clearAllMocks()
+		})
+
+		it('should go back to previous step in history', () => {
+			FrameState.goToStep('step3')
+			vi.clearAllMocks()
+
+			const result = FrameState.goBackInStepHistory()
+
+			expect(result).toBe(true)
+			expect(FrameState.state.currentStepKey).toBe('step1')
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+
+		it('should emit frame:navigation:step-history-back event', () => {
+			FrameState.goToStep('step3')
+			vi.clearAllMocks()
+
+			FrameState.goBackInStepHistory()
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:step-history-back', {
+				flow: 'test-flow',
+				fromStepKey: 'step3',
+				toStepKey: 'step1',
+			})
+		})
+
+		it('should emit frame:step:change event', () => {
+			FrameState.goToStep('step2')
+			vi.clearAllMocks()
+
+			FrameState.goBackInStepHistory()
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:step:change', {
+				stepKey: 'step1',
+				previousStepKey: 'step2',
+			})
+		})
+
+		it('should return false if no step history', () => {
+			const result = FrameState.goBackInStepHistory()
+
+			expect(result).toBe(false)
+			expect(FrameState.state.currentStepKey).toBe('step1')
+		})
+
+		it('should handle multiple step history entries', () => {
+			FrameState.goToStep('step2')
+			FrameState.goToStep('step3')
+			FrameState.goToStep('step1')
+
+			expect(FrameState.state.stepHistory).toEqual(['step1', 'step2', 'step3'])
+
+			FrameState.goBackInStepHistory()
+			expect(FrameState.state.currentStepKey).toBe('step3')
+			expect(FrameState.state.stepHistory).toEqual(['step1', 'step2'])
+
+			FrameState.goBackInStepHistory()
+			expect(FrameState.state.currentStepKey).toBe('step2')
+			expect(FrameState.state.stepHistory).toEqual(['step1'])
+
+			FrameState.goBackInStepHistory()
+			expect(FrameState.state.currentStepKey).toBe('step1')
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+
+		it('should update variant when going back', () => {
+			FrameState.setStepKey('step2')
+			expect(FrameState.state.variant).toBe('fullscreen')
+
+			FrameState.goToStep('step1')
+			expect(FrameState.state.variant).toBe('drawer')
+
+			FrameState.goBackInStepHistory()
+			expect(FrameState.state.variant).toBe('fullscreen')
+		})
+
+		it('should reset currentStepEntered flag', () => {
+			FrameState.goToStep('step2')
+			FrameState.markStepEntered()
+			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(true)
+
+			FrameState.goBackInStepHistory()
+			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(false)
+		})
+	})
+
+	describe('clearStepHistory', () => {
+		beforeEach(() => {
+			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
+			FrameState.openFrame('test-flow', 'step1')
+		})
+
+		it('should clear step history', () => {
+			FrameState.goToStep('step2')
+			FrameState.goToStep('step3')
+
+			expect(FrameState.state.stepHistory.length).toBe(2)
+
+			FrameState.clearStepHistory()
+
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+	})
+
+	describe('Step History Integration', () => {
+		beforeEach(() => {
+			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
+			FrameState.cacheFlowDefinition('flow-2', mockFlowDefinition2)
+		})
+
+		it('should clear step history when changing flows', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+			FrameState.goToStep('step3')
+
+			expect(FrameState.state.stepHistory).toEqual(['step1', 'step2'])
+
+			FrameState.openFrame('flow-2')
+
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+
+		it('should clear step history when closing frame', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+
+			expect(FrameState.state.stepHistory.length).toBe(1)
+
+			FrameState.closeFrame()
+
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+
+		it('should clear step history when resetting frame', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+
+			expect(FrameState.state.stepHistory.length).toBe(1)
+
+			FrameState.resetFrame()
+
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+
+		it('should preserve step history when navigating within same flow via openFrame', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+
+			expect(FrameState.state.stepHistory).toEqual(['step1'])
+
+			// Navigating to different step in same flow via openFrame should not clear step history
+			// This is handled by the step navigation within the same flow
+			FrameState.openFrame('test-flow', 'step3')
+
+			// Step history is cleared when navigating within same flow via openFrame
+			// because it's treated as a new navigation context
+			expect(FrameState.state.stepHistory).toEqual(['step1'])
+		})
+
+		it('should clear step history when reopening a closed flow', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+			FrameState.closeFrame()
+
+			FrameState.openFrame('test-flow', 'step1')
+
+			expect(FrameState.state.stepHistory).toEqual([])
+		})
+	})
+
 	describe('Flow Lifecycle', () => {
 		it('should mark flow as entered', () => {
 			FrameState.markFlowEntered('test-flow')
@@ -590,6 +878,25 @@ describe('FrameState', () => {
 			FrameState.openFrame('flow-2')
 
 			expect(FrameState.selectHasHistory()).toBe(true)
+		})
+
+		it('selectHasStepHistory should return false initially', () => {
+			expect(FrameState.selectHasStepHistory()).toBe(false)
+		})
+
+		it('selectHasStepHistory should return true when step history exists', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+
+			expect(FrameState.selectHasStepHistory()).toBe(true)
+		})
+
+		it('selectHasStepHistory should return false after step history is cleared', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			FrameState.goToStep('step2')
+			FrameState.clearStepHistory()
+
+			expect(FrameState.selectHasStepHistory()).toBe(false)
 		})
 
 		it('selectVariant should return correct variant', () => {
