@@ -92,47 +92,21 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		if (!isOpen) return
 
 		const subscription = customEventManager.subscribe('frame:step:change', data => {
-			// If frame hasn't been initialized yet, sync immediately without animation
-			if (!hasFrameInit) {
+			// If frame hasn't been initialized or animation is skipped, sync immediately
+			if (!hasFrameInit || data.skipAnimation) {
 				if (debug) {
-					console.log('[FrameContainer] Direct step sync (no animation - frame not init):', {
+					console.log('[FrameContainer] Direct step sync (no animation):', {
 						to: data.stepKey,
+						reason: !hasFrameInit ? 'frame not init' : 'browser navigation',
 					})
 				}
 				setRenderedStepKey(data.stepKey)
-			} else {
-				// If frame is initialized, wait briefly to see if animation runs
-				// If animation event fires, it will update renderedStepKey
-				// If no animation (e.g., browser navigation), fallback will update it
-				let handled = false
-
-				// Listen for animation start
-				const navNextSub = customEventManager.subscribe('frame:navigation:next', () => {
-					handled = true
-				})
-				const navPrevSub = customEventManager.subscribe('frame:navigation:previous', () => {
-					handled = true
-				})
-
-				// Fallback: if no animation event fires within 50ms, update directly
-				setTimeout(() => {
-					navNextSub.unsubscribe()
-					navPrevSub.unsubscribe()
-
-					if (!handled && currentStepKey === data.stepKey && renderedStepKey !== data.stepKey) {
-						if (debug) {
-							console.log('[FrameContainer] Direct step sync (no animation):', {
-								to: data.stepKey,
-							})
-						}
-						setRenderedStepKey(data.stepKey)
-					}
-				}, 50)
 			}
+			// Otherwise, animation will handle the update via the callback
 		})
 
 		return () => subscription.unsubscribe()
-	}, [isOpen, hasFrameInit, currentStepKey, renderedStepKey, debug])
+	}, [isOpen, hasFrameInit, debug])
 
 	/**
 	 * Handle frame entrance animation
@@ -184,7 +158,15 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 			// Use hook to animate flow transition
 			animateFlowTransition(currentFlow, currentStepKey)
 		}
-	}, [currentFlow, renderedFlow, currentStepKey, flowOpenCount, hasFrameInit, debug, animateFlowTransition])
+	}, [
+		currentFlow,
+		renderedFlow,
+		currentStepKey,
+		flowOpenCount,
+		hasFrameInit,
+		debug,
+		animateFlowTransition,
+	])
 
 	/**
 	 * Trigger close with animation

@@ -95,6 +95,7 @@ export interface FrameOpenEventData {
 export interface FrameStepChangeEventData {
 	stepKey: string
 	previousStepKey: string | null
+	skipAnimation?: boolean
 }
 
 export interface FrameFlowChangeEventData {
@@ -442,10 +443,11 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			const fromIndex = stepKeys.indexOf(currentStepKey)
 			const toIndex = stepKeys.indexOf(targetStepKey)
 
-			// Emit step change event
+			// Emit step change event with skipAnimation flag
 			customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
 				stepKey: targetStepKey,
 				previousStepKey: currentStepKey,
+				skipAnimation,
 			})
 
 			// Only emit navigation events if we want animations

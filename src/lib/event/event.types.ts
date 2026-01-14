@@ -18,7 +18,7 @@ export interface EventDataMap {
 	// Lifecycle Events (state changes)
 	'frame:open': { flow: string; stepKey: string }
 	'frame:close': void
-	'frame:step:change': { stepKey: string; previousStepKey: string | null }
+	'frame:step:change': { stepKey: string; previousStepKey: string | null; skipAnimation?: boolean }
 	'frame:flow:change': { flow: string; previousFlow: string | null }
 	'frame:step:enter': { flow: string; stepKey: string }
 	'frame:step:exit': { flow: string; stepKey: string }
