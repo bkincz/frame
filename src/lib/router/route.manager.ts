@@ -14,6 +14,7 @@ export interface RouteManagerConfig {
 export class RouteManager {
 	private debug: boolean
 	private listeners: Set<() => void> = new Set()
+	private isBrowserNavigation: boolean = false
 
 	constructor(config: RouteManagerConfig = {}) {
 		this.debug = config.debug || false
@@ -40,7 +41,12 @@ export class RouteManager {
 	 */
 	private handlePopState = (): void => {
 		this.log('Browser navigation detected')
+		this.isBrowserNavigation = true
 		this.notifyListeners()
+		// Reset flag after a short delay (allows listeners to check the flag)
+		setTimeout(() => {
+			this.isBrowserNavigation = false
+		}, 100)
 	}
 
 	/**
@@ -58,6 +64,13 @@ export class RouteManager {
 	 */
 	private notifyListeners(): void {
 		this.listeners.forEach(callback => callback())
+	}
+
+	/**
+	 * Check if the last navigation was triggered by browser back/forward
+	 */
+	public isBrowserNavigating(): boolean {
+		return this.isBrowserNavigation
 	}
 
 	/**

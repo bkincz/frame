@@ -7,7 +7,7 @@ import { useStateMachine } from '@bkincz/clutch'
 /*
  *   SHARED
  ***************************************************************************************************/
-import FrameState, { FRAME_EVENTS } from '@/state/frame.state'
+import FrameState from '@/state/frame.state'
 import AnimationState from '@/state/animation.state'
 import { flowExists, createFlowDefinition } from '@/core/frame.functions'
 
@@ -209,7 +209,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				const nextStepKey = stepKeys[currentStepIndex + 1]
 
 				// Emit navigation event before URL change
-				customEventManager.emit(FRAME_EVENTS.NEXT_STEP, {
+				customEventManager.emit('frame:navigation:next', {
 					flow: currentFlow,
 					fromStepKey: currentStepKey,
 					toStepKey: nextStepKey,
@@ -243,7 +243,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				const prevStepKey = stepKeys[currentStepIndex - 1]
 
 				// Emit navigation event before URL change
-				customEventManager.emit(FRAME_EVENTS.PREVIOUS_STEP, {
+				customEventManager.emit('frame:navigation:previous', {
 					flow: currentFlow,
 					fromStepKey: currentStepKey,
 					toStepKey: prevStepKey,
@@ -295,18 +295,26 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	useEffect(() => {
 		const flowValue = router.params[flowParam] || null
 		const stepValue = router.params[stepParam] || null
+		const isBrowserNav = router.isBrowserNavigating()
+
+		log('URL params effect triggered', { flowValue, stepValue, isBrowserNav })
 
 		// Skip if params haven't changed
 		if (
 			flowValue === lastProcessedParams.current.flow &&
 			stepValue === lastProcessedParams.current.step
 		) {
+			log('Skipping - params unchanged')
 			return
 		}
 
 		lastProcessedParams.current = { flow: flowValue, step: stepValue }
 
-		log('Query params changed', { flowValue, stepValue })
+		log('Processing query params change', {
+			flowValue,
+			stepValue,
+			source: isBrowserNav ? 'browser navigation' : 'programmatic',
+		})
 
 		// If flow param is present
 		if (flowValue) {
@@ -336,16 +344,19 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				: Math.max(0, Math.min(parsedStepIndex, stepKeys.length - 1))
 			const stepKey = stepKeys[stepIndex]
 
+			log('Opening frame from URL', { flow: flowValue, stepKey, skipAnimation: isBrowserNav })
+
 			// Open the flow with the specified step key
-			FrameState.openFrame(flowValue, stepKey)
+			// Skip animations for browser navigation for instant updates
+			FrameState.openFrame(flowValue, stepKey, undefined, isBrowserNav)
 		} else {
 			// No flow param - close the frame if it's open
 			if (frameState.isOpen) {
+				log('Closing frame - no flow param')
 				FrameState.closeFrame()
 			}
 		}
 	}, [
-		router,
 		router.params,
 		flowParam,
 		stepParam,

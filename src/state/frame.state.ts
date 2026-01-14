@@ -65,42 +65,28 @@ interface FrameActions {
 export interface FrameStateProps extends FrameActions, FrameStateData {}
 
 /*
- *   EVENTS
+ *   EVENT DATA TYPES
  *
  *   Event Emission Patterns:
  *
  *   Frame Lifecycle:
- *   - openFrame() → OPEN, FLOW_CHANGE (if flow changed)
- *   - closeFrame() → CLOSE
+ *   - openFrame() → frame:open, frame:flow:change (if flow changed)
+ *   - closeFrame() → frame:close
  *
  *   Step Navigation:
- *   - setStepKey() → STEP_CHANGE
- *   - nextStep() → NEXT_STEP, STEP_CHANGE (via setStepKey)
- *   - previousStep() → PREVIOUS_STEP, STEP_CHANGE (via setStepKey)
+ *   - setStepKey() → frame:step:change
+ *   - nextStep() → frame:navigation:next, frame:step:change (via setStepKey)
+ *   - previousStep() → frame:navigation:previous, frame:step:change (via setStepKey)
  *
  *   Flow Navigation:
- *   - goBackInHistory() → HISTORY_BACK, FLOW_CHANGE
+ *   - goBackInHistory() → frame:navigation:history-back, frame:flow:change
  *
  *   Lifecycle Tracking:
- *   - markFlowEntered() → FLOW_ENTER
- *   - markFlowExited() → FLOW_EXIT
- *   - markStepEntered() → STEP_ENTER
- *   - markStepExited() → STEP_EXIT
+ *   - markFlowEntered() → frame:flow:enter
+ *   - markFlowExited() → frame:flow:exit
+ *   - markStepEntered() → frame:step:enter
+ *   - markStepExited() → frame:step:exit
  ***************************************************************************************************/
-export const FRAME_EVENTS = {
-	OPEN: 'frame:open',
-	CLOSE: 'frame:close',
-	STEP_CHANGE: 'frame:step:change',
-	FLOW_CHANGE: 'frame:flow:change',
-	NEXT_STEP: 'frame:navigation:next',
-	PREVIOUS_STEP: 'frame:navigation:previous',
-	HISTORY_BACK: 'frame:navigation:history-back',
-	STEP_ENTER: 'frame:step:enter',
-	STEP_EXIT: 'frame:step:exit',
-	FLOW_ENTER: 'frame:flow:enter',
-	FLOW_EXIT: 'frame:flow:exit',
-} as const
-
 export interface FrameOpenEventData {
 	flow: string
 	stepKey: string
@@ -322,7 +308,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			}
 		}, 'Mark Flow Entered')
 
-		customEventManager.emit<FrameFlowEnterEventData>(FRAME_EVENTS.FLOW_ENTER, {
+		customEventManager.emit<FrameFlowEnterEventData>('frame:flow:enter', {
 			flow: flowName,
 		})
 	}
@@ -338,7 +324,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			}
 		}, 'Mark Flow Exited')
 
-		customEventManager.emit<FrameFlowExitEventData>(FRAME_EVENTS.FLOW_EXIT, {
+		customEventManager.emit<FrameFlowExitEventData>('frame:flow:exit', {
 			flow: flowName,
 		})
 	}
@@ -354,7 +340,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}, 'Mark Step Entered')
 
 		if (currentFlow && currentStepKey) {
-			customEventManager.emit<FrameStepEnterEventData>(FRAME_EVENTS.STEP_ENTER, {
+			customEventManager.emit<FrameStepEnterEventData>('frame:step:enter', {
 				flow: currentFlow,
 				stepKey: currentStepKey,
 			})
@@ -372,7 +358,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}, 'Mark Step Exited')
 
 		if (currentFlow && currentStepKey) {
-			customEventManager.emit<FrameStepExitEventData>(FRAME_EVENTS.STEP_EXIT, {
+			customEventManager.emit<FrameStepExitEventData>('frame:step:exit', {
 				flow: currentFlow,
 				stepKey: currentStepKey,
 			})
@@ -384,8 +370,9 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 	 * @param flow - The flow name to open
 	 * @param stepKey - The step key to start at (optional, defaults to first step)
 	 * @param chain - If true, pushes current flow to history before opening new flow (default: true if frame is already open)
+	 * @param skipAnimation - If true, skips emitting navigation events (no animations)
 	 */
-	public openFrame(flow: string, stepKey?: string, chain?: boolean): void {
+	public openFrame(flow: string, stepKey?: string, chain?: boolean, skipAnimation?: boolean): void {
 		const { currentFlow, currentStepKey, isOpen } = this.state
 		const flowDef = this.getFlowDefinition(flow)
 
@@ -437,16 +424,50 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		this.updateVariant()
 
 		// Emit events
-		customEventManager.emit<FrameOpenEventData>(FRAME_EVENTS.OPEN, {
+		customEventManager.emit<FrameOpenEventData>('frame:open', {
 			flow,
 			stepKey: targetStepKey,
 		})
 
 		if (currentFlow !== flow) {
-			customEventManager.emit<FrameFlowChangeEventData>(FRAME_EVENTS.FLOW_CHANGE, {
+			customEventManager.emit<FrameFlowChangeEventData>('frame:flow:change', {
 				flow,
 				previousFlow: currentFlow,
 			})
+		}
+
+		// Emit step change and navigation events if step changed within same flow
+		if (currentFlow === flow && currentStepKey !== targetStepKey && currentStepKey) {
+			const stepKeys = Object.keys(flowDef.flow)
+			const fromIndex = stepKeys.indexOf(currentStepKey)
+			const toIndex = stepKeys.indexOf(targetStepKey)
+
+			// Emit step change event
+			customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
+				stepKey: targetStepKey,
+				previousStepKey: currentStepKey,
+			})
+
+			// Only emit navigation events if we want animations
+			if (!skipAnimation) {
+				// Emit appropriate navigation event for animations asynchronously
+				// This ensures subscriptions have time to be set up
+				setTimeout(() => {
+					if (toIndex > fromIndex) {
+						customEventManager.emit<FrameNextStepEventData>('frame:navigation:next', {
+							flow,
+							fromStepKey: currentStepKey,
+							toStepKey: targetStepKey,
+						})
+					} else if (toIndex < fromIndex) {
+						customEventManager.emit<FramePreviousStepEventData>('frame:navigation:previous', {
+							flow,
+							fromStepKey: currentStepKey,
+							toStepKey: targetStepKey,
+						})
+					}
+				}, 0)
+			}
 		}
 	}
 
@@ -467,7 +488,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 		// Emit navigation event before mutation
 		if (currentFlow) {
-			customEventManager.emit<FrameHistoryBackEventData>(FRAME_EVENTS.HISTORY_BACK, {
+			customEventManager.emit<FrameHistoryBackEventData>('frame:navigation:history-back', {
 				fromFlow: currentFlow,
 				toFlow: previousEntry.flow,
 				toStepKey: previousEntry.stepKey,
@@ -484,7 +505,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		this.updateVariant()
 
 		// Emit flow change event
-		customEventManager.emit<FrameFlowChangeEventData>(FRAME_EVENTS.FLOW_CHANGE, {
+		customEventManager.emit<FrameFlowChangeEventData>('frame:flow:change', {
 			flow: previousEntry.flow,
 			previousFlow: currentFlow,
 		})
@@ -520,7 +541,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.variant = 'fullscreen' // Reset to default
 		}, 'Close Frame')
 
-		customEventManager.emit(FRAME_EVENTS.CLOSE, {})
+		customEventManager.emit('frame:close', undefined)
 	}
 
 	/**
@@ -544,7 +565,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		// Update variant based on new step
 		this.updateVariant()
 
-		customEventManager.emit<FrameStepChangeEventData>(FRAME_EVENTS.STEP_CHANGE, {
+		customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
 			stepKey,
 			previousStepKey: currentStepKey,
 		})
@@ -563,7 +584,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			const nextStepKey = stepKeys[currentStepIndex + 1]
 
 			// Emit navigation event
-			customEventManager.emit<FrameNextStepEventData>(FRAME_EVENTS.NEXT_STEP, {
+			customEventManager.emit<FrameNextStepEventData>('frame:navigation:next', {
 				flow: currentFlow,
 				fromStepKey: currentStepKey,
 				toStepKey: nextStepKey,
@@ -586,7 +607,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			const prevStepKey = stepKeys[currentStepIndex - 1]
 
 			// Emit navigation event
-			customEventManager.emit<FramePreviousStepEventData>(FRAME_EVENTS.PREVIOUS_STEP, {
+			customEventManager.emit<FramePreviousStepEventData>('frame:navigation:previous', {
 				flow: currentFlow,
 				fromStepKey: currentStepKey,
 				toStepKey: prevStepKey,

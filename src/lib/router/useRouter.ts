@@ -53,6 +53,10 @@ export interface UseRouterReturn {
 	 */
 	goForward: () => void
 	/**
+	 * Check if the last navigation was triggered by browser back/forward
+	 */
+	isBrowserNavigating: () => boolean
+	/**
 	 * Current pathname
 	 */
 	pathname: string
@@ -125,6 +129,10 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 		routeManager.goForward()
 	}, [])
 
+	const isBrowserNavigating = useCallback(() => {
+		return routeManager.isBrowserNavigating()
+	}, [])
+
 	return useMemo(
 		() => ({
 			params,
@@ -135,6 +143,7 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 			clearAllParams,
 			goBack,
 			goForward,
+			isBrowserNavigating,
 			pathname,
 			search,
 		}),
@@ -147,6 +156,7 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 			clearAllParams,
 			goBack,
 			goForward,
+			isBrowserNavigating,
 			pathname,
 			search,
 		]

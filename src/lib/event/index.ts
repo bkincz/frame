@@ -6,3 +6,5 @@ export type { CustomEventCallback, CustomEventSubscription } from './event.manag
 
 export { useCustomEvent, useCustomEventEmit } from './useCustomEvent'
 export type { UseCustomEventOptions } from './useCustomEvent'
+
+export type { EventType, EventData, EventDataMap } from './event.types'

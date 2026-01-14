@@ -85,6 +85,56 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	useStepLifecycle(currentStepKey, flowDefinition)
 
 	/**
+	 * Subscribe to step change events to sync rendered step
+	 * This handles cases where animations don't run (e.g., frame not initialized yet, browser navigation)
+	 */
+	useEffect(() => {
+		if (!isOpen) return
+
+		const subscription = customEventManager.subscribe('frame:step:change', data => {
+			// If frame hasn't been initialized yet, sync immediately without animation
+			if (!hasFrameInit) {
+				if (debug) {
+					console.log('[FrameContainer] Direct step sync (no animation - frame not init):', {
+						to: data.stepKey,
+					})
+				}
+				setRenderedStepKey(data.stepKey)
+			} else {
+				// If frame is initialized, wait briefly to see if animation runs
+				// If animation event fires, it will update renderedStepKey
+				// If no animation (e.g., browser navigation), fallback will update it
+				let handled = false
+
+				// Listen for animation start
+				const navNextSub = customEventManager.subscribe('frame:navigation:next', () => {
+					handled = true
+				})
+				const navPrevSub = customEventManager.subscribe('frame:navigation:previous', () => {
+					handled = true
+				})
+
+				// Fallback: if no animation event fires within 50ms, update directly
+				setTimeout(() => {
+					navNextSub.unsubscribe()
+					navPrevSub.unsubscribe()
+
+					if (!handled && currentStepKey === data.stepKey && renderedStepKey !== data.stepKey) {
+						if (debug) {
+							console.log('[FrameContainer] Direct step sync (no animation):', {
+								to: data.stepKey,
+							})
+						}
+						setRenderedStepKey(data.stepKey)
+					}
+				}, 50)
+			}
+		})
+
+		return () => subscription.unsubscribe()
+	}, [isOpen, hasFrameInit, currentStepKey, renderedStepKey, debug])
+
+	/**
 	 * Handle frame entrance animation
 	 */
 	useEffect(() => {
