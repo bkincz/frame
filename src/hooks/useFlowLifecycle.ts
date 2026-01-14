@@ -11,7 +11,7 @@ import FrameState from '@/state/frame.state'
 /*
  *   TYPES
  ***************************************************************************************************/
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   HOOK

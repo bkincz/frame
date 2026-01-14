@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import { customEventManager } from '@/lib/event'
 import { useStateSlice } from '@bkincz/clutch'
 
-import type { FrameVariant } from '@/flows/flow.types'
+import type { FrameVariant } from '@/types/flow.types'
 
 /*
  *   SHARED COMPONENTS
@@ -39,7 +39,7 @@ import type {
 	InteractiveSizes,
 } from '@/types/generic'
 import type { MouseEvent } from 'react'
-import type { Step } from '@/flows/flow.types'
+import type { Step } from '@/types/flow.types'
 import { isFirstStepOfRootFlow, isLastStepOfLeafFlow } from './frame.functions'
 
 export interface FrameProps extends BaseInterface {}

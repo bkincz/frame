@@ -10,7 +10,7 @@ import { FlowChainingDemo } from './components/flow.chaining.demo'
 /*
  *   TYPES
  **********************************************************************************************************/
-import type { FlowDefinition } from '../flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   LIFECYCLE CALLBACKS

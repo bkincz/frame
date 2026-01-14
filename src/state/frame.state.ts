@@ -12,7 +12,7 @@ import type { EventDataMap } from '@/lib/event'
 /*
  *   TYPES
  ***************************************************************************************************/
-import type { FlowDefinition, FrameVariant } from '@/flows/flow.types'
+import type { FlowDefinition, FrameVariant } from '@/types/flow.types'
 
 export interface FlowLifecycleState {
 	enteredFlows: string[]

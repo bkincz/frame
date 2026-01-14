@@ -2,7 +2,7 @@
  *   TYPES FOR FRAME CUSTOMIZATION
  ***************************************************************************************************/
 import type { RefObject, ReactNode } from 'react'
-import type { Step, FrameVariant } from '@/flows/flow.types'
+import type { Step, FrameVariant } from '@/types/flow.types'
 import type { Frame as FrameComponent } from './frame.component'
 
 /**

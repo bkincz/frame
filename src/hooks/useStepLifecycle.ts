@@ -12,7 +12,7 @@ import StepState from '@/state/step.state'
 /*
  *   TYPES
  ***************************************************************************************************/
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   HOOK

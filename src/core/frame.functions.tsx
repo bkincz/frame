@@ -2,7 +2,7 @@
  *   HELPER FUNCTIONS
  **************************************************************************************************/
 import { getFlowRegistry, type FlowRegistryEntry } from './frame.registry'
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 import FrameState from '@/state/frame.state'
 
 /*

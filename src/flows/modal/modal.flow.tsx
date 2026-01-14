@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  **********************************************************************************************************/
-import type { FlowDefinition } from '../flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   STEP COMPONENTS

@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useFlowLifecycle } from '../useFlowLifecycle'
 import FrameState from '@/state/frame.state'
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   MOCKS

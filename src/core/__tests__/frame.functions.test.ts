@@ -20,7 +20,7 @@ import {
 } from '../frame.functions'
 import { setFlowRegistry, clearFlowRegistry, type FlowRegistry } from '../frame.registry'
 import FrameState from '@/state/frame.state'
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   TEST FIXTURES

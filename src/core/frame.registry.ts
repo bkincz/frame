@@ -1,7 +1,7 @@
 /*
  *   TYPES
  ***************************************************************************************************/
-import type { FlowFactory } from '@/flows/flow.types'
+import type { FlowFactory } from '@/types/flow.types'
 
 export interface FlowRegistryEntry {
 	factory: FlowFactory

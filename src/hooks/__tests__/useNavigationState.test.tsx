@@ -8,7 +8,7 @@ import AnimationState from '@/state/animation.state'
 import StepState from '@/state/step.state'
 import FrameState from '@/state/frame.state'
 import * as frameFunctions from '@/core/frame.functions'
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   MOCKS

@@ -20,3 +20,4 @@ export * from './lib/functions'
 
 // Type definitions
 export * from './types/generic'
+export * from './types/flow.types'

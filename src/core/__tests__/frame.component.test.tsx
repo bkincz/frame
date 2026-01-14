@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Frame } from '../frame.component'
 import { customEventManager } from '@/lib/event'
-import type { Step } from '@/flows/flow.types'
+import type { Step } from '@/types/flow.types'
 
 /*
  *   MOCKS

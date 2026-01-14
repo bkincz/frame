@@ -6,7 +6,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { useStepLifecycle } from '../useStepLifecycle'
 import FrameState from '@/state/frame.state'
 import StepState from '@/state/step.state'
-import type { FlowDefinition } from '@/flows/flow.types'
+import type { FlowDefinition } from '@/types/flow.types'
 
 /*
  *   MOCKS
