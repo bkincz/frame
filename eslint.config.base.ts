@@ -1,3 +1,4 @@
+import type { Linter } from 'eslint'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import tsparser from '@typescript-eslint/parser'
 import js from '@eslint/js'
@@ -8,7 +9,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import prettier from 'eslint-plugin-prettier'
 import prettierConfig from 'eslint-config-prettier'
 
-export const baseConfig = [
+export const baseConfig: Linter.Config[] = [
 	js.configs.recommended,
 	prettierConfig,
 	{

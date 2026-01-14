@@ -1,6 +1,7 @@
+import type { Linter } from 'eslint'
 import { baseConfig } from './eslint.config.base.js'
 
-export default [
+const config: Linter.Config[] = [
 	...baseConfig,
 	{
 		ignores: ['node_modules', 'dist', '**/__tests__/**'],
@@ -12,3 +13,5 @@ export default [
 		},
 	},
 ]
+
+export default config
