@@ -455,6 +455,8 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			})
 		}
 
+		const previousStepKey = this.state.currentStepKey
+
 		this.mutate(draft => {
 			draft.flowHistory.pop()
 			draft.currentFlow = previousEntry.flow
@@ -468,6 +470,13 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		customEventManager.emit<FrameFlowChangeEventData>('frame:flow:change', {
 			flow: previousEntry.flow,
 			previousFlow: currentFlow,
+		})
+
+		// Emit step change event (no animation for history navigation)
+		customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
+			stepKey: previousEntry.stepKey,
+			previousStepKey,
+			skipAnimation: true,
 		})
 
 		return true
