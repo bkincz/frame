@@ -26,14 +26,6 @@ class UIStateMachine extends StateMachine<UIStateData> {
 		})
 	}
 
-	protected async saveToServer(): Promise<void> {
-		return void 0
-	}
-
-	protected async loadFromServer(): Promise<UIStateData | null> {
-		return null
-	}
-
 	/**
 	 * Set loading state
 	 */

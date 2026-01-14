@@ -149,14 +149,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 	}
 
-	protected async saveToServer(): Promise<void> {
-		return void 0
-	}
-
-	protected async loadFromServer(): Promise<FrameStateProps | null> {
-		return null
-	}
-
 	/**
 	 * Selector: Get current step index (derived)
 	 */
@@ -334,7 +326,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 	 * @param chain - If true, pushes current flow to history before opening new flow (default: true if frame is already open)
 	 * @param skipAnimation - If true, skips emitting navigation events (no animations)
 	 */
-	public openFrame(flow: string, stepKey?: string, chain?: boolean, skipAnimation?: boolean): void {
+	public openFrame(
+		flow: string,
+		stepKey?: string,
+		chain?: boolean,
+		skipAnimation?: boolean
+	): void {
 		const { currentFlow, currentStepKey, isOpen } = this.state
 		const flowDef = this.getFlowDefinition(flow)
 
@@ -421,11 +418,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 						toStepKey: targetStepKey,
 					})
 				} else if (toIndex < fromIndex) {
-					customEventManager.emit<FramePreviousStepEventData>('frame:navigation:previous', {
-						flow,
-						fromStepKey: currentStepKey,
-						toStepKey: targetStepKey,
-					})
+					customEventManager.emit<FramePreviousStepEventData>(
+						'frame:navigation:previous',
+						{
+							flow,
+							fromStepKey: currentStepKey,
+							toStepKey: targetStepKey,
+						}
+					)
 				}
 			}
 		}

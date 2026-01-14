@@ -29,15 +29,6 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 		})
 	}
 
-	protected async saveToServer(_state: AnimationStateData): Promise<void> {
-		// Animation state is ephemeral, no server persistence needed
-	}
-
-	protected async loadFromServer(): Promise<AnimationStateData | null> {
-		// Animation state is ephemeral, no server persistence needed
-		return null
-	}
-
 	/**
 	 * Start an animation
 	 * @returns true if animation started, false if already animating

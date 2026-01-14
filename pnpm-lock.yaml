@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@bkincz/clutch':
-        specifier: ^1.0.2
-        version: 1.0.2(immer@11.0.1)(react@19.2.3)
+        specifier: ^1.0.3
+        version: 1.0.3(immer@11.0.1)(react@19.2.3)
       '@tabler/icons-react':
         specifier: ^3.36.0
         version: 3.36.0(react@19.2.3)
@@ -201,8 +201,8 @@ packages:
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
 
-  '@bkincz/clutch@1.0.2':
-    resolution: {integrity: sha512-5CueZloubdJ2TH3Phi/+HtSNI7UMNb6NiJZMHi1mAVC7aiPPTf7bBHbSHt4+d2xQxZ0x022w9IGjsbsMbXes7A==}
+  '@bkincz/clutch@1.0.3':
+    resolution: {integrity: sha512-6WbEzAZnOLWTJ/Xb5H+DSQgOSNmRTPThA2QM7v+2qY3KOK93yVsQLCYTIHGNItpHYDmgmLHgn3L6LaEvpfW6jw==}
     engines: {node: '>=20'}
     peerDependencies:
       immer: '>=9.0.0'
@@ -2282,7 +2282,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@bkincz/clutch@1.0.2(immer@11.0.1)(react@19.2.3)':
+  '@bkincz/clutch@1.0.3(immer@11.0.1)(react@19.2.3)':
     dependencies:
       immer: 11.0.1
       react: 19.2.3

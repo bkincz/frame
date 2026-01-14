@@ -25,15 +25,6 @@ class StepStateMachine extends StateMachine<StepStateData> {
 		})
 	}
 
-	protected async saveToServer(_state: StepStateData): Promise<void> {
-		// Step lifecycle state is ephemeral, no server persistence needed
-	}
-
-	protected async loadFromServer(): Promise<StepStateData | null> {
-		// Step lifecycle state is ephemeral, no server persistence needed
-		return null
-	}
-
 	/**
 	 * Mark step as entering
 	 */
