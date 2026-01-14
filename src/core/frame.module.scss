@@ -229,7 +229,7 @@
         display: grid;
         gap: 12px;
         width: 100%;
-        padding-top: 24px;
+        padding-top: 12px;
 
         // With sidebar: main max 1200px, sidebar 400px
         // Use minmax(auto, 600px) so each column can shrink but won't exceed 600px (total 1200px)

@@ -68,7 +68,9 @@ export class RouteManager {
 	 * Returns true if current navigation ID matches the last browser navigation
 	 */
 	public isBrowserNavigating(): boolean {
-		return this.navigationId === this.lastBrowserNavigationId && this.lastBrowserNavigationId > 0
+		return (
+			this.navigationId === this.lastBrowserNavigationId && this.lastBrowserNavigationId > 0
+		)
 	}
 
 	/**
