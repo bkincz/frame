@@ -1,7 +1,7 @@
 {
   "name": "@bkincz/frame",
   "version": "1.0.0",
-  "description": "A lightweight, flexible component library for building multi-step flows and wizards",
+  "description": "A high-performance React multi-step flow system with animations, navigation history, and optional URL routing",
   "type": "module",
   "main": "./dist/frame.cjs",
   "module": "./dist/frame.mjs",
@@ -58,10 +58,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "docs:dev": "cd docs && pnpm start",
-    "docs:build": "cd docs && pnpm build",
-    "docs:serve": "cd docs && pnpm serve"
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "peerDependencies": {
     "@bkincz/clutch": "^1.0.3",
