@@ -26,9 +26,6 @@ class UIStateMachine extends StateMachine<UIStateData> {
 		})
 	}
 
-	/**
-	 * Set loading state
-	 */
 	public setLoading(loading: boolean | string): void {
 		this.mutate(draft => {
 			draft.loading = loading
