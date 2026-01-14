@@ -1,0 +1,37 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Enable declaration file generation
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+
+    // Output directory for type declarations
+    "outDir": "./dist",
+    "declarationDir": "./dist/types",
+
+    // Module resolution for library
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // Ensure we emit files
+    "noEmit": false,
+
+    // Source maps for debugging
+    "sourceMap": true,
+
+    // Skip lib check for faster builds
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/__tests__/**",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/main.tsx",
+    "src/flows/**",
+    "node_modules"
+  ]
+}

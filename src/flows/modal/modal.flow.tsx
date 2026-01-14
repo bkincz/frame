@@ -26,8 +26,8 @@ const ModalStepOne = () => (
 const ModalStepTwo = () => (
 	<div>
 		<p>
-			You can navigate between steps using the Back/Next buttons. Each step can override
-			the variant if needed.
+			You can navigate between steps using the Back/Next buttons. Each step can override the
+			variant if needed.
 		</p>
 	</div>
 )

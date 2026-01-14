@@ -18,37 +18,39 @@ import {
 	isFirstStepOfRootFlow,
 	isLastStepOfLeafFlow,
 } from '../frame.functions'
+import { setFlowRegistry, clearFlowRegistry, type FlowRegistry } from '../frame.registry'
 import FrameState from '@/state/frame.state'
 import type { FlowDefinition } from '@/flows/flow.types'
 
 /*
+ *   TEST FIXTURES
+ ***************************************************************************************************/
+const testRegistry: FlowRegistry = {
+	'test-flow': {
+		factory: vi.fn(() => ({
+			flow: {
+				'step-1': { components: [] },
+				'step-2': { components: [] },
+				'step-3': { components: [] },
+			},
+		})),
+		title: 'Test Flow',
+		description: 'A test flow for unit testing',
+	},
+	'another-flow': {
+		factory: vi.fn(() => ({
+			flow: {
+				'step-a': { components: [] },
+				'step-b': { components: [] },
+			},
+		})),
+		title: 'Another Flow',
+	},
+}
+
+/*
  *   MOCKS
  ***************************************************************************************************/
-vi.mock('../frame.registry', () => ({
-	FLOW_REGISTRY: {
-		'test-flow': {
-			factory: vi.fn(() => ({
-				flow: {
-					'step-1': { components: [] },
-					'step-2': { components: [] },
-					'step-3': { components: [] },
-				},
-			})),
-			title: 'Test Flow',
-			description: 'A test flow for unit testing',
-		},
-		'another-flow': {
-			factory: vi.fn(() => ({
-				flow: {
-					'step-a': { components: [] },
-					'step-b': { components: [] },
-				},
-			})),
-			title: 'Another Flow',
-		},
-	},
-}))
-
 vi.mock('@/state/frame.state', () => ({
 	default: {
 		getFlowDefinition: vi.fn(),
@@ -64,6 +66,8 @@ vi.mock('@/state/frame.state', () => ({
 describe('Frame Functions', () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
+		clearFlowRegistry()
+		setFlowRegistry(testRegistry)
 	})
 
 	describe('Registry Helpers', () => {

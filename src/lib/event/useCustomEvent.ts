@@ -13,12 +13,6 @@ export interface UseCustomEventOptions {
 	disabled?: boolean
 }
 
-/**
- * Hook for subscribing to custom application events
- * @param eventType - The custom event type to listen for
- * @param callback - The callback function to execute
- * @param options - Optional configuration
- */
 export function useCustomEvent<T = any>(
 	eventType: string,
 	callback: CustomEventCallback<T>,
@@ -49,9 +43,6 @@ export function useCustomEvent<T = any>(
 	}, [eventType, stableCallback, options?.disabled])
 }
 
-/**
- * Hook for emitting custom events
- */
 export function useCustomEventEmit() {
 	return useCallback(<T = any>(eventType: string, data: T) => {
 		customEventManager.emit(eventType, data)

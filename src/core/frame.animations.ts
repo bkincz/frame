@@ -25,12 +25,6 @@ const DEFAULT_CONFIG: Required<FrameAnimationConfig> = {
  *   ANIMATION FUNCTIONS
  ***************************************************************************************************/
 
-/**
- * Animate frame entrance (fade in from center)
- * @param element - The frame element to animate
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFrameIn(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}
@@ -50,12 +44,6 @@ export function animateFrameIn(
 	return timeline
 }
 
-/**
- * Animate frame exit (fade out to center)
- * @param element - The frame element to animate
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFrameOut(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}
@@ -75,12 +63,6 @@ export function animateFrameOut(
 	return timeline
 }
 
-/**
- * Animate overlay entrance (fade in)
- * @param element - The overlay element to animate
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateOverlayIn(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}
@@ -99,12 +81,6 @@ export function animateOverlayIn(
 	return timeline
 }
 
-/**
- * Animate overlay exit (fade out)
- * @param element - The overlay element to animate
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateOverlayOut(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}
@@ -123,13 +99,6 @@ export function animateOverlayOut(
 	return timeline
 }
 
-/**
- * Animate full frame (overlay + content) in
- * @param overlayElement - The overlay element
- * @param contentElement - The content element
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFullFrameIn(
 	overlayElement: HTMLElement,
 	contentElement: HTMLElement,
@@ -144,13 +113,6 @@ export function animateFullFrameIn(
 	return masterTimeline
 }
 
-/**
- * Animate full frame (overlay + content) out
- * @param overlayElement - The overlay element
- * @param contentElement - The content element
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFullFrameOut(
 	overlayElement: HTMLElement,
 	contentElement: HTMLElement,
@@ -165,13 +127,6 @@ export function animateFullFrameOut(
 	return masterTimeline
 }
 
-/**
- * Animate step exit based on direction
- * @param element - The step element to animate out
- * @param direction - The direction of navigation (forward = slide left, backward = slide right)
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateStepOut(
 	element: HTMLElement,
 	direction: StepDirection,
@@ -194,13 +149,6 @@ export function animateStepOut(
 	return timeline
 }
 
-/**
- * Animate step entrance based on direction
- * @param element - The step element to animate in
- * @param direction - The direction of navigation (forward = slide from right, backward = slide from left)
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateStepIn(
 	element: HTMLElement,
 	direction: StepDirection,
@@ -227,12 +175,6 @@ export function animateStepIn(
 	return timeline
 }
 
-/**
- * Animate flow exit (fade out and scale down)
- * @param element - The content element to animate out
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFlowOut(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}
@@ -251,12 +193,6 @@ export function animateFlowOut(
 	return timeline
 }
 
-/**
- * Animate flow entrance (fade in and scale up)
- * @param element - The content element to animate in
- * @param config - Animation configuration
- * @returns GSAP timeline
- */
 export function animateFlowIn(
 	element: HTMLElement,
 	config: FrameAnimationConfig = {}

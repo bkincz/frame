@@ -1,52 +1,185 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { describe, it, expect } from 'vitest'
-import { FLOW_REGISTRY } from '../frame.registry'
+import { describe, it, expect, beforeEach } from 'vitest'
+import {
+	setFlowRegistry,
+	getFlowRegistry,
+	registerFlow,
+	unregisterFlow,
+	clearFlowRegistry,
+	type FlowRegistry,
+} from '../frame.registry'
+
+/*
+ *   TEST FIXTURES
+ ***************************************************************************************************/
+const mockFlowFactory = () => ({
+	flow: {
+		step1: { components: [] },
+		step2: { components: [] },
+	},
+})
+
+const testRegistry: FlowRegistry = {
+	testFlow: {
+		factory: mockFlowFactory,
+		title: 'Test Flow',
+		description: 'A test flow',
+	},
+	anotherFlow: {
+		factory: mockFlowFactory,
+		title: 'Another Flow',
+	},
+}
 
 /*
  *   TESTS
  ***************************************************************************************************/
 describe('Frame Registry', () => {
-	describe('FLOW_REGISTRY', () => {
-		it('should be defined', () => {
-			expect(FLOW_REGISTRY).toBeDefined()
-			expect(typeof FLOW_REGISTRY).toBe('object')
+	beforeEach(() => {
+		// Clear registry before each test
+		clearFlowRegistry()
+	})
+
+	describe('setFlowRegistry', () => {
+		it('should set the flow registry', () => {
+			setFlowRegistry(testRegistry)
+			const registry = getFlowRegistry()
+
+			expect(registry).toEqual(testRegistry)
 		})
 
-		it('should contain flow entries with required properties', () => {
-			const flowNames = Object.keys(FLOW_REGISTRY)
+		it('should replace existing registry', () => {
+			setFlowRegistry(testRegistry)
+			const newRegistry: FlowRegistry = {
+				newFlow: {
+					factory: mockFlowFactory,
+					title: 'New Flow',
+				},
+			}
 
-			expect(flowNames.length).toBeGreaterThan(0)
+			setFlowRegistry(newRegistry)
+			const registry = getFlowRegistry()
 
-			flowNames.forEach(flowName => {
-				const entry = FLOW_REGISTRY[flowName]
+			expect(registry).toEqual(newRegistry)
+			expect(registry.testFlow).toBeUndefined()
+		})
+	})
 
-				expect(entry).toBeDefined()
+	describe('getFlowRegistry', () => {
+		it('should return empty object when no registry set', () => {
+			const registry = getFlowRegistry()
+			expect(registry).toEqual({})
+		})
+
+		it('should return the current registry', () => {
+			setFlowRegistry(testRegistry)
+			const registry = getFlowRegistry()
+
+			expect(registry).toBe(testRegistry)
+		})
+	})
+
+	describe('registerFlow', () => {
+		it('should add a flow to the registry', () => {
+			const flowEntry = {
+				factory: mockFlowFactory,
+				title: 'Dynamic Flow',
+			}
+
+			registerFlow('dynamicFlow', flowEntry)
+			const registry = getFlowRegistry()
+
+			expect(registry.dynamicFlow).toEqual(flowEntry)
+		})
+
+		it('should add to existing registry', () => {
+			setFlowRegistry(testRegistry)
+
+			const newFlow = {
+				factory: mockFlowFactory,
+				title: 'New Flow',
+			}
+
+			registerFlow('newFlow', newFlow)
+			const registry = getFlowRegistry()
+
+			expect(registry.newFlow).toEqual(newFlow)
+			expect(registry.testFlow).toEqual(testRegistry.testFlow)
+		})
+
+		it('should overwrite existing flow with same name', () => {
+			setFlowRegistry(testRegistry)
+
+			const updatedFlow = {
+				factory: mockFlowFactory,
+				title: 'Updated Test Flow',
+			}
+
+			registerFlow('testFlow', updatedFlow)
+			const registry = getFlowRegistry()
+
+			expect(registry.testFlow).toEqual(updatedFlow)
+		})
+	})
+
+	describe('unregisterFlow', () => {
+		it('should remove a flow from the registry', () => {
+			setFlowRegistry(testRegistry)
+
+			unregisterFlow('testFlow')
+			const registry = getFlowRegistry()
+
+			expect(registry.testFlow).toBeUndefined()
+			expect(registry.anotherFlow).toBeDefined()
+		})
+
+		it('should do nothing if flow does not exist', () => {
+			setFlowRegistry(testRegistry)
+
+			unregisterFlow('nonexistent')
+			const registry = getFlowRegistry()
+
+			expect(registry).toEqual(testRegistry)
+		})
+	})
+
+	describe('clearFlowRegistry', () => {
+		it('should clear all flows', () => {
+			setFlowRegistry(testRegistry)
+
+			clearFlowRegistry()
+			const registry = getFlowRegistry()
+
+			expect(registry).toEqual({})
+		})
+	})
+
+	describe('Flow Entry Structure', () => {
+		it('should contain required properties', () => {
+			setFlowRegistry(testRegistry)
+			const registry = getFlowRegistry()
+
+			Object.entries(registry).forEach(([, entry]) => {
 				expect(entry.factory).toBeDefined()
 				expect(typeof entry.factory).toBe('function')
 				expect(entry.title).toBeDefined()
 				expect(typeof entry.title).toBe('string')
-
-				// Description is optional
-				if (entry.description) {
-					expect(typeof entry.description).toBe('string')
-				}
 			})
 		})
 
 		it('should have factories that return valid flow definitions', () => {
-			const flowNames = Object.keys(FLOW_REGISTRY)
+			setFlowRegistry(testRegistry)
+			const registry = getFlowRegistry()
 
-			flowNames.forEach(flowName => {
-				const entry = FLOW_REGISTRY[flowName]
+			Object.entries(registry).forEach(([, entry]) => {
 				const flowDef = entry.factory()
 
 				expect(flowDef).toBeDefined()
 				expect(flowDef.flow).toBeDefined()
 				expect(typeof flowDef.flow).toBe('object')
 
-				// Verify each step has required properties
 				const stepKeys = Object.keys(flowDef.flow)
 				expect(stepKeys.length).toBeGreaterThan(0)
 
@@ -56,27 +189,6 @@ describe('Frame Registry', () => {
 					expect(step.components).toBeDefined()
 					expect(Array.isArray(step.components)).toBe(true)
 				})
-			})
-		})
-
-		it('should contain expected default flows', () => {
-			// Verify common flows exist
-			expect(FLOW_REGISTRY.example).toBeDefined()
-			expect(FLOW_REGISTRY.modal).toBeDefined()
-			expect(FLOW_REGISTRY.showcase).toBeDefined()
-		})
-
-		it('should have unique flow names', () => {
-			const flowNames = Object.keys(FLOW_REGISTRY)
-			const uniqueNames = new Set(flowNames)
-
-			expect(uniqueNames.size).toBe(flowNames.length)
-		})
-
-		it('should have descriptive titles', () => {
-			Object.entries(FLOW_REGISTRY).forEach(([flowName, entry]) => {
-				expect(entry.title.length).toBeGreaterThan(0)
-				expect(entry.title).not.toBe(flowName) // Title should be different from key
 			})
 		})
 	})

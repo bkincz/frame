@@ -10,6 +10,27 @@ import { createRoot } from 'react-dom/client'
 import '@/styles/global.scss'
 
 /*
+ *   FRAME SETUP
+ ***************************************************************************************************/
+import { setFlowRegistry } from '@/core/frame.registry'
+import { createExampleFlow } from '@/flows/example/example.flow'
+import { createModalFlow } from '@/flows/modal/modal.flow'
+
+// Register flows for this demo application
+setFlowRegistry({
+	example: {
+		factory: createExampleFlow,
+		title: 'Example Flow',
+		description: 'A demonstration of the factory-based flow system',
+	},
+	modal: {
+		factory: createModalFlow,
+		title: 'Modal Flow',
+		description: 'A demonstration of the modal variant with centered content',
+	},
+})
+
+/*
  *   COMPONENTS
  ***************************************************************************************************/
 import { FrameContainer } from '@/core/frame.container'

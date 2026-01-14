@@ -67,10 +67,8 @@ export const Button: FC<ButtonProps> = ({
 	tooltip,
 	...rest
 }) => {
-	// Button ref for tooltip positioning
 	const buttonRef = useRef<HTMLButtonElement>(null)
 
-	// Initialize tooltip if tooltip prop is provided
 	const tooltipHook = useTooltip({
 		offset: {
 			x: 0,
@@ -98,7 +96,6 @@ export const Button: FC<ButtonProps> = ({
 		onClick?.(e)
 	}
 
-	// Handle adornment prop for icon buttons
 	const iconAdornment = adornment
 		? (() => {
 				const IconComponent = TablerIcons[
@@ -113,7 +110,6 @@ export const Button: FC<ButtonProps> = ({
 			})()
 		: null
 
-	// Determine effective adornments based on adornment prop
 	const effectiveStartAdornment =
 		adornment && adornment.position === 'start' ? iconAdornment : startAdornment
 	const effectiveEndAdornment =
@@ -137,7 +133,6 @@ export const Button: FC<ButtonProps> = ({
 		className
 	)
 
-	// For icon variants with adornment prop, render the icon directly
 	const isIconVariant = variant === 'iconSolid' || variant === 'iconOutlined'
 	const iconContent = isIconVariant && adornment ? iconAdornment : children
 
@@ -171,63 +166,3 @@ export const Button: FC<ButtonProps> = ({
 }
 
 Button.displayName = 'Button'
-
-/*
- *  EXAMPLE USAGE:
- *
- *    // Standard button with adornments
- *    <Button
- *      color="primary"
- *      variant="outlined"
- *      size="small"
- *      startAdornment={<Icon icon="IconPlus" />}
- *      endAdornment={<Icon icon="IconChevronRight" />}
- *    >
- *      Button Label
- *    </Button>
- *
- *    // Solid icon button (circular, filled)
- *    <Button
- *      color="primary"
- *      variant="iconSolid"
- *      adornment={{
- *        position: 'start',
- *        name: 'IconPlus',
- *        size: 20,
- *        stroke: 2,
- *      }}
- *    />
- *
- *    // Outlined icon button (circular, with border)
- *    <Button
- *      color="success"
- *      variant="iconOutlined"
- *      adornment={{
- *        position: 'start',
- *        name: 'IconCheck',
- *        size: 20,
- *        stroke: 2,
- *      }}
- *    />
- *
- *    // Icon button with children (works with both variants)
- *    <Button
- *      color="error"
- *      variant="iconSolid"
- *    >
- *      <Icon icon="IconTrash" />
- *    </Button>
- *
- *    // Button with label and icon adornment
- *    <Button
- *      color="primary"
- *      variant="solid"
- *      label="Delete"
- *      adornment={{
- *        position: 'start',
- *        name: 'IconTrash',
- *        size: 18,
- *        stroke: 2,
- *      }}
- *    />
- **********************************************************************************************************/

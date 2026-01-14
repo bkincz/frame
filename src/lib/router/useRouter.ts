@@ -78,9 +78,6 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 	const [pathname, setPathname] = useState(routeManager.getPathname())
 	const [search, setSearch] = useState(routeManager.getSearch())
 
-	/**
-	 * Update local state when route changes
-	 */
 	const handleRouteChange = useCallback(() => {
 		setParams(routeManager.getParams(watchParams))
 		setPathname(routeManager.getPathname())
@@ -94,17 +91,11 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 		}
 	}, [watchParams, debug])
 
-	/**
-	 * Subscribe to route changes
-	 */
 	useEffect(() => {
 		const unsubscribe = routeManager.subscribe(handleRouteChange)
 		return unsubscribe
 	}, [handleRouteChange])
 
-	/**
-	 * Memoized methods
-	 */
 	const updateParams = useCallback((newParams: RouteParams) => {
 		routeManager.updateParams(newParams)
 	}, [])

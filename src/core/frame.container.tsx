@@ -19,6 +19,7 @@ import { customEventManager } from '@/lib/event'
  *   TYPES
  ***************************************************************************************************/
 export interface FrameContainerProps {
+	/** Enable debug logging to console (default: false) */
 	debug?: boolean
 }
 
@@ -26,6 +27,28 @@ export interface FrameContainerProps {
  *   FRAME CONTAINER
  *   Smart component that orchestrates the frame routing and rendering
  ***************************************************************************************************/
+
+/**
+ * The main Frame container component that manages flow rendering and animations.
+ * This component should be placed at the root of your application.
+ *
+ * @param props - Component props
+ * @param props.debug - Enable debug logging to console (default: false)
+ *
+ * @example
+ * ```tsx
+ * import { FrameContainer } from '@bkincz/frame'
+ *
+ * function App() {
+ *   return (
+ *     <>
+ *       <YourApp />
+ *       <FrameContainer debug={false} />
+ *     </>
+ *   )
+ * }
+ * ```
+ */
 export function FrameContainer({ debug = false }: FrameContainerProps) {
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
@@ -84,10 +107,7 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 	useFlowLifecycle(isOpen, currentFlow, flowDefinition)
 	useStepLifecycle(currentStepKey, flowDefinition)
 
-	/**
-	 * Subscribe to step change events to sync rendered step
-	 * This handles cases where animations don't run (e.g., frame not initialized yet, browser navigation)
-	 */
+	// This handles cases where animations don't run (e.g., frame not initialized yet, browser navigation)
 	useEffect(() => {
 		if (!isOpen) return
 
@@ -108,9 +128,6 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		return () => subscription.unsubscribe()
 	}, [isOpen, hasFrameInit, debug])
 
-	/**
-	 * Handle frame entrance animation
-	 */
 	useEffect(() => {
 		if (!isOpen) return
 
@@ -118,9 +135,6 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		return cleanup
 	}, [isOpen, variant, animateFrameEntrance])
 
-	/**
-	 * Handle flow transitions with fade and scale animation
-	 */
 	useEffect(() => {
 		// Only sync without animation if one of them is null (initial open or close)
 		const isInitialOpen = !renderedFlow && currentFlow
@@ -168,16 +182,10 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		animateFlowTransition,
 	])
 
-	/**
-	 * Trigger close with animation
-	 */
 	const triggerClose = useCallback(() => {
 		animateFrameExit(closeFlow)
 	}, [animateFrameExit, closeFlow])
 
-	/**
-	 * Handle frame:request:close event and keyboard events
-	 */
 	useEffect(() => {
 		if (!isOpen) return
 
@@ -195,16 +203,10 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		}
 	}, [isOpen, triggerClose])
 
-	/**
-	 * Handle background overlay click
-	 */
 	const handleOverlayClick = () => {
 		triggerClose()
 	}
 
-	/**
-	 * Prevent clicks inside content from closing
-	 */
 	const handleContentClick = (event: React.MouseEvent) => {
 		event.stopPropagation()
 	}

@@ -20,11 +20,6 @@ class CustomEventManager {
 	private subscribers: Map<string, Map<string, CustomEventSubscriber>> = new Map()
 	private debug: boolean = process.env.NODE_ENV !== 'production'
 
-	/**
-	 * Subscribe to a custom event
-	 * @param eventType - The custom event type (e.g., 'cart:loading', 'cart:complete')
-	 * @param callback - The callback function
-	 */
 	subscribe<T extends EventType>(
 		eventType: T,
 		callback: CustomEventCallback<EventData<T>>
@@ -69,11 +64,6 @@ class CustomEventManager {
 		}
 	}
 
-	/**
-	 * Emit a custom event to all subscribers
-	 * @param eventType - The event type to emit
-	 * @param data - The data to pass to subscribers
-	 */
 	emit<T extends EventType>(eventType: T, data: EventData<T>): void
 	emit<T = any>(eventType: string, data: T): void
 	emit<T = any>(eventType: string, data?: T): void {
@@ -97,9 +87,6 @@ class CustomEventManager {
 		})
 	}
 
-	/**
-	 * Unsubscribe from a custom event
-	 */
 	private unsubscribe(eventType: string, subscriberId: string): void {
 		const subscriberMap = this.subscribers.get(eventType)
 		if (!subscriberMap) return
@@ -124,16 +111,10 @@ class CustomEventManager {
 		}
 	}
 
-	/**
-	 * Clean up all subscriptions (useful for testing or app teardown)
-	 */
 	cleanup(): void {
 		this.subscribers.clear()
 	}
 
-	/**
-	 * Get current subscription count for debugging
-	 */
 	getSubscriptionCount(): Record<string, number> {
 		const counts: Record<string, number> = {}
 		this.subscribers.forEach((subscriberMap, eventType) => {

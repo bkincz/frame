@@ -47,7 +47,6 @@ export const Tooltip: FC<TooltipProps> = ({
 	const [showAfterDelay, setShowAfterDelay] = useState(false)
 	const delayTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-	// Create or get portal root
 	useEffect(() => {
 		let root = document.getElementById('tooltip-portal-root')
 		if (!root) {
@@ -70,7 +69,6 @@ export const Tooltip: FC<TooltipProps> = ({
 		}
 	}, [])
 
-	// Position calculation function with direct DOM manipulation
 	const calculateAndApplyPosition = useCallback(
 		(mouseX: number, mouseY: number) => {
 			if (!tooltipRef.current || !visible) return
@@ -128,7 +126,6 @@ export const Tooltip: FC<TooltipProps> = ({
 		[visible, placement, offset.x, offset.y]
 	)
 
-	// Handle delay
 	useEffect(() => {
 		if (visible && delay !== undefined) {
 			delayTimeoutRef.current = setTimeout(() => {
@@ -150,7 +147,6 @@ export const Tooltip: FC<TooltipProps> = ({
 		}
 	}, [visible, delay])
 
-	// Animate tooltip visibility with GSAP
 	useEffect(() => {
 		if (!tooltipRef.current) return
 
@@ -177,7 +173,6 @@ export const Tooltip: FC<TooltipProps> = ({
 		}
 	}, [visible, isPositioned, showAfterDelay])
 
-	// Position based on anchor element or mouse tracking
 	useEffect(() => {
 		if (!visible) return
 

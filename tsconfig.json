@@ -20,11 +20,20 @@
       "@/*": ["src/*"]
     },
 
+    /* Type declarations */
+    "declaration": true,
+    "declarationMap": true,
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Library compatibility */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
   "exclude": ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"],

@@ -1,11 +1,4 @@
 /*
- *   IMPORTS
- ***************************************************************************************************/
-import { createExampleFlow } from '@/flows/example/example.flow'
-import { createModalFlow } from '@/flows/modal/modal.flow'
-import { createShowcaseFlow } from '@/flows/showcase/showcase.flow'
-
-/*
  *   TYPES
  ***************************************************************************************************/
 import type { FlowFactory } from '@/flows/flow.types'
@@ -19,23 +12,46 @@ export interface FlowRegistryEntry {
 export type FlowRegistry = Record<string, FlowRegistryEntry>
 
 /*
- *   FLOW REGISTRY
- *   Register all available flows here
+ *   REGISTRY MANAGEMENT
+ *   Developers should create their own registry and pass it to Frame
  ***************************************************************************************************/
-export const FLOW_REGISTRY: FlowRegistry = {
-	example: {
-		factory: createExampleFlow,
-		title: 'Example Flow',
-		description: 'A demonstration of the factory-based flow system',
-	},
-	modal: {
-		factory: createModalFlow,
-		title: 'Modal Flow',
-		description: 'A demonstration of the modal variant with centered content',
-	},
-	showcase: {
-		factory: createShowcaseFlow,
-		title: 'Component Showcase',
-		description: 'A dedicated space for building and testing components in isolation',
-	},
+// Internal registry storage (can be set by developers)
+let _registry: FlowRegistry = {}
+
+/**
+ * Set the flow registry for the Frame
+ * This should be called once in your application before using Frame
+ *
+ * @example
+ * ```tsx
+ * import { setFlowRegistry } from '@bkincz/frame'
+ * import { createMyFlow } from './flows/my-flow'
+ *
+ * setFlowRegistry({
+ *   myFlow: {
+ *     factory: createMyFlow,
+ *     title: 'My Flow',
+ *     description: 'Description of my flow'
+ *   }
+ * })
+ * ```
+ */
+export function setFlowRegistry(registry: FlowRegistry): void {
+	_registry = registry
+}
+
+export function getFlowRegistry(): FlowRegistry {
+	return _registry
+}
+
+export function registerFlow(flowName: string, entry: FlowRegistryEntry): void {
+	_registry[flowName] = entry
+}
+
+export function unregisterFlow(flowName: string): void {
+	delete _registry[flowName]
+}
+
+export function clearFlowRegistry(): void {
+	_registry = {}
 }

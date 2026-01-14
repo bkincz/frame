@@ -301,7 +301,7 @@ Frame.Next = ({
 	)
 }
 
-Frame.Navigation = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
+Frame.Navigation = ({ className, children, ...rest }: BaseInterface) => {
 	const variant = useStateSlice(FrameState, state => state.variant)
 
 	const navClassName = variant === 'modal' ? styles.navigationModal : styles.navigation
@@ -309,8 +309,12 @@ Frame.Navigation = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => 
 	return (
 		<div className={clsx(navClassName, className)} {...rest}>
 			<div>
-				<Frame.Back />
-				<Frame.Next />
+				{children ?? (
+					<>
+						<Frame.Back />
+						<Frame.Next />
+					</>
+				)}
 			</div>
 		</div>
 	)

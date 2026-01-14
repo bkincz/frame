@@ -62,108 +62,6 @@
                 'label-focus': $button-primary-icon-outlined-label-focus,
             ),
         ),
-        'success': ('solid': ('base': $button-success-solid-bg,
-                'hover': $button-success-solid-bg-hover,
-                'focus': $button-success-solid-bg-focus,
-                'border': $button-success-solid-border,
-                'border-hover': $button-success-solid-border-hover,
-                'border-focus': $button-success-solid-border-focus,
-                'label': $button-success-solid-label,
-                'label-hover': $button-success-solid-label-hover,
-                'label-focus': $button-success-solid-label-focus,
-            ),
-            'outlined': ('base': $button-success-outlined-bg,
-                'hover': $button-success-outlined-bg-hover,
-                'focus': $button-success-outlined-bg-focus,
-                'border': $button-success-outlined-border,
-                'border-hover': $button-success-outlined-border-hover,
-                'border-focus': $button-success-outlined-border-focus,
-                'label': $button-success-outlined-label,
-                'label-hover': $button-success-outlined-label-hover,
-                'label-focus': $button-success-outlined-label-focus,
-            ),
-            'text': ('base': $button-success-text-bg,
-                'hover': $button-success-text-bg-hover,
-                'focus': $button-success-text-bg-focus,
-                'border': $button-success-text-border,
-                'border-hover': $button-success-text-border-hover,
-                'border-focus': $button-success-text-border-focus,
-                'label': $button-success-text-label,
-                'label-hover': $button-success-text-label-hover,
-                'label-focus': $button-success-text-label-focus,
-            ),
-            'iconSolid': ('base': $button-success-icon-solid-bg,
-                'hover': $button-success-icon-solid-bg-hover,
-                'focus': $button-success-icon-solid-bg-focus,
-                'border': $button-success-icon-solid-border,
-                'border-hover': $button-success-icon-solid-border-hover,
-                'border-focus': $button-success-icon-solid-border-focus,
-                'label': $button-success-icon-solid-label,
-                'label-hover': $button-success-icon-solid-label-hover,
-                'label-focus': $button-success-icon-solid-label-focus,
-            ),
-            'iconOutlined': ('base': $button-success-icon-outlined-bg,
-                'hover': $button-success-icon-outlined-bg-hover,
-                'focus': $button-success-icon-outlined-bg-focus,
-                'border': $button-success-icon-outlined-border,
-                'border-hover': $button-success-icon-outlined-border-hover,
-                'border-focus': $button-success-icon-outlined-border-focus,
-                'label': $button-success-icon-outlined-label,
-                'label-hover': $button-success-icon-outlined-label-hover,
-                'label-focus': $button-success-icon-outlined-label-focus,
-            ),
-        ),
-        'error': ('solid': ('base': $button-error-solid-bg,
-                'hover': $button-error-solid-bg-hover,
-                'focus': $button-error-solid-bg-focus,
-                'border': $button-error-solid-border,
-                'border-hover': $button-error-solid-border-hover,
-                'border-focus': $button-error-solid-border-focus,
-                'label': $button-error-solid-label,
-                'label-hover': $button-error-solid-label-hover,
-                'label-focus': $button-error-solid-label-focus,
-            ),
-            'outlined': ('base': $button-error-outlined-bg,
-                'hover': $button-error-outlined-bg-hover,
-                'focus': $button-error-outlined-bg-focus,
-                'border': $button-error-outlined-border,
-                'border-hover': $button-error-outlined-border-hover,
-                'border-focus': $button-error-outlined-border-focus,
-                'label': $button-error-outlined-label,
-                'label-hover': $button-error-outlined-label-hover,
-                'label-focus': $button-error-outlined-label-focus,
-            ),
-            'text': ('base': $button-error-text-bg,
-                'hover': $button-error-text-bg-hover,
-                'focus': $button-error-text-bg-focus,
-                'border': $button-error-text-border,
-                'border-hover': $button-error-text-border-hover,
-                'border-focus': $button-error-text-border-focus,
-                'label': $button-error-text-label,
-                'label-hover': $button-error-text-label-hover,
-                'label-focus': $button-error-text-label-focus,
-            ),
-            'iconSolid': ('base': $button-error-icon-solid-bg,
-                'hover': $button-error-icon-solid-bg-hover,
-                'focus': $button-error-icon-solid-bg-focus,
-                'border': $button-error-icon-solid-border,
-                'border-hover': $button-error-icon-solid-border-hover,
-                'border-focus': $button-error-icon-solid-border-focus,
-                'label': $button-error-icon-solid-label,
-                'label-hover': $button-error-icon-solid-label-hover,
-                'label-focus': $button-error-icon-solid-label-focus,
-            ),
-            'iconOutlined': ('base': $button-error-icon-outlined-bg,
-                'hover': $button-error-icon-outlined-bg-hover,
-                'focus': $button-error-icon-outlined-bg-focus,
-                'border': $button-error-icon-outlined-border,
-                'border-hover': $button-error-icon-outlined-border-hover,
-                'border-focus': $button-error-icon-outlined-border-focus,
-                'label': $button-error-icon-outlined-label,
-                'label-hover': $button-error-icon-outlined-label-hover,
-                'label-focus': $button-error-icon-outlined-label-focus,
-            ),
-        ),
         'disabled': ('solid': ('base': $button-disabled-solid-bg,
                 'hover': $button-disabled-solid-bg-hover,
                 'focus': $button-disabled-solid-bg-focus,
@@ -243,11 +141,13 @@
     justify-content: center;
     gap: 8px;
     border: none;
-    border-radius: 12px;
-    transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
 
-    & span {
-        transition: color 0.3s ease-in-out;
+    & span,
+    & svg,
+    & * {
+        transition: all 0.2s ease-in-out;
     }
 
     &:focus,
@@ -335,9 +235,9 @@
     @each $variantName, $variantConfig in $variants {
         .color#{capitalize($colorName)}#{capitalize($variantName)} {
             color: map.get($variantConfig, 'label');
-            border: 1px solid map.get($variantConfig, 'border');
+            border: 2px solid map.get($variantConfig, 'border');
             background: map.get($variantConfig, 'base');
-            transition: background 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            transition: all 0.2s ease-in-out;
 
             @if $variantName =='iconSolid' or $variantName =='iconOutlined' {
                 padding: 0;
@@ -345,16 +245,20 @@
             }
 
             &>span,
+            & svg,
             & * {
                 color: map.get($variantConfig, 'label');
+                transition: all 0.2s ease-in-out;
             }
 
             &:hover {
                 color: map.get($variantConfig, 'label-hover');
                 border-color: map.get($variantConfig, 'border-hover');
                 background: map.get($variantConfig, 'hover');
+                box-shadow: 0 2px 8px $shadow00;
 
                 &>span,
+                & svg,
                 & * {
                     color: map.get($variantConfig, 'label-hover');
                 }
@@ -366,6 +270,7 @@
                 background: map.get($variantConfig, 'focus');
 
                 &>span,
+                & svg,
                 & * {
                     color: map.get($variantConfig, 'label-focus');
                 }
