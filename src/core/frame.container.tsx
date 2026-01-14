@@ -155,8 +155,9 @@ export function FrameContainer({ debug = false, children }: FrameContainerProps)
 	const showOverlay = variant === 'modal'
 
 	// Determine if sidebar should be shown (step config > flow config > default true)
+	// Always hide sidebar in modal variant
 	const sidebarConfig = currentStep?.config?.sidebar ?? flowDefinition?.config?.sidebar ?? true
-	const showSidebar = sidebarConfig !== false
+	const showSidebar = variant === 'modal' ? false : sidebarConfig !== false
 
 	// Handle flow and step lifecycle with custom hooks
 	useFlowLifecycle(isOpen, currentFlow, flowDefinition)
