@@ -12,18 +12,23 @@
  *   RESET LAYER
  ***************************************************************************************************/
 @layer reset {
-    body {
-        margin: 0;
-        font-family: 'Noto Sans', sans-serif;
-        color: variables.$text00;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+	body {
+		margin: 0;
+		font-family: 'Noto Sans', sans-serif;
+		color: variables.$text00;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
 
-    h1, h2, h3, h4, h5, h6 {
-        margin: 0;
-        padding: 0;
-        font-weight: bold;
-        font-family: 'Noto Sans', sans-serif;
-    }
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin: 0;
+		padding: 0;
+		font-weight: bold;
+		font-family: 'Noto Sans', sans-serif;
+	}
 }

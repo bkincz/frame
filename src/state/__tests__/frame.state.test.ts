@@ -194,9 +194,7 @@ describe('FrameState', () => {
 			FrameState.openFrame('test-flow', 'step2')
 			FrameState.openFrame('flow-2')
 
-			expect(FrameState.state.flowHistory).toEqual([
-				{ flow: 'test-flow', stepKey: 'step2' },
-			])
+			expect(FrameState.state.flowHistory).toEqual([{ flow: 'test-flow', stepKey: 'step2' }])
 		})
 
 		it('should not chain if chain=false', () => {

@@ -1,7 +1,7 @@
 {
   "name": "@bkincz/frame",
   "version": "1.0.0",
-  "description": "A high-performance React multi-step flow system with animations, navigation history, and optional URL routing",
+  "description": "A production-ready, TypeScript-first React multi-step flow system with animations, navigation history, and customizable layouts",
   "type": "module",
   "main": "./dist/frame.cjs",
   "module": "./dist/frame.mjs",
@@ -42,16 +42,27 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bkincz/frame"
+    "url": "https://github.com/bkincz/frame.git"
   },
-  "author": "Benjamin Kinczel",
+  "bugs": {
+    "url": "https://github.com/bkincz/frame/issues"
+  },
+  "homepage": "https://github.com/bkincz/frame#readme",
+  "author": "Benjamin Kinczel <beni.kinczel@gmail.com>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:lib": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "pnpm run build:lib",
+    "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

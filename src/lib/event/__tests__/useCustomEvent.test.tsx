@@ -66,7 +66,10 @@ describe('useCustomEvent', () => {
 
 			renderHook(() => useCustomEvent('test:event', callback))
 
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('test:event', expect.any(Function))
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'test:event',
+				expect.any(Function)
+			)
 		})
 
 		it('should call callback when event is emitted', () => {
@@ -107,11 +110,17 @@ describe('useCustomEvent', () => {
 				}
 			)
 
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('event:one', expect.any(Function))
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'event:one',
+				expect.any(Function)
+			)
 
 			rerender({ eventType: 'event:two' })
 
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('event:two', expect.any(Function))
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'event:two',
+				expect.any(Function)
+			)
 		})
 
 		it('should use latest callback without resubscribing', () => {
@@ -121,9 +130,12 @@ describe('useCustomEvent', () => {
 			;(customEventManager as any).__reset()
 			vi.clearAllMocks()
 
-			const { rerender } = renderHook(({ callback }) => useCustomEvent('test:event', callback), {
-				initialProps: { callback: callback1 },
-			})
+			const { rerender } = renderHook(
+				({ callback }) => useCustomEvent('test:event', callback),
+				{
+					initialProps: { callback: callback1 },
+				}
+			)
 
 			// Clear the initial subscribe call count
 			const initialCallCount = vi.mocked(customEventManager.subscribe).mock.calls.length
@@ -187,7 +199,10 @@ describe('useCustomEvent', () => {
 
 			rerender({ disabled: false })
 
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('test:event', expect.any(Function))
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'test:event',
+				expect.any(Function)
+			)
 		})
 
 		it('should unsubscribe when disabled changes from false to true', () => {
@@ -238,8 +253,14 @@ describe('useCustomEvent', () => {
 			renderHook(() => useCustomEvent('event:one', callback1))
 			renderHook(() => useCustomEvent('event:two', callback2))
 
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('event:one', expect.any(Function))
-			expect(customEventManager.subscribe).toHaveBeenCalledWith('event:two', expect.any(Function))
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'event:one',
+				expect.any(Function)
+			)
+			expect(customEventManager.subscribe).toHaveBeenCalledWith(
+				'event:two',
+				expect.any(Function)
+			)
 		})
 	})
 })

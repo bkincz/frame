@@ -9,264 +9,276 @@
  *   STYLES
  **********************************************************************************************************/
 @layer components {
-    $colorConfigs: (
-        'primary': ('solid': ('base': $button-primary-solid-bg,
-                'hover': $button-primary-solid-bg-hover,
-                'focus': $button-primary-solid-bg-focus,
-                'border': $button-primary-solid-border,
-                'border-hover': $button-primary-solid-border-hover,
-                'border-focus': $button-primary-solid-border-focus,
-                'label': $button-primary-solid-label,
-                'label-hover': $button-primary-solid-label-hover,
-                'label-focus': $button-primary-solid-label-focus,
-            ),
-            'outlined': ('base': $button-primary-outlined-bg,
-                'hover': $button-primary-outlined-bg-hover,
-                'focus': $button-primary-outlined-bg-focus,
-                'border': $button-primary-outlined-border,
-                'border-hover': $button-primary-outlined-border-hover,
-                'border-focus': $button-primary-outlined-border-focus,
-                'label': $button-primary-outlined-label,
-                'label-hover': $button-primary-outlined-label-hover,
-                'label-focus': $button-primary-outlined-label-focus,
-            ),
-            'text': ('base': $button-primary-text-bg,
-                'hover': $button-primary-text-bg-hover,
-                'focus': $button-primary-text-bg-focus,
-                'border': $button-primary-text-border,
-                'border-hover': $button-primary-text-border-hover,
-                'border-focus': $button-primary-text-border-focus,
-                'label': $button-primary-text-label,
-                'label-hover': $button-primary-text-label-hover,
-                'label-focus': $button-primary-text-label-focus,
-            ),
-            'iconSolid': ('base': $button-primary-icon-solid-bg,
-                'hover': $button-primary-icon-solid-bg-hover,
-                'focus': $button-primary-icon-solid-bg-focus,
-                'border': $button-primary-icon-solid-border,
-                'border-hover': $button-primary-icon-solid-border-hover,
-                'border-focus': $button-primary-icon-solid-border-focus,
-                'label': $button-primary-icon-solid-label,
-                'label-hover': $button-primary-icon-solid-label-hover,
-                'label-focus': $button-primary-icon-solid-label-focus,
-            ),
-            'iconOutlined': ('base': $button-primary-icon-outlined-bg,
-                'hover': $button-primary-icon-outlined-bg-hover,
-                'focus': $button-primary-icon-outlined-bg-focus,
-                'border': $button-primary-icon-outlined-border,
-                'border-hover': $button-primary-icon-outlined-border-hover,
-                'border-focus': $button-primary-icon-outlined-border-focus,
-                'label': $button-primary-icon-outlined-label,
-                'label-hover': $button-primary-icon-outlined-label-hover,
-                'label-focus': $button-primary-icon-outlined-label-focus,
-            ),
-        ),
-        'disabled': ('solid': ('base': $button-disabled-solid-bg,
-                'hover': $button-disabled-solid-bg-hover,
-                'focus': $button-disabled-solid-bg-focus,
-                'border': $button-disabled-solid-border,
-                'border-hover': $button-disabled-solid-border-hover,
-                'border-focus': $button-disabled-solid-border-focus,
-                'label': $button-disabled-solid-label,
-                'label-hover': $button-disabled-solid-label-hover,
-                'label-focus': $button-disabled-solid-label-focus,
-            ),
-            'outlined': ('base': $button-disabled-outlined-bg,
-                'hover': $button-disabled-outlined-bg-hover,
-                'focus': $button-disabled-outlined-bg-focus,
-                'border': $button-disabled-outlined-border,
-                'border-hover': $button-disabled-outlined-border-hover,
-                'border-focus': $button-disabled-outlined-border-focus,
-                'label': $button-disabled-outlined-label,
-                'label-hover': $button-disabled-outlined-label-hover,
-                'label-focus': $button-disabled-outlined-label-focus,
-            ),
-            'text': ('base': $button-disabled-text-bg,
-                'hover': $button-disabled-text-bg-hover,
-                'focus': $button-disabled-text-bg-focus,
-                'border': $button-disabled-text-border,
-                'border-hover': $button-disabled-text-border-hover,
-                'border-focus': $button-disabled-text-border-focus,
-                'label': $button-disabled-text-label,
-                'label-hover': $button-disabled-text-label-hover,
-                'label-focus': $button-disabled-text-label-focus,
-            ),
-            'iconSolid': ('base': $button-disabled-icon-solid-bg,
-                'hover': $button-disabled-icon-solid-bg-hover,
-                'focus': $button-disabled-icon-solid-bg-focus,
-                'border': $button-disabled-icon-solid-border,
-                'border-hover': $button-disabled-icon-solid-border-hover,
-                'border-focus': $button-disabled-icon-solid-border-focus,
-                'label': $button-disabled-icon-solid-label,
-                'label-hover': $button-disabled-icon-solid-label-hover,
-                'label-focus': $button-disabled-icon-solid-label-focus,
-            ),
-            'iconOutlined': ('base': $button-disabled-icon-outlined-bg,
-                'hover': $button-disabled-icon-outlined-bg-hover,
-                'focus': $button-disabled-icon-outlined-bg-focus,
-                'border': $button-disabled-icon-outlined-border,
-                'border-hover': $button-disabled-icon-outlined-border-hover,
-                'border-focus': $button-disabled-icon-outlined-border-focus,
-                'label': $button-disabled-icon-outlined-label,
-                'label-hover': $button-disabled-icon-outlined-label-hover,
-                'label-focus': $button-disabled-icon-outlined-label-focus,
-            ),
-        )
-    );
+	$colorConfigs: (
+		'primary': (
+			'solid': (
+				'base': $button-primary-solid-bg,
+				'hover': $button-primary-solid-bg-hover,
+				'focus': $button-primary-solid-bg-focus,
+				'border': $button-primary-solid-border,
+				'border-hover': $button-primary-solid-border-hover,
+				'border-focus': $button-primary-solid-border-focus,
+				'label': $button-primary-solid-label,
+				'label-hover': $button-primary-solid-label-hover,
+				'label-focus': $button-primary-solid-label-focus,
+			),
+			'outlined': (
+				'base': $button-primary-outlined-bg,
+				'hover': $button-primary-outlined-bg-hover,
+				'focus': $button-primary-outlined-bg-focus,
+				'border': $button-primary-outlined-border,
+				'border-hover': $button-primary-outlined-border-hover,
+				'border-focus': $button-primary-outlined-border-focus,
+				'label': $button-primary-outlined-label,
+				'label-hover': $button-primary-outlined-label-hover,
+				'label-focus': $button-primary-outlined-label-focus,
+			),
+			'text': (
+				'base': $button-primary-text-bg,
+				'hover': $button-primary-text-bg-hover,
+				'focus': $button-primary-text-bg-focus,
+				'border': $button-primary-text-border,
+				'border-hover': $button-primary-text-border-hover,
+				'border-focus': $button-primary-text-border-focus,
+				'label': $button-primary-text-label,
+				'label-hover': $button-primary-text-label-hover,
+				'label-focus': $button-primary-text-label-focus,
+			),
+			'iconSolid': (
+				'base': $button-primary-icon-solid-bg,
+				'hover': $button-primary-icon-solid-bg-hover,
+				'focus': $button-primary-icon-solid-bg-focus,
+				'border': $button-primary-icon-solid-border,
+				'border-hover': $button-primary-icon-solid-border-hover,
+				'border-focus': $button-primary-icon-solid-border-focus,
+				'label': $button-primary-icon-solid-label,
+				'label-hover': $button-primary-icon-solid-label-hover,
+				'label-focus': $button-primary-icon-solid-label-focus,
+			),
+			'iconOutlined': (
+				'base': $button-primary-icon-outlined-bg,
+				'hover': $button-primary-icon-outlined-bg-hover,
+				'focus': $button-primary-icon-outlined-bg-focus,
+				'border': $button-primary-icon-outlined-border,
+				'border-hover': $button-primary-icon-outlined-border-hover,
+				'border-focus': $button-primary-icon-outlined-border-focus,
+				'label': $button-primary-icon-outlined-label,
+				'label-hover': $button-primary-icon-outlined-label-hover,
+				'label-focus': $button-primary-icon-outlined-label-focus,
+			),
+		),
+		'disabled': (
+			'solid': (
+				'base': $button-disabled-solid-bg,
+				'hover': $button-disabled-solid-bg-hover,
+				'focus': $button-disabled-solid-bg-focus,
+				'border': $button-disabled-solid-border,
+				'border-hover': $button-disabled-solid-border-hover,
+				'border-focus': $button-disabled-solid-border-focus,
+				'label': $button-disabled-solid-label,
+				'label-hover': $button-disabled-solid-label-hover,
+				'label-focus': $button-disabled-solid-label-focus,
+			),
+			'outlined': (
+				'base': $button-disabled-outlined-bg,
+				'hover': $button-disabled-outlined-bg-hover,
+				'focus': $button-disabled-outlined-bg-focus,
+				'border': $button-disabled-outlined-border,
+				'border-hover': $button-disabled-outlined-border-hover,
+				'border-focus': $button-disabled-outlined-border-focus,
+				'label': $button-disabled-outlined-label,
+				'label-hover': $button-disabled-outlined-label-hover,
+				'label-focus': $button-disabled-outlined-label-focus,
+			),
+			'text': (
+				'base': $button-disabled-text-bg,
+				'hover': $button-disabled-text-bg-hover,
+				'focus': $button-disabled-text-bg-focus,
+				'border': $button-disabled-text-border,
+				'border-hover': $button-disabled-text-border-hover,
+				'border-focus': $button-disabled-text-border-focus,
+				'label': $button-disabled-text-label,
+				'label-hover': $button-disabled-text-label-hover,
+				'label-focus': $button-disabled-text-label-focus,
+			),
+			'iconSolid': (
+				'base': $button-disabled-icon-solid-bg,
+				'hover': $button-disabled-icon-solid-bg-hover,
+				'focus': $button-disabled-icon-solid-bg-focus,
+				'border': $button-disabled-icon-solid-border,
+				'border-hover': $button-disabled-icon-solid-border-hover,
+				'border-focus': $button-disabled-icon-solid-border-focus,
+				'label': $button-disabled-icon-solid-label,
+				'label-hover': $button-disabled-icon-solid-label-hover,
+				'label-focus': $button-disabled-icon-solid-label-focus,
+			),
+			'iconOutlined': (
+				'base': $button-disabled-icon-outlined-bg,
+				'hover': $button-disabled-icon-outlined-bg-hover,
+				'focus': $button-disabled-icon-outlined-bg-focus,
+				'border': $button-disabled-icon-outlined-border,
+				'border-hover': $button-disabled-icon-outlined-border-hover,
+				'border-focus': $button-disabled-icon-outlined-border-focus,
+				'label': $button-disabled-icon-outlined-label,
+				'label-hover': $button-disabled-icon-outlined-label-hover,
+				'label-focus': $button-disabled-icon-outlined-label-focus,
+			),
+		),
+	);
 
-.adornmentItem {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+	.adornmentItem {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-.buttonLabel {
-    font-weight: 800;
-    font-size: 14px;
-    text-transform: uppercase;
-    font-family: 'JetBrains Mono', monospace;
-}
+	.buttonLabel {
+		font-weight: 800;
+		font-size: 14px;
+		text-transform: uppercase;
+		font-family: 'JetBrains Mono', monospace;
+	}
 
-.buttonWrapper {
-    position: relative;
-    cursor: pointer;
-    background-color: transparent;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
+	.buttonWrapper {
+		position: relative;
+		cursor: pointer;
+		background-color: transparent;
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
 
-    display: inline-flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: none;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
+		display: inline-flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		border: none;
+		border-radius: 8px;
+		transition: all 0.2s ease-in-out;
 
-    & span,
-    & svg,
-    & * {
-        transition: all 0.2s ease-in-out;
-    }
+		& span,
+		& svg,
+		& * {
+			transition: all 0.2s ease-in-out;
+		}
 
-    &:focus,
-    &:focus-visible {
-        outline: none;
-    }
+		&:focus,
+		&:focus-visible {
+			outline: none;
+		}
 
-    &:disabled {
-        cursor: not-allowed;
-    }
+		&:disabled {
+			cursor: not-allowed;
+		}
 
-    &.sizeSmall {
-        font-size: 0.85rem;
-        height: 38px;
-        padding-inline: 16px;
+		&.sizeSmall {
+			font-size: 0.85rem;
+			height: 38px;
+			padding-inline: 16px;
 
-        &.hasStartAdornment {
-            padding-left: 16px;
-        }
+			&.hasStartAdornment {
+				padding-left: 16px;
+			}
 
-        &.hasEndAdornment {
-            padding-right: 16px;
-        }
+			&.hasEndAdornment {
+				padding-right: 16px;
+			}
 
-        &.iconSolid,
-        &.iconOutlined {
-            width: 38px;
-            min-width: 38px;
-            padding: 0;
-        }
-    }
+			&.iconSolid,
+			&.iconOutlined {
+				width: 38px;
+				min-width: 38px;
+				padding: 0;
+			}
+		}
 
-    &.sizeMedium {
-        font-size: 1rem;
-        height: 44px;
-        padding-inline: 24px;
+		&.sizeMedium {
+			font-size: 1rem;
+			height: 44px;
+			padding-inline: 24px;
 
-        &.hasStartAdornment {
-            padding-left: 16px;
-        }
+			&.hasStartAdornment {
+				padding-left: 16px;
+			}
 
-        &.hasEndAdornment {
-            padding-right: 24px;
-        }
+			&.hasEndAdornment {
+				padding-right: 24px;
+			}
 
-        &.iconSolid,
-        &.iconOutlined {
-            width: 44px;
-            min-width: 44px;
-            padding: 0;
-        }
-    }
+			&.iconSolid,
+			&.iconOutlined {
+				width: 44px;
+				min-width: 44px;
+				padding: 0;
+			}
+		}
 
-    &.sizeLarge {
-        font-size: 1rem;
-        height: 52px;
-        padding-inline: 24px;
+		&.sizeLarge {
+			font-size: 1rem;
+			height: 52px;
+			padding-inline: 24px;
 
-        &.hasStartAdornment {
-            padding-left: 24px;
-        }
+			&.hasStartAdornment {
+				padding-left: 24px;
+			}
 
-        &.hasEndAdornment {
-            padding-right: 24px;
-        }
+			&.hasEndAdornment {
+				padding-right: 24px;
+			}
 
-        &.iconSolid,
-        &.iconOutlined {
-            width: 52px;
-            min-width: 52px;
-            padding: 0;
-        }
-    }
-}
+			&.iconSolid,
+			&.iconOutlined {
+				width: 52px;
+				min-width: 52px;
+				padding: 0;
+			}
+		}
+	}
 
-@each $colorName, $variants in $colorConfigs {
-    @each $variantName, $variantConfig in $variants {
-        .color#{capitalize($colorName)}#{capitalize($variantName)} {
-            color: map.get($variantConfig, 'label');
-            border: 2px solid map.get($variantConfig, 'border');
-            background: map.get($variantConfig, 'base');
-            transition: all 0.2s ease-in-out;
+	@each $colorName, $variants in $colorConfigs {
+		@each $variantName, $variantConfig in $variants {
+			.color#{capitalize($colorName)}#{capitalize($variantName)} {
+				color: map.get($variantConfig, 'label');
+				border: 2px solid map.get($variantConfig, 'border');
+				background: map.get($variantConfig, 'base');
+				transition: all 0.2s ease-in-out;
 
-            @if $variantName =='iconSolid' or $variantName =='iconOutlined' {
-                padding: 0;
-                border-radius: 50%;
-            }
+				@if $variantName == 'iconSolid' or $variantName == 'iconOutlined' {
+					padding: 0;
+					border-radius: 50%;
+				}
 
-            &>span,
-            & svg,
-            & * {
-                color: map.get($variantConfig, 'label');
-                transition: all 0.2s ease-in-out;
-            }
+				& > span,
+				& svg,
+				& * {
+					color: map.get($variantConfig, 'label');
+					transition: all 0.2s ease-in-out;
+				}
 
-            &:hover {
-                color: map.get($variantConfig, 'label-hover');
-                border-color: map.get($variantConfig, 'border-hover');
-                background: map.get($variantConfig, 'hover');
-                box-shadow: 0 2px 8px $shadow00;
+				&:hover {
+					color: map.get($variantConfig, 'label-hover');
+					border-color: map.get($variantConfig, 'border-hover');
+					background: map.get($variantConfig, 'hover');
+					box-shadow: 0 2px 8px $shadow00;
 
-                &>span,
-                & svg,
-                & * {
-                    color: map.get($variantConfig, 'label-hover');
-                }
-            }
+					& > span,
+					& svg,
+					& * {
+						color: map.get($variantConfig, 'label-hover');
+					}
+				}
 
-            &:focus {
-                color: map.get($variantConfig, 'label-focus');
-                border-color: map.get($variantConfig, 'border-focus');
-                background: map.get($variantConfig, 'focus');
+				&:focus {
+					color: map.get($variantConfig, 'label-focus');
+					border-color: map.get($variantConfig, 'border-focus');
+					background: map.get($variantConfig, 'focus');
 
-                &>span,
-                & svg,
-                & * {
-                    color: map.get($variantConfig, 'label-focus');
-                }
-            }
-        }
-    }
-}
+					& > span,
+					& svg,
+					& * {
+						color: map.get($variantConfig, 'label-focus');
+					}
+				}
+			}
+		}
+	}
 }

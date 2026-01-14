@@ -2,9 +2,9 @@
 @use 'sass:string';
 
 @function em($pixels) {
-    @return math.div($pixels, 16) * 1em;
+	@return math.div($pixels, 16) * 1em;
 }
 
 @function capitalize($string) {
-    @return string.to-upper-case(string.slice($string, 1, 1))+string.slice($string, 2);
+	@return string.to-upper-case(string.slice($string, 1, 1)) + string.slice($string, 2);
 }

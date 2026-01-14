@@ -484,12 +484,9 @@ describe('useStepLifecycle', () => {
 				},
 			}
 
-			const { rerender } = renderHook(
-				({ stepKey }) => useStepLifecycle(stepKey, flowDef),
-				{
-					initialProps: { stepKey: 'step1' },
-				}
-			)
+			const { rerender } = renderHook(({ stepKey }) => useStepLifecycle(stepKey, flowDef), {
+				initialProps: { stepKey: 'step1' },
+			})
 
 			await waitFor(() => {
 				expect(onEnter1).toHaveBeenCalled()
@@ -527,12 +524,9 @@ describe('useStepLifecycle', () => {
 				},
 			}
 
-			const { rerender } = renderHook(
-				({ flowDef }) => useStepLifecycle('step1', flowDef),
-				{
-					initialProps: { flowDef: flowDef1 },
-				}
-			)
+			const { rerender } = renderHook(({ flowDef }) => useStepLifecycle('step1', flowDef), {
+				initialProps: { flowDef: flowDef1 },
+			})
 
 			expect(onEnter).toHaveBeenCalledTimes(1)
 

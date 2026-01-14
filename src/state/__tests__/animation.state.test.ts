@@ -75,9 +75,7 @@ describe('AnimationState', () => {
 			expect(AnimationState.selectIsAnimating()).toBe(true)
 			expect(AnimationState.selectAnimationType()).toBe('step')
 			expect(AnimationState.selectDirection()).toBe('forward')
-			expect(consoleSpy).toHaveBeenCalledWith(
-				'[AnimationState] Already animating: step'
-			)
+			expect(consoleSpy).toHaveBeenCalledWith('[AnimationState] Already animating: step')
 
 			consoleSpy.mockRestore()
 		})

@@ -5,305 +5,305 @@
 @use 'sass:color';
 
 @layer base {
-    .frame {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        z-index: 1000;
-    }
+	.frame {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+		z-index: 1000;
+	}
 
-    .backgroundOverlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba($black, 0.5);
-        z-index: 1001;
+	.backgroundOverlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba($black, 0.5);
+		z-index: 1001;
 
-        /* Initial state for animation */
-        opacity: 0;
-    }
+		/* Initial state for animation */
+		opacity: 0;
+	}
 
-    .content {
-        position: relative;
-        background-color: $surface01;
-        height: 100%;
-        padding: 24px;
-        z-index: 1002;
-    }
+	.content {
+		position: relative;
+		background-color: $surface01;
+		height: 100%;
+		padding: 24px;
+		z-index: 1002;
+	}
 
-    /* Modal variant: centered modal with max-width */
-    .contentModal {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: $surface0a;
-        width: 600px;
-        max-width: 1200px;
-        max-height: 85vh;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba($black, 0.3);
-        z-index: 1002;
-        display: flex;
-        flex-direction: column;
+	/* Modal variant: centered modal with max-width */
+	.contentModal {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: $surface0a;
+		width: 600px;
+		max-width: 1200px;
+		max-height: 85vh;
+		border-radius: 16px;
+		box-shadow: 0 20px 60px rgba($black, 0.3);
+		z-index: 1002;
+		display: flex;
+		flex-direction: column;
 
-        /* Initial state for animation */
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.95);
+		/* Initial state for animation */
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.95);
 
-        // Mobile: fill most of the screen (fixed height for scrollable content)
-        @media (max-width: 767px) {
-            width: 95dvw;
-            height: 95dvh;
-            max-width: 95dvw;
-            max-height: 95dvh;
-        }
+		// Mobile: fill most of the screen (fixed height for scrollable content)
+		@media (max-width: 767px) {
+			width: 95dvw;
+			height: 95dvh;
+			max-width: 95dvw;
+			max-height: 95dvh;
+		}
 
-        // Tablet: constrained but flexible (content dictates height)
-        @media (min-width: 768px) and (max-width: 1099px) {
-            width: 85dvw;
-            max-width: 85dvw;
-            max-height: 85dvh;
-        }
+		// Tablet: constrained but flexible (content dictates height)
+		@media (min-width: 768px) and (max-width: 1099px) {
+			width: 85dvw;
+			max-width: 85dvw;
+			max-height: 85dvh;
+		}
 
-        // Desktop: flexible sizing with constraints
-        @media (min-width: 1100px) {
-            max-width: 90dvw;
-            max-height: 85dvh;
-        }
-    }
+		// Desktop: flexible sizing with constraints
+		@media (min-width: 1100px) {
+			max-width: 90dvw;
+			max-height: 85dvh;
+		}
+	}
 
-    /* Fullscreen variant: full viewport (default) */
-    .contentFullscreen {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        background-color: $surface0a;
-        height: 100%;
-        width: 100%;
-        z-index: 1002;
+	/* Fullscreen variant: full viewport (default) */
+	.contentFullscreen {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		background-color: $surface0a;
+		height: 100%;
+		width: 100%;
+		z-index: 1002;
 
-        /* Initial state for animation */
-        opacity: 0;
-        transform: scale(0.95);
-    }
+		/* Initial state for animation */
+		opacity: 0;
+		transform: scale(0.95);
+	}
 
-    .close {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        cursor: pointer;
-        padding: 12px;
-        background-color: $surface0a;
-        border: 2px solid $border00;
-        border-radius: 50%;
-        line-height: 0;
-        z-index: 1003;
-        transition: all 0.2s ease-in-out;
+	.close {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		cursor: pointer;
+		padding: 12px;
+		background-color: $surface0a;
+		border: 2px solid $border00;
+		border-radius: 50%;
+		line-height: 0;
+		z-index: 1003;
+		transition: all 0.2s ease-in-out;
 
-        &:hover {
-            border-color: rgba($red, 0.15);
-            background-color: color.adjust(rgba($red, 0.25), $lightness: 35%);
-            color: $red;
-        }
-    }
+		&:hover {
+			border-color: rgba($red, 0.15);
+			background-color: color.adjust(rgba($red, 0.25), $lightness: 35%);
+			color: $red;
+		}
+	}
 
-    .closeModal {
-        position: absolute;
-        top: -64px; // 30px above + half button height (26px)
-        right: 0px;
-        cursor: pointer;
-        padding: 12px;
-        background-color: $surface0a;
-        border: 2px solid $border00;
-        border-radius: 50%;
-        line-height: 0;
-        z-index: 1003;
-        transition: all 0.2s ease-in-out;
+	.closeModal {
+		position: absolute;
+		top: -64px; // 30px above + half button height (26px)
+		right: 0px;
+		cursor: pointer;
+		padding: 12px;
+		background-color: $surface0a;
+		border: 2px solid $border00;
+		border-radius: 50%;
+		line-height: 0;
+		z-index: 1003;
+		transition: all 0.2s ease-in-out;
 
-        &:hover {
-            border-color: rgba($red, 0.15);
-            background-color: color.adjust(rgba($red, 0.25), $lightness: 35%);
-            color: $red;
-        }
+		&:hover {
+			border-color: rgba($red, 0.15);
+			background-color: color.adjust(rgba($red, 0.25), $lightness: 35%);
+			color: $red;
+		}
 
-        // On mobile, position inside the modal at top-right
-        @media (max-width: 767px) {
-            top: 12px;
-            right: 12px;
-        }
-    }
+		// On mobile, position inside the modal at top-right
+		@media (max-width: 767px) {
+			top: 12px;
+			right: 12px;
+		}
+	}
 
-    .footer {
-        position: relative;
-        background-color: $surface00;
-        border: 1px solid $border02;
-        border-radius: 12px;
-        z-index: 1002;
-    }
+	.footer {
+		position: relative;
+		background-color: $surface00;
+		border: 1px solid $border02;
+		border-radius: 12px;
+		z-index: 1002;
+	}
 
-    .navigation {
-        position: relative;
-        background-color: $surface0a;
-        display: flex;
-        grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
-        flex-flow: row nowrap;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 24px;
-        border-top: 1px solid $border00;
-        box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
-        z-index: 1004;
+	.navigation {
+		position: relative;
+		background-color: $surface0a;
+		display: flex;
+		grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
+		flex-flow: row nowrap;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 24px;
+		border-top: 1px solid $border00;
+		box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
+		z-index: 1004;
 
-        >div {
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            width: 100%;
-            max-width: 1600px;
-            margin-inline: auto;
-        }
-    }
+		> div {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			width: 100%;
+			max-width: 1600px;
+			margin-inline: auto;
+		}
+	}
 
-    .navigationModal {
-        position: relative;
-        width: calc(100% - 48px);
-        background-color: $surface0a;
-        display: flex;
-        grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
-        flex-flow: row nowrap;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 24px;
-        z-index: 1004;
+	.navigationModal {
+		position: relative;
+		width: calc(100% - 48px);
+		background-color: $surface0a;
+		display: flex;
+		grid-area: 3 / 1 / 4 / -1; // Span all columns (full width)
+		flex-flow: row nowrap;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 24px;
+		z-index: 1004;
 
-        border-radius: 0 0 12px 12px;
-        border-top: 1px solid $border00;
-        box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
+		border-radius: 0 0 12px 12px;
+		border-top: 1px solid $border00;
+		box-shadow: 0 -12px 24px rgba($shadow00, 0.15);
 
-        >div {
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            width: 100%;
-            max-width: 1600px;
-            margin-inline: auto;
-        }
-    }
+		> div {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			width: 100%;
+			max-width: 1600px;
+			margin-inline: auto;
+		}
+	}
 
-    .sidebar {
-        position: relative;
-        background-color: $surface00;
-        border: 1px solid $border02;
-        border-radius: 12px;
-        z-index: 1002;
-        display: flex;
-        grid-area: 1 / 4 / 3 / 5; // Column 4 (sidebar column)
-        padding: 24px;
-        align-self: start; // Fit content height instead of stretching
-        height: fit-content;
+	.sidebar {
+		position: relative;
+		background-color: $surface00;
+		border: 1px solid $border02;
+		border-radius: 12px;
+		z-index: 1002;
+		display: flex;
+		grid-area: 1 / 4 / 3 / 5; // Column 4 (sidebar column)
+		padding: 24px;
+		align-self: start; // Fit content height instead of stretching
+		height: fit-content;
 
-        // Hide sidebar on tablet and mobile (below 1100px)
-        @media (max-width: 1099px) {
-            display: none;
-        }
-    }
+		// Hide sidebar on tablet and mobile (below 1100px)
+		@media (max-width: 1099px) {
+			display: none;
+		}
+	}
 
-    .main {
-        position: relative;
-        display: flex;
-        flex-flow: column nowrap;
-        grid-area: 1 / 2 / 3 / 4; // Columns 2-3 (main columns)
-        overflow: auto;
-        padding: 24px;
+	.main {
+		position: relative;
+		display: flex;
+		flex-flow: column nowrap;
+		grid-area: 1 / 2 / 3 / 4; // Columns 2-3 (main columns)
+		overflow: auto;
+		padding: 24px;
 
-        // Performance optimizations for scrolling
-        -webkit-overflow-scrolling: touch; // iOS momentum scrolling
-        overscroll-behavior: contain; // Prevent scroll chaining
+		// Performance optimizations for scrolling
+		-webkit-overflow-scrolling: touch; // iOS momentum scrolling
+		overscroll-behavior: contain; // Prevent scroll chaining
 
-        // Custom scrollbar styling
-        scrollbar-width: thin;
-        scrollbar-color: rgba($text00, 0.2) transparent;
+		// Custom scrollbar styling
+		scrollbar-width: thin;
+		scrollbar-color: rgba($text00, 0.2) transparent;
 
-        &::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+		&::-webkit-scrollbar {
+			width: 8px;
+			height: 8px;
+		}
 
-        &::-webkit-scrollbar-track {
-            background: transparent;
-        }
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
 
-        &::-webkit-scrollbar-thumb {
-            background-color: rgba($text00, 0.2);
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
+		&::-webkit-scrollbar-thumb {
+			background-color: rgba($text00, 0.2);
+			border-radius: 4px;
+			transition: background-color 0.2s ease;
 
-            &:hover {
-                background-color: rgba($text00, 0.3);
-            }
-        }
-    }
+			&:hover {
+				background-color: rgba($text00, 0.3);
+			}
+		}
+	}
 
-    // Modal-specific main adjustments
-    .contentModal .main {
-        grid-area: 1 !important;
-        padding: 24px;
-        width: 100%;
-        max-width: none;
-        box-sizing: border-box;
-    }
+	// Modal-specific main adjustments
+	.contentModal .main {
+		grid-area: 1 !important;
+		padding: 24px;
+		width: 100%;
+		max-width: none;
+		box-sizing: border-box;
+	}
 
-    // Modal-specific navigation adjustments
-    .contentModal .navigationModal {
-        grid-area: 2 !important;
-    }
+	// Modal-specific navigation adjustments
+	.contentModal .navigationModal {
+		grid-area: 2 !important;
+	}
 
-    .grid {
-        display: grid;
-        gap: 12px;
-        width: 100%;
-        padding-top: 12px;
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
+	.grid {
+		display: grid;
+		gap: 12px;
+		width: 100%;
+		padding-top: 12px;
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
 
-        // With sidebar: main max 1200px, sidebar 400px
-        // Use minmax(auto, 600px) so each column can shrink but won't exceed 600px (total 1200px)
-        grid-template-columns: 1fr minmax(auto, 600px) minmax(auto, 600px) 400px 1fr;
-        grid-template-rows: minmax(0, 1fr) auto auto;
+		// With sidebar: main max 1200px, sidebar 400px
+		// Use minmax(auto, 600px) so each column can shrink but won't exceed 600px (total 1200px)
+		grid-template-columns: 1fr minmax(auto, 600px) minmax(auto, 600px) 400px 1fr;
+		grid-template-rows: minmax(0, 1fr) auto auto;
 
-        // On tablet and mobile, switch to noSidebar layout (below 1100px)
-        @media (max-width: 1099px) {
-            grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
-            grid-template-rows: minmax(0, 1fr) auto auto;
-        }
+		// On tablet and mobile, switch to noSidebar layout (below 1100px)
+		@media (max-width: 1099px) {
+			grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
+			grid-template-rows: minmax(0, 1fr) auto auto;
+		}
 
-        &.noSidebar {
-            // Without sidebar: main max 1600px
-            // Use minmax(auto, 800px) so each column can shrink but won't exceed 800px (total 1600px)
-            grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
-            grid-template-rows: minmax(0, 1fr) auto auto;
-        }
-    }
+		&.noSidebar {
+			// Without sidebar: main max 1600px
+			// Use minmax(auto, 800px) so each column can shrink but won't exceed 800px (total 1600px)
+			grid-template-columns: 1fr minmax(auto, 800px) minmax(auto, 800px) 1fr;
+			grid-template-rows: minmax(0, 1fr) auto auto;
+		}
+	}
 
-    // Modal-specific grid adjustments
-    .contentModal .grid {
-        // Tighter layout for modals - no padding
-        padding: 0;
-        gap: 0;
-        width: 100%;
-        // Single column layout for modal - no padding columns
-        grid-template-columns: 1fr !important;
-        grid-template-rows: minmax(0, 1fr) auto !important;
-    }
+	// Modal-specific grid adjustments
+	.contentModal .grid {
+		// Tighter layout for modals - no padding
+		padding: 0;
+		gap: 0;
+		width: 100%;
+		// Single column layout for modal - no padding columns
+		grid-template-columns: 1fr !important;
+		grid-template-rows: minmax(0, 1fr) auto !important;
+	}
 }

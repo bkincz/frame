@@ -1,43 +1,70 @@
+[![Release](https://github.com/bkincz/frame/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/bkincz/frame/actions/workflows/release.yml)
+[![npm version](https://badge.fury.io/js/@bkincz%2Fframe.svg)](https://badge.fury.io/js/@bkincz%2Fframe)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+
 # Frame
 
-A high-performance React multi-step flow system with animations, navigation history, and optional URL routing.
+A production-ready, TypeScript-first React multi-step flow system with animations, navigation history, and customizable layouts.
+
+## Features
+
+- **Multi-Step Flows** - Create complex, nested flows with automatic navigation history
+- **Animations** - Smooth GSAP-powered transitions between steps and flows
+- **Customizable Layouts** - Full control via render props or use the built-in responsive grid
+- **Modal & Fullscreen** - Switch between centered modals and fullscreen layouts per flow or step
+- **Navigation Management** - Intelligent back/next buttons with flow chaining support
+- **Type Safety** - Full TypeScript support with comprehensive type definitions
+- **Framework Agnostic** - Works with Next.js, Vite, Create React App, and more
+- **Lifecycle Hooks** - React to flow and step events for analytics, data fetching, etc.
 
 ## Installation
 
 ```bash
 npm install @bkincz/frame
 # or
-pnpm add @bkincz/frame
-# or
 yarn add @bkincz/frame
+# or
+pnpm add @bkincz/frame
 ```
 
 ## Quick Start
 
-### 1. Setup Flow Registry
+### 1. Define Your Flow
 
-Create your flows and register them before using Frame:
+```tsx
+// flows/checkout.tsx
+import type { FlowDefinition } from '@bkincz/frame'
+
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    cart: {
+      components: [CartStep],
+      heading: 'Your Cart',
+      subheading: 'Review your items',
+    },
+    payment: {
+      components: [PaymentStep],
+      heading: 'Payment',
+    },
+    confirmation: {
+      components: [ConfirmationStep],
+      heading: 'Order Complete',
+    },
+  },
+  config: {
+    variant: 'modal', // or 'fullscreen'
+  },
+})
+```
+
+### 2. Register Your Flows
 
 ```tsx
 // app.tsx or main.tsx
 import { setFlowRegistry } from '@bkincz/frame'
+import { createCheckoutFlow } from './flows/checkout'
 
-// Define your flow
-const createCheckoutFlow = () => ({
-  flow: {
-    cart: {
-      components: [CartStep],
-    },
-    payment: {
-      components: [PaymentStep],
-    },
-    confirmation: {
-      components: [ConfirmationStep],
-    },
-  },
-})
-
-// Register flows
 setFlowRegistry({
   checkout: {
     factory: createCheckoutFlow,
@@ -47,9 +74,7 @@ setFlowRegistry({
 })
 ```
 
-### 2. Add FrameContainer
-
-Add the `FrameContainer` component to your app root:
+### 3. Add FrameContainer
 
 ```tsx
 import { FrameContainer } from '@bkincz/frame'
@@ -64,27 +89,23 @@ function App() {
 }
 ```
 
-> **Note:** FrameContainer now supports custom layouts via render props. See the [Customization](#customization) section for details.
-
-### 3. Open a Flow
-
-Use the FrameAPI to open flows from anywhere in your app:
+### 4. Open Flows
 
 ```tsx
 import { FrameAPI } from '@bkincz/frame'
 
-function MyComponent() {
+function ProductPage() {
   return (
     <button onClick={() => FrameAPI.openFlow('checkout')}>
-      Start Checkout
+      Checkout
     </button>
   )
 }
 ```
 
-## FrameAPI
+## Core Features
 
-The FrameAPI provides imperative methods to control flows:
+### Flow Navigation
 
 ```tsx
 import { FrameAPI } from '@bkincz/frame'
@@ -99,41 +120,84 @@ FrameAPI.replaceFlow('login')
 // Navigate within flow
 FrameAPI.nextStep()
 FrameAPI.previousStep()
-
-// Navigation utilities
 FrameAPI.goBack() // Smart back (previous step or close)
 FrameAPI.closeFlow()
-FrameAPI.clearHistory()
 
-// Check state
+// Manage history
+FrameAPI.clearHistory()
 const hasHistory = FrameAPI.hasHistory()
 ```
 
-## Frame Components
+### Step Components
 
-Frame provides composable UI components for building your flows:
-
-### Basic Layout
+Write simple React components for each step:
 
 ```tsx
 import { Frame } from '@bkincz/frame'
 
-function MyStep() {
+function CartStep() {
   return (
     <>
-      <Frame.Heading>Welcome</Frame.Heading>
-      <Frame.Subheading>Let's get started</Frame.Subheading>
+      {/* Heading and subheading can be set in flow definition or here */}
+      <Frame.Heading>Your Cart</Frame.Heading>
+      <Frame.Subheading>Review your items before checkout</Frame.Subheading>
 
-      {/* Your content */}
+      {/* Your cart UI */}
+      <div className="cart-items">
+        {/* Cart items... */}
+      </div>
 
+      {/* Navigation automatically manages back/next/close */}
       <Frame.Navigation>
         <Frame.Back />
-        <Frame.Next />
+        <Frame.Next>Continue to Payment</Frame.Next>
       </Frame.Navigation>
     </>
   )
 }
 ```
+
+### Flow Chaining
+
+Flows can open other flows, maintaining navigation history:
+
+```tsx
+function LoginStep() {
+  return (
+    <>
+      <Frame.Heading>Login</Frame.Heading>
+
+      {/* Opens nested flow - back button returns to login */}
+      <button onClick={() => FrameAPI.openFlow('forgot-password')}>
+        Forgot Password?
+      </button>
+
+      <Frame.Navigation>
+        <Frame.Back />
+        <Frame.Next>Login</Frame.Next>
+      </Frame.Navigation>
+    </>
+  )
+}
+```
+
+## Frame Components
+
+### Available Components
+
+- `<Frame>` - Root container
+- `<Frame.Overlay>` - Overlay backdrop (modal variant)
+- `<Frame.Content>` - Content wrapper
+- `<Frame.Close>` - Close button
+- `<Frame.Heading>` - Step heading
+- `<Frame.Subheading>` - Step subheading
+- `<Frame.Grid>` - Two-column grid layout
+- `<Frame.Main>` - Main content area
+- `<Frame.Sidebar>` - Sidebar area
+- `<Frame.Navigation>` - Navigation container
+- `<Frame.Back>` - Back button (intelligent auto-hide/close)
+- `<Frame.Next>` - Next button (intelligent auto-hide/close)
+- `<Frame.Step>` - Renders step components
 
 ### Grid Layout
 
@@ -142,12 +206,18 @@ function MyStep() {
   return (
     <Frame.Grid>
       <Frame.Main>
-        {/* Main content */}
+        <Frame.Heading>Main Content</Frame.Heading>
+        {/* Your main content */}
       </Frame.Main>
 
       <Frame.Sidebar>
-        {/* Sidebar content */}
+        {/* Sidebar content (hidden on mobile/tablet, hidden in modal variant) */}
       </Frame.Sidebar>
+
+      <Frame.Navigation>
+        <Frame.Back />
+        <Frame.Next />
+      </Frame.Navigation>
     </Frame.Grid>
   )
 }
@@ -162,7 +232,7 @@ function MyStep() {
       <Frame.Heading>Step Title</Frame.Heading>
 
       <Frame.Navigation>
-        {/* Custom buttons instead of default Back/Next */}
+        {/* Replace default navigation with custom buttons */}
         <button onClick={() => FrameAPI.closeFlow()}>
           Cancel
         </button>
@@ -175,197 +245,52 @@ function MyStep() {
 }
 ```
 
-### Available Components
+## React Hooks
 
-- `<Frame>` - Root container
-- `<Frame.Overlay>` - Overlay backdrop
-- `<Frame.Content>` - Content wrapper
-- `<Frame.Close>` - Close button (top-right)
-- `<Frame.Heading>` - Step heading
-- `<Frame.Subheading>` - Step subheading
-- `<Frame.Grid>` - Two-column grid layout
-- `<Frame.Main>` - Main content area (in Grid)
-- `<Frame.Sidebar>` - Sidebar area (in Grid)
-- `<Frame.Navigation>` - Navigation button container
-- `<Frame.Back>` - Back button (auto-hides/closes intelligently)
-- `<Frame.Next>` - Next button (auto-hides/closes intelligently)
-- `<Frame.Step>` - Renders step components from flow definition
+### `useNavigationState(options)`
 
-## Creating Flows
-
-### Flow Definition
-
-A flow is a factory function that returns a flow definition:
-
-```tsx
-import type { FlowDefinition } from '@bkincz/frame'
-
-export const createMyFlow = (): FlowDefinition => ({
-  flow: {
-    stepKey1: {
-      components: [Component1, Component2],
-    },
-    stepKey2: {
-      components: [Component3],
-    },
-  },
-})
-```
-
-### Step Components
-
-Step components are just React components:
-
-```tsx
-function CartStep() {
-  return (
-    <>
-      <Frame.Heading>Your Cart</Frame.Heading>
-
-      {/* Your cart UI */}
-
-      <Frame.Navigation>
-        <Frame.Back />
-        <Frame.Next>Continue to Payment</Frame.Next>
-      </Frame.Navigation>
-    </>
-  )
-}
-```
-
-### Flow Chaining
-
-Flows can open other flows, creating a navigation history:
-
-```tsx
-function LoginStep() {
-  return (
-    <>
-      <Frame.Heading>Login</Frame.Heading>
-
-      <button onClick={() => FrameAPI.openFlow('forgot-password')}>
-        Forgot Password?
-      </button>
-
-      <Frame.Navigation>
-        <Frame.Back />
-        <Frame.Next>Login</Frame.Next>
-      </Frame.Navigation>
-    </>
-  )
-}
-```
-
-When users navigate back from 'forgot-password', they return to the login flow.
-
-## Hooks
-
-Frame provides React hooks for advanced use cases:
-
-### useNavigationState
-
-Get navigation button state for custom navigation:
+Get navigation state for custom UI:
 
 ```tsx
 import { useNavigationState } from '@bkincz/frame'
 
 function CustomNavigation() {
-  const backState = useNavigationState({ direction: 'back' })
+  const backState = useNavigationState({ direction: 'previous' })
   const nextState = useNavigationState({ direction: 'next' })
 
   return (
-    <div>
-      <button
-        onClick={backState.onClick}
-        disabled={backState.isDisabled}
-        style={{ display: backState.isHidden ? 'none' : 'block' }}
-      >
-        {backState.label}
-      </button>
-
-      <button
-        onClick={nextState.onClick}
+    <nav>
+      {!backState.isHidden && (
+        <button 
+          onClick={() => FrameAPI.previousStep()} 
+          disabled={backState.isDisabled}
+        >
+          Back
+        </button>
+      )}
+      
+      <button 
+        onClick={() => FrameAPI.nextStep()} 
         disabled={nextState.isDisabled}
       >
-        {nextState.label}
+        Next
       </button>
-    </div>
+    </nav>
   )
-}
-```
-
-### useFlowLifecycle
-
-React to flow lifecycle events:
-
-```tsx
-import { useFlowLifecycle } from '@bkincz/frame'
-
-function MyStep() {
-  useFlowLifecycle({
-    onEnter: (flow) => {
-      console.log('Flow opened:', flow)
-    },
-    onExit: (flow) => {
-      console.log('Flow closed:', flow)
-    },
-  })
-
-  return <div>Content</div>
-}
-```
-
-### useStepLifecycle
-
-React to step lifecycle events:
-
-```tsx
-import { useStepLifecycle } from '@bkincz/frame'
-
-function MyStep() {
-  useStepLifecycle({
-    onEnter: (stepKey) => {
-      console.log('Step entered:', stepKey)
-      // Track analytics, fetch data, etc.
-    },
-    onExit: (stepKey) => {
-      console.log('Step exited:', stepKey)
-    },
-  })
-
-  return <div>Content</div>
-}
-```
-
-### useFrameAnimations
-
-Access animation controls (advanced):
-
-```tsx
-import { useFrameAnimations } from '@bkincz/frame'
-
-function MyComponent() {
-  const { animateFrameEntrance, animateFrameExit } = useFrameAnimations()
-
-  // Custom animation logic
 }
 ```
 
 ## Customization
 
-Frame provides full control over layout structure through render props, allowing you to completely customize the appearance while maintaining all built-in functionality.
+Frame provides full control over layout structure through render props.
 
 ### Default Layout
-
-By default, FrameContainer uses a built-in layout:
 
 ```tsx
 <FrameContainer debug={false} />
 ```
 
 ### Custom Layout with Render Props
-
-Pass a render function to fully customize the layout:
 
 ```tsx
 <FrameContainer debug={false}>
@@ -381,8 +306,7 @@ Pass a render function to fully customize the layout:
       >
         <div className="my-custom-layout">
           <Frame.Close />
-
-          {/* Your custom structure */}
+          
           <Frame.Main ref={refs.stepWrapper}>
             {state.currentStep && (
               <>
@@ -394,7 +318,7 @@ Pass a render function to fully customize the layout:
             )}
           </Frame.Main>
 
-          {/* Navigation can be anywhere */}
+          {/* Custom navigation placement */}
           <div className="custom-nav">
             <Frame.Back />
             <Frame.Next />
@@ -407,8 +331,6 @@ Pass a render function to fully customize the layout:
 ```
 
 ### Render Props API
-
-The render function receives:
 
 **`refs`** - Required element references:
 - `refs.overlay` - Attach to `Frame.Overlay` (modal variant)
@@ -424,9 +346,8 @@ The render function receives:
 - `state.isOpen` - Whether frame is open
 - `state.currentFlow` - Current flow name
 - `state.currentStepKey` - Current step key
-- `state.renderedStepKey` - Rendered step key (for transitions)
 - `state.currentStep` - Current step definition
-- `state.variant` - Frame variant (`'modal'` or `'fullscreen'`)
+- `state.variant` - Frame variant (`'modal'` | `'fullscreen'`)
 - `state.showOverlay` - Whether to show overlay
 - `state.showSidebar` - Whether to show sidebar
 
@@ -439,19 +360,7 @@ Custom layouts must include:
 - `<Frame.Content ref={refs.content}>` - Content container
 - `<Frame.Main ref={refs.stepWrapper}>` - Step wrapper
 - `<Frame.Step step={state.currentStep} />` - Step renderer
-- `<Frame.Overlay ref={refs.overlay} />` - Only if `state.variant === 'modal'`
-
-### Optional Elements
-
-Replace or omit as needed:
-- `<Frame.Grid>` - Default grid layout
-- `<Frame.Navigation>` - Navigation container
-- `<Frame.Back>` / `<Frame.Next>` - Navigation buttons
-- `<Frame.Close>` - Close button
-- `<Frame.Heading>` / `<Frame.Subheading>` - Text elements
-- `<Frame.Sidebar>` - Sidebar container
-
-For detailed examples and advanced patterns, see [CUSTOMIZATION.md](./CUSTOMIZATION.md).
+- `<Frame.Overlay ref={refs.overlay} />` - Only if `state.showOverlay === true`
 
 ## Configuration
 
@@ -461,6 +370,34 @@ For detailed examples and advanced patterns, see [CUSTOMIZATION.md](./CUSTOMIZAT
 interface FrameContainerProps {
   debug?: boolean  // Enable debug logging (default: false)
   children?: FrameRenderFunction  // Optional render function for custom layouts
+}
+```
+
+### Flow Configuration
+
+```tsx
+interface FlowDefinition {
+  flow: Record<string, FlowStep>
+  config?: FlowConfig
+  onEnter?: (flowName: string) => void
+  onExit?: (flowName: string) => void
+}
+
+interface FlowConfig {
+  variant?: 'modal' | 'fullscreen'  // Default: 'fullscreen'
+  sidebar?: boolean  // Default: true (auto-hidden in modal)
+}
+
+interface FlowStep {
+  components: React.ComponentType[]
+  heading?: string
+  subheading?: string
+  config?: {
+    variant?: 'modal' | 'fullscreen'
+    sidebar?: boolean
+  }
+  onEnter?: (stepKey: string) => void
+  onExit?: (stepKey: string) => void
 }
 ```
 
@@ -477,15 +414,25 @@ import {
 
 // Set entire registry
 setFlowRegistry({
-  flow1: { factory, title, description },
-  flow2: { factory, title, description },
+  checkout: { 
+    factory: createCheckoutFlow, 
+    title: 'Checkout',
+    description: 'Complete your purchase',
+  },
+  login: { 
+    factory: createLoginFlow, 
+    title: 'Login' 
+  },
 })
 
 // Add individual flow
-registerFlow('flow3', { factory, title, description })
+registerFlow('signup', {
+  factory: createSignupFlow,
+  title: 'Sign Up',
+})
 
 // Remove flow
-unregisterFlow('flow3')
+unregisterFlow('signup')
 
 // Clear all
 clearFlowRegistry()
@@ -494,13 +441,10 @@ clearFlowRegistry()
 const registry = getFlowRegistry()
 ```
 
-## Helper Functions
-
-Frame provides utility functions for working with flows:
+## Utility Functions
 
 ```tsx
 import {
-  getFlowEntry,
   flowExists,
   getAvailableFlows,
   getFlowMetadata,
@@ -509,8 +453,6 @@ import {
   getFirstStepKey,
   getNextStepKey,
   getPreviousStepKey,
-  isFirstStepOfRootFlow,
-  isLastStepOfLeafFlow,
 } from '@bkincz/frame'
 
 // Check if flow exists
@@ -518,7 +460,7 @@ if (flowExists('checkout')) {
   FrameAPI.openFlow('checkout')
 }
 
-// Get all available flows
+// Get all flow names
 const flows = getAvailableFlows()
 // ['checkout', 'login', 'signup']
 
@@ -526,11 +468,11 @@ const flows = getAvailableFlows()
 const metadata = getFlowMetadata('checkout')
 // { title: 'Checkout', description: '...' }
 
-// Get step keys
+// Get step keys for a flow
 const steps = getFlowStepKeys('checkout')
 // ['cart', 'payment', 'confirmation']
 
-// Validate step key
+// Validate step
 if (isValidStepKey('checkout', 'payment')) {
   FrameAPI.openFlow('checkout', 'payment')
 }
@@ -543,9 +485,9 @@ if (isValidStepKey('checkout', 'payment')) {
 ```tsx
 // app/layout.tsx
 import { FrameContainer, setFlowRegistry } from '@bkincz/frame'
+import '@bkincz/frame/styles'
 import { createCheckoutFlow } from './flows/checkout'
 
-// Register flows
 setFlowRegistry({
   checkout: {
     factory: createCheckoutFlow,
@@ -570,6 +512,7 @@ export default function RootLayout({ children }) {
 ```tsx
 // pages/_app.tsx
 import { FrameContainer, setFlowRegistry } from '@bkincz/frame'
+import '@bkincz/frame/styles'
 import { createCheckoutFlow } from '../flows/checkout'
 
 setFlowRegistry({
@@ -589,14 +532,16 @@ export default function App({ Component, pageProps }) {
 }
 ```
 
-### Standalone React
+### Vite / Create React App
 
 ```tsx
-// main.tsx
+// main.tsx or index.tsx
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { FrameContainer, setFlowRegistry } from '@bkincz/frame'
+import '@bkincz/frame/styles'
 import { createCheckoutFlow } from './flows/checkout'
+import App from './App'
 
 setFlowRegistry({
   checkout: {
@@ -615,15 +560,18 @@ createRoot(document.getElementById('root')!).render(
 
 ## TypeScript
 
-Frame is written in TypeScript and provides full type definitions:
+Full TypeScript support with comprehensive type definitions:
 
 ```tsx
 import type {
+  // Flow types
   FlowDefinition,
   FlowFactory,
+  FlowConfig,
+  FlowStep,
   FlowRegistry,
   FlowRegistryEntry,
-  FlowStep,
+  FrameVariant,
   // Customization types
   FrameRenderProps,
   FrameRenderFunction,
@@ -632,38 +580,68 @@ import type {
   FrameState,
 } from '@bkincz/frame'
 
-const createMyFlow: FlowFactory = () => {
-  return {
-    flow: {
-      step1: {
-        components: [MyComponent],
-      },
+// Typed flow factory
+const createMyFlow: FlowFactory = () => ({
+  flow: {
+    step1: {
+      components: [MyComponent],
+      heading: 'Step 1',
     },
-  }
-}
+  },
+  config: {
+    variant: 'modal',
+  },
+})
 
-// Create typed custom layout
+// Typed custom layout
 function CustomLayout(props: FrameRenderProps) {
   const { refs, handlers, state, Frame } = props
-  // Your custom layout
-  return <Frame>...</Frame>
+  return (
+    <Frame>
+      <Frame.Content ref={refs.content} variant={state.variant}>
+        <Frame.Main ref={refs.stepWrapper}>
+          {state.currentStep && <Frame.Step step={state.currentStep} />}
+        </Frame.Main>
+      </Frame.Content>
+    </Frame>
+  )
 }
 ```
 
-## Browser Support
+## API Reference
 
-- Modern browsers (Chrome, Firefox, Safari, Edge)
-- React 18+
-- TypeScript 5+
+### FrameAPI
+
+- `openFlow(flowName, stepKey?)` - Open flow (chains to history)
+- `replaceFlow(flowName, stepKey?)` - Replace flow (clears history)
+- `nextStep()` - Navigate to next step
+- `previousStep()` - Navigate to previous step
+- `goBack()` - Smart back navigation
+- `closeFlow()` - Close current flow
+- `clearHistory()` - Clear navigation history
+- `hasHistory()` - Check if history exists
+
+### Flow Registry
+
+- `setFlowRegistry(registry)` - Set entire registry
+- `registerFlow(name, entry)` - Register single flow
+- `unregisterFlow(name)` - Unregister flow
+- `clearFlowRegistry()` - Clear all flows
+- `getFlowRegistry()` - Get current registry
+
+### Utility Functions
+
+- `flowExists(name)` - Check if flow exists
+- `getAvailableFlows()` - Get all flow names
+- `getFlowMetadata(name)` - Get flow metadata
+- `getFlowStepKeys(name)` - Get step keys
+- `isValidStepKey(flowName, stepKey)` - Validate step
+- `getFirstStepKey(flowName)` - Get first step
+- `getNextStepKey(flowName, currentKey)` - Get next step
+- `getPreviousStepKey(flowName, currentKey)` - Get previous step
+- `isFirstStepOfRootFlow()` - Check if first step of root
+- `isLastStepOfLeafFlow()` - Check if last step of leaf
 
 ## License
 
 MIT
-
-## Credits
-
-Built with:
-- [React](https://react.dev/)
-- [Clutch](https://github.com/bkincz/clutch) - State management
-- [GSAP](https://greensock.com/gsap/) - Animations
-- [TypeScript](https://www.typescriptlang.org/)
