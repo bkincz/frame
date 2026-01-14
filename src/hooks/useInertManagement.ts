@@ -102,10 +102,7 @@ export function useInertManagement({
 
 				if (isExcluded) {
 					if (debug) {
-						console.log(
-							`[useInertManagement] Excluding element from inert:`,
-							element
-						)
+						console.log(`[useInertManagement] Excluding element from inert:`, element)
 					}
 					return
 				}
@@ -132,14 +129,11 @@ export function useInertManagement({
 		stateRef.current.elements = inertElements
 
 		if (debug) {
-			console.log(
-				`[useInertManagement] Applied inert to ${inertElements.length} elements`
-			)
+			console.log(`[useInertManagement] Applied inert to ${inertElements.length} elements`)
 		}
 
 		return () => {
-			restoreInertState(stateRef.current, debug)
-			stateRef.current.elements = []
+			restoreInertState({ elements: inertElements }, debug)
 		}
 	}, [isOpen, isModal, config.enabled, config.excludeSelectors, debug])
 }
