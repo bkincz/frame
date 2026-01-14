@@ -264,9 +264,9 @@ describe('useInertManagement', () => {
 		)
 
 		expect(consoleSpy).toHaveBeenCalled()
-		expect(
-			consoleSpy.mock.calls.some(call => call[0].includes('[useInertManagement]'))
-		).toBe(true)
+		expect(consoleSpy.mock.calls.some(call => call[0].includes('[useInertManagement]'))).toBe(
+			true
+		)
 
 		consoleSpy.mockRestore()
 	})

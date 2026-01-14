@@ -632,11 +632,14 @@ describe('FrameState', () => {
 
 			FrameState.goBackInStepHistory()
 
-			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:step-history-back', {
-				flow: 'test-flow',
-				fromStepKey: 'step3',
-				toStepKey: 'step1',
-			})
+			expect(customEventManager.emit).toHaveBeenCalledWith(
+				'frame:navigation:step-history-back',
+				{
+					flow: 'test-flow',
+					fromStepKey: 'step3',
+					toStepKey: 'step1',
+				}
+			)
 		})
 
 		it('should emit frame:step:change event', () => {

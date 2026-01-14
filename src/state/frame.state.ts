@@ -609,11 +609,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		const previousStepKey = stepHistory[stepHistory.length - 1]
 
 		// Emit step history back event
-		customEventManager.emit<FrameStepHistoryBackEventData>('frame:navigation:step-history-back', {
-			flow: currentFlow,
-			fromStepKey: currentStepKey,
-			toStepKey: previousStepKey,
-		})
+		customEventManager.emit<FrameStepHistoryBackEventData>(
+			'frame:navigation:step-history-back',
+			{
+				flow: currentFlow,
+				fromStepKey: currentStepKey,
+				toStepKey: previousStepKey,
+			}
+		)
 
 		this.mutate(draft => {
 			draft.stepHistory.pop()
