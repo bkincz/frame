@@ -57,6 +57,10 @@ export interface UseRouterReturn {
 	 */
 	isBrowserNavigating: () => boolean
 	/**
+	 * Mark browser navigation as consumed
+	 */
+	consumeBrowserNavigation: () => void
+	/**
 	 * Current pathname
 	 */
 	pathname: string
@@ -133,6 +137,10 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 		return routeManager.isBrowserNavigating()
 	}, [])
 
+	const consumeBrowserNavigation = useCallback(() => {
+		routeManager.consumeBrowserNavigation()
+	}, [])
+
 	return useMemo(
 		() => ({
 			params,
@@ -144,6 +152,7 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 			goBack,
 			goForward,
 			isBrowserNavigating,
+			consumeBrowserNavigation,
 			pathname,
 			search,
 		}),
@@ -157,6 +166,7 @@ export function useRouter(config: UseRouterConfig = {}): UseRouterReturn {
 			goBack,
 			goForward,
 			isBrowserNavigating,
+			consumeBrowserNavigation,
 			pathname,
 			search,
 		]

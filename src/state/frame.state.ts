@@ -7,6 +7,7 @@ import { StateMachine } from '@bkincz/clutch'
  *   SHARED
  ***************************************************************************************************/
 import { customEventManager } from '@/lib/event'
+import type { EventDataMap } from '@/lib/event'
 
 /*
  *   TYPES
@@ -87,57 +88,17 @@ export interface FrameStateProps extends FrameActions, FrameStateData {}
  *   - markStepEntered() → frame:step:enter
  *   - markStepExited() → frame:step:exit
  ***************************************************************************************************/
-export interface FrameOpenEventData {
-	flow: string
-	stepKey: string
-}
-
-export interface FrameStepChangeEventData {
-	stepKey: string
-	previousStepKey: string | null
-	skipAnimation?: boolean
-}
-
-export interface FrameFlowChangeEventData {
-	flow: string
-	previousFlow: string | null
-}
-
-export interface FrameStepEnterEventData {
-	flow: string
-	stepKey: string
-}
-
-export interface FrameStepExitEventData {
-	flow: string
-	stepKey: string
-}
-
-export interface FrameFlowEnterEventData {
-	flow: string
-}
-
-export interface FrameFlowExitEventData {
-	flow: string
-}
-
-export interface FrameNextStepEventData {
-	flow: string
-	fromStepKey: string
-	toStepKey: string
-}
-
-export interface FramePreviousStepEventData {
-	flow: string
-	fromStepKey: string
-	toStepKey: string
-}
-
-export interface FrameHistoryBackEventData {
-	fromFlow: string
-	toFlow: string
-	toStepKey: string
-}
+// Use EventDataMap as single source of truth for event types
+export type FrameOpenEventData = EventDataMap['frame:open']
+export type FrameStepChangeEventData = EventDataMap['frame:step:change']
+export type FrameFlowChangeEventData = EventDataMap['frame:flow:change']
+export type FrameStepEnterEventData = EventDataMap['frame:step:enter']
+export type FrameStepExitEventData = EventDataMap['frame:step:exit']
+export type FrameFlowEnterEventData = EventDataMap['frame:flow:enter']
+export type FrameFlowExitEventData = EventDataMap['frame:flow:exit']
+export type FrameNextStepEventData = EventDataMap['frame:navigation:next']
+export type FramePreviousStepEventData = EventDataMap['frame:navigation:previous']
+export type FrameHistoryBackEventData = EventDataMap['frame:navigation:history-back']
 
 /*
  *   STATE
@@ -452,23 +413,20 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 			// Only emit navigation events if we want animations
 			if (!skipAnimation) {
-				// Emit appropriate navigation event for animations asynchronously
-				// This ensures subscriptions have time to be set up
-				setTimeout(() => {
-					if (toIndex > fromIndex) {
-						customEventManager.emit<FrameNextStepEventData>('frame:navigation:next', {
-							flow,
-							fromStepKey: currentStepKey,
-							toStepKey: targetStepKey,
-						})
-					} else if (toIndex < fromIndex) {
-						customEventManager.emit<FramePreviousStepEventData>('frame:navigation:previous', {
-							flow,
-							fromStepKey: currentStepKey,
-							toStepKey: targetStepKey,
-						})
-					}
-				}, 0)
+				// Emit appropriate navigation event for animations
+				if (toIndex > fromIndex) {
+					customEventManager.emit<FrameNextStepEventData>('frame:navigation:next', {
+						flow,
+						fromStepKey: currentStepKey,
+						toStepKey: targetStepKey,
+					})
+				} else if (toIndex < fromIndex) {
+					customEventManager.emit<FramePreviousStepEventData>('frame:navigation:previous', {
+						flow,
+						fromStepKey: currentStepKey,
+						toStepKey: targetStepKey,
+					})
+				}
 			}
 		}
 	}

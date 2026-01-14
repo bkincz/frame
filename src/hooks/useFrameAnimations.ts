@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { useEffect, useCallback, type RefObject } from 'react'
+import { useEffect, useCallback, useRef, type RefObject } from 'react'
 
 /*
  *   SHARED
@@ -205,23 +205,27 @@ export function useFrameAnimations(
 
 	/**
 	 * Subscribe to step navigation events
+	 * Use ref to avoid recreating subscriptions
 	 */
+	const animateStepTransitionRef = useRef(animateStepTransition)
+	animateStepTransitionRef.current = animateStepTransition
+
 	useEffect(() => {
 		const nextSub = customEventManager.subscribe<FrameNextStepEventData>(
 			'frame:navigation:next',
-			data => animateStepTransition(data, 'forward')
+			data => animateStepTransitionRef.current(data, 'forward')
 		)
 
 		const prevSub = customEventManager.subscribe<FramePreviousStepEventData>(
 			'frame:navigation:previous',
-			data => animateStepTransition(data, 'backward')
+			data => animateStepTransitionRef.current(data, 'backward')
 		)
 
 		return () => {
 			nextSub.unsubscribe()
 			prevSub.unsubscribe()
 		}
-	}, [animateStepTransition])
+	}, []) // Empty deps - subscribe once
 
 	return {
 		isAnimating: AnimationState.selectIsAnimating(),

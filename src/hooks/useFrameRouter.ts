@@ -349,6 +349,11 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			// Open the flow with the specified step key
 			// Skip animations for browser navigation for instant updates
 			FrameState.openFrame(flowValue, stepKey, undefined, isBrowserNav)
+
+			// Consume the browser navigation flag after using it
+			if (isBrowserNav) {
+				router.consumeBrowserNavigation()
+			}
 		} else {
 			// No flow param - close the frame if it's open
 			if (frameState.isOpen) {
