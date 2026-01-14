@@ -16,17 +16,11 @@ import type { FlowDefinition } from '@/flows/flow.types'
 /*
  *   HOOK
  ***************************************************************************************************/
-/**
- * Manages flow lifecycle (onEnter/onExit) based on flow state
- */
 export function useFlowLifecycle(
 	isOpen: boolean,
 	currentFlow: string | null,
 	flowDefinition: FlowDefinition | null
 ) {
-	/**
-	 * Handle flow onEnter when flow opens
-	 */
 	useEffect(() => {
 		if (!isOpen || !currentFlow || !flowDefinition) return
 
@@ -49,9 +43,6 @@ export function useFlowLifecycle(
 		runFlowEnter()
 	}, [isOpen, currentFlow, flowDefinition])
 
-	/**
-	 * Handle flow onExit cleanup when flow closes
-	 */
 	useEffect(() => {
 		return () => {
 			if (!currentFlow || !flowDefinition?.onExit) return

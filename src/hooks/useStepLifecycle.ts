@@ -17,9 +17,6 @@ import type { FlowDefinition } from '@/flows/flow.types'
 /*
  *   HOOK
  ***************************************************************************************************/
-/**
- * Manages step lifecycle (onEnter/onExit) based on step state
- */
 export function useStepLifecycle(
 	currentStepKey: string | null,
 	flowDefinition: FlowDefinition | null

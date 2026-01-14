@@ -25,45 +25,30 @@ class StepStateMachine extends StateMachine<StepStateData> {
 		})
 	}
 
-	/**
-	 * Mark step as entering
-	 */
 	public startEntering(): void {
 		this.mutate(draft => {
 			draft.isEntering = true
 		}, 'Start Step Enter')
 	}
 
-	/**
-	 * Mark step enter complete
-	 */
 	public endEntering(): void {
 		this.mutate(draft => {
 			draft.isEntering = false
 		}, 'End Step Enter')
 	}
 
-	/**
-	 * Mark step as exiting
-	 */
 	public startExiting(): void {
 		this.mutate(draft => {
 			draft.isExiting = true
 		}, 'Start Step Exit')
 	}
 
-	/**
-	 * Mark step exit complete
-	 */
 	public endExiting(): void {
 		this.mutate(draft => {
 			draft.isExiting = false
 		}, 'End Step Exit')
 	}
 
-	/**
-	 * Selectors
-	 */
 	public selectIsExiting(): boolean {
 		return this.state.isExiting
 	}

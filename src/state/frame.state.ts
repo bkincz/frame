@@ -149,9 +149,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 	}
 
-	/**
-	 * Selector: Get current step index (derived)
-	 */
 	public selectCurrentStepIndex(): number {
 		const { currentFlow, currentStepKey, flowDefinitionCache } = this.state
 		if (!currentFlow || !currentStepKey) return 0
@@ -163,9 +160,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		return stepKeys.indexOf(currentStepKey)
 	}
 
-	/**
-	 * Selector: Get step keys for current flow (derived)
-	 */
 	public selectStepKeys(): string[] {
 		const { currentFlow, flowDefinitionCache } = this.state
 		if (!currentFlow) return []
@@ -174,23 +168,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		return flowDef ? Object.keys(flowDef.flow) : []
 	}
 
-	/**
-	 * Selector: Check if flow has been entered
-	 */
 	public selectIsFlowEntered(flowName: string): boolean {
 		return this.state.flowLifecycle.enteredFlows.includes(flowName)
 	}
 
-	/**
-	 * Selector: Check if there is flow history
-	 */
 	public selectHasHistory(): boolean {
 		return this.state.flowHistory.length > 0
 	}
 
-	/**
-	 * Selector: Get current frame variant (derived from step/flow config)
-	 */
 	public selectVariant(): FrameVariant {
 		const { currentFlow, currentStepKey, flowDefinitionCache } = this.state
 		if (!currentFlow || !currentStepKey) return 'fullscreen'
@@ -204,16 +189,10 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		return currentStep?.config?.variant || flowDef.config?.variant || 'fullscreen'
 	}
 
-	/**
-	 * Selector: Check if frame has been initialized
-	 */
 	public selectHasFrameInit(): boolean {
 		return this.state.hasFrameInit
 	}
 
-	/**
-	 * Update variant in state based on current flow/step
-	 */
 	private updateVariant(): void {
 		const newVariant = this.selectVariant()
 		if (this.state.variant !== newVariant) {
@@ -223,25 +202,16 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
-	/**
-	 * Cache a flow definition for performance
-	 */
 	public cacheFlowDefinition(flowName: string, definition: FlowDefinition): void {
 		this.mutate(draft => {
 			draft.flowDefinitionCache[flowName] = definition
 		}, 'Cache Flow Definition')
 	}
 
-	/**
-	 * Get a cached flow definition
-	 */
 	public getFlowDefinition(flowName: string): FlowDefinition | null {
 		return this.state.flowDefinitionCache[flowName] || null
 	}
 
-	/**
-	 * Clear flow cache (optionally for specific flow)
-	 */
 	public clearFlowCache(flowName?: string): void {
 		this.mutate(draft => {
 			if (flowName) {
@@ -252,9 +222,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}, 'Clear Flow Cache')
 	}
 
-	/**
-	 * Mark a flow as entered (lifecycle tracking)
-	 */
 	public markFlowEntered(flowName: string): void {
 		this.mutate(draft => {
 			if (!draft.flowLifecycle.enteredFlows.includes(flowName)) {
@@ -267,9 +234,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 	}
 
-	/**
-	 * Mark a flow as exited (lifecycle tracking)
-	 */
 	public markFlowExited(flowName: string): void {
 		this.mutate(draft => {
 			const index = draft.flowLifecycle.enteredFlows.indexOf(flowName)
@@ -283,9 +247,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 	}
 
-	/**
-	 * Mark current step as entered
-	 */
 	public markStepEntered(): void {
 		const { currentFlow, currentStepKey } = this.state
 
@@ -301,9 +262,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
-	/**
-	 * Mark current step as exited
-	 */
 	public markStepExited(): void {
 		const { currentFlow, currentStepKey } = this.state
 
@@ -320,9 +278,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 	}
 
 	/**
-	 * Opens the frame with specified flow and step key
-	 * @param flow - The flow name to open
-	 * @param stepKey - The step key to start at (optional, defaults to first step)
 	 * @param chain - If true, pushes current flow to history before opening new flow (default: true if frame is already open)
 	 * @param skipAnimation - If true, skips emitting navigation events (no animations)
 	 */
@@ -431,11 +386,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
-	/**
-	 * Go back to previous flow in history
-	 * Emits: HISTORY_BACK, FLOW_CHANGE
-	 * @returns true if went back, false if no history
-	 */
 	public goBackInHistory(): boolean {
 		const { flowHistory, currentFlow } = this.state
 
@@ -482,18 +432,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		return true
 	}
 
-	/**
-	 * Clear flow history stack
-	 */
 	public clearFlowHistory(): void {
 		this.mutate(draft => {
 			draft.flowHistory = []
 		}, 'Clear Flow History')
 	}
 
-	/**
-	 * Closes the frame and resets state
-	 */
 	public closeFrame(): void {
 		const { currentFlow, currentStepKey } = this.state
 
@@ -513,9 +457,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		customEventManager.emit('frame:close', undefined)
 	}
 
-	/**
-	 * Set step by step key
-	 */
 	public setStepKey(stepKey: string): void {
 		const stepKeys = this.selectStepKeys()
 		const { currentStepKey } = this.state
@@ -540,10 +481,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 	}
 
-	/**
-	 * Advances to the next step
-	 * Emits: NEXT_STEP, STEP_CHANGE (via setStepKey)
-	 */
 	public nextStep(): void {
 		const currentStepIndex = this.selectCurrentStepIndex()
 		const stepKeys = this.selectStepKeys()
@@ -563,10 +500,6 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
-	/**
-	 * Goes back to the previous step
-	 * Emits: PREVIOUS_STEP, STEP_CHANGE (via setStepKey)
-	 */
 	public previousStep(): void {
 		const currentStepIndex = this.selectCurrentStepIndex()
 		const stepKeys = this.selectStepKeys()
@@ -586,27 +519,18 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
-	/**
-	 * Set animation state
-	 */
 	public setAnimating(isAnimating: boolean): void {
 		this.mutate(draft => {
 			draft.isAnimating = isAnimating
 		}, 'Set Animating')
 	}
 
-	/**
-	 * Mark frame as initialized (after initial animation completes)
-	 */
 	public markFrameInit(): void {
 		this.mutate(draft => {
 			draft.hasFrameInit = true
 		}, 'Mark Frame Init')
 	}
 
-	/**
-	 * Resets frame to initial state
-	 */
 	public resetFrame(): void {
 		this.mutate(draft => {
 			draft.isOpen = false

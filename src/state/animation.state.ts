@@ -29,10 +29,6 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 		})
 	}
 
-	/**
-	 * Start an animation
-	 * @returns true if animation started, false if already animating
-	 */
 	public startAnimation(type: AnimationType, direction?: 'forward' | 'backward'): boolean {
 		if (this.state.isAnimating) {
 			console.warn(`[AnimationState] Already animating: ${this.state.animationType}`)
@@ -48,9 +44,6 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 		return true
 	}
 
-	/**
-	 * End the current animation
-	 */
 	public endAnimation(): void {
 		this.mutate(draft => {
 			draft.isAnimating = false
@@ -59,9 +52,6 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 		}, 'End Animation')
 	}
 
-	/**
-	 * Selectors
-	 */
 	public selectIsAnimating(): boolean {
 		return this.state.isAnimating
 	}

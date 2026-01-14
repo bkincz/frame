@@ -48,9 +48,6 @@ export function useFrameAnimations(
 ): UseFrameAnimationsReturn {
 	const { debug = false, onStepChange, onFlowChange } = config
 
-	/**
-	 * Handle step transition animations
-	 */
 	const animateStepTransition = useCallback(
 		(
 			data: FrameNextStepEventData | FramePreviousStepEventData,
@@ -95,9 +92,6 @@ export function useFrameAnimations(
 		[stepWrapperRef, onStepChange, debug]
 	)
 
-	/**
-	 * Handle flow transition animations
-	 */
 	const animateFlowTransition = useCallback(
 		(flowName: string | null, stepKey: string | null) => {
 			if (!stepWrapperRef.current) {
@@ -143,9 +137,6 @@ export function useFrameAnimations(
 		[stepWrapperRef, onFlowChange, debug]
 	)
 
-	/**
-	 * Handle frame entrance animation
-	 */
 	const animateFrameEntrance = useCallback(
 		(variant: 'modal' | 'fullscreen') => {
 			if (!contentRef.current) return
@@ -176,9 +167,6 @@ export function useFrameAnimations(
 		[overlayRef, contentRef, debug]
 	)
 
-	/**
-	 * Handle frame exit animation
-	 */
 	const animateFrameExit = useCallback(
 		(onComplete: () => void) => {
 			if (!contentRef.current) return
@@ -203,10 +191,7 @@ export function useFrameAnimations(
 		[overlayRef, contentRef, debug]
 	)
 
-	/**
-	 * Subscribe to step navigation events
-	 * Use ref to avoid recreating subscriptions
-	 */
+	// Use ref to avoid recreating subscriptions
 	const animateStepTransitionRef = useRef(animateStepTransition)
 	animateStepTransitionRef.current = animateStepTransition
 

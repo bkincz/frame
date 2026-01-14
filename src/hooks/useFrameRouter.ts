@@ -63,9 +63,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	const previousStepRef = useRef<() => void>(() => {})
 	const goBackRef = useRef<() => void>(() => {})
 
-	/**
-	 * Log debug messages
-	 */
 	const log = useCallback(
 		(message: string, data?: unknown) => {
 			if (debug) {
@@ -75,9 +72,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		[debug]
 	)
 
-	/**
-	 * Ensure flow definition is cached
-	 */
 	const ensureFlowCached = useCallback(
 		(flowName: string): boolean => {
 			// Check if already cached
@@ -99,9 +93,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		[log]
 	)
 
-	/**
-	 * Open a flow and optionally update URL
-	 */
 	const openFlow = useCallback(
 		(flow: string, stepKey?: string) => {
 			if (!flowExists(flow)) {
@@ -138,9 +129,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		[flowParam, stepParam, updateUrl, router, log, ensureFlowCached]
 	)
 
-	/**
-	 * Close the flow and optionally update URL
-	 */
 	const closeFlow = useCallback(() => {
 		log('Closing flow')
 
@@ -154,9 +142,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		}
 	}, [flowParam, stepParam, updateUrl, router, log])
 
-	/**
-	 * Set the current step and optionally update URL
-	 */
 	const setStep = useCallback(
 		(stepKey: string) => {
 			const { currentFlow } = frameState
@@ -189,9 +174,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		[frameState, stepParam, updateUrl, router, log]
 	)
 
-	/**
-	 * Advance to the next step
-	 */
 	const nextStep = useCallback(() => {
 		// Check if frame is currently animating
 		if (AnimationState.selectIsAnimating()) {
@@ -223,9 +205,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		}
 	}, [stepParam, updateUrl, router, debug])
 
-	/**
-	 * Go back to the previous step
-	 */
 	const previousStep = useCallback(() => {
 		// Check if frame is currently animating
 		if (AnimationState.selectIsAnimating()) {
@@ -257,9 +236,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		}
 	}, [stepParam, updateUrl, router, debug])
 
-	/**
-	 * Go back to previous flow in history
-	 */
 	const goBackInHistory = useCallback(() => {
 		const didGoBack = FrameState.goBackInHistory()
 
@@ -289,9 +265,6 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	previousStepRef.current = previousStep
 	goBackRef.current = goBackInHistory
 
-	/**
-	 * Watch URL query params and sync with frame state
-	 */
 	useEffect(() => {
 		const flowValue = router.params[flowParam] || null
 		const stepValue = router.params[stepParam] || null
@@ -361,21 +334,10 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				FrameState.closeFrame()
 			}
 		}
-	}, [
-		router.params,
-		flowParam,
-		stepParam,
-		updateUrl,
-		frameState.isOpen,
-		log,
-		ensureFlowCached,
-	])
+		// eslint-disable-next-line
+	}, [router.params, flowParam, stepParam, updateUrl, frameState.isOpen, log, ensureFlowCached])
 
-	/**
-	 * Listen for custom events to open/navigate frame
-	 * Using refs to avoid recreating subscriptions on every render
-	 * Note: frame:request:close is handled in FrameContainer to trigger exit animation
-	 */
+	// Note: frame:request:close is handled in FrameContainer to trigger exit animation
 	useEffect(() => {
 		const openSubscription = customEventManager.subscribe<{
 			flow: string
