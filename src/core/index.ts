@@ -7,6 +7,9 @@ export type { FrameProps } from './frame.component'
 export { FrameContainer } from './frame.container'
 export type { FrameContainerProps } from './frame.container'
 
+export { DefaultFrameLayout } from './frame.layout'
+
+export * from './frame.types'
 export * from './frame.registry'
 export * from './frame.functions'
 

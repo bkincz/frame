@@ -23,8 +23,22 @@ vi.mock('@/lib/event', () => ({
 	},
 }))
 
-vi.mock('@/components/icon', () => ({
-	Icon: ({ icon }: { icon: string }) => <div data-testid="icon">{icon}</div>,
+vi.mock('@/components/icons', () => ({
+	IconArrowLeft: ({ size }: { size?: number }) => (
+		<svg data-testid="icon-arrow-left" width={size} height={size}>
+			<path d="M5 12h14" />
+		</svg>
+	),
+	IconArrowRight: ({ size }: { size?: number }) => (
+		<svg data-testid="icon-arrow-right" width={size} height={size}>
+			<path d="M5 12h14" />
+		</svg>
+	),
+	IconX: () => (
+		<svg data-testid="icon-x">
+			<path d="M18 6L6 18" />
+		</svg>
+	),
 }))
 
 vi.mock('@/components/button', () => ({
@@ -364,7 +378,7 @@ describe('Frame Component', () => {
 		it('should render close button', () => {
 			render(<Frame.Close />)
 
-			expect(screen.getByTestId('icon')).toBeInTheDocument()
+			expect(screen.getByTestId('icon-x')).toBeInTheDocument()
 		})
 
 		it('should emit frame:request:close event on click', () => {

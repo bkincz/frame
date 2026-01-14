@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-@use 'palette' as *;
+@use 'variables' as *;
 @use 'sass:color';
 
 @layer base {
@@ -53,6 +53,10 @@
         /* Initial state for animation */
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.95);
+
+        @media (min-width: 768px) {
+            max-width: 90dvw;
+        }
     }
 
     /* Fullscreen variant: full viewport (default) */

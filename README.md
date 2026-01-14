@@ -64,6 +64,8 @@ function App() {
 }
 ```
 
+> **Note:** FrameContainer now supports custom layouts via render props. See the [Customization](#customization) section for details.
+
 ### 3. Open a Flow
 
 Use the FrameAPI to open flows from anywhere in your app:
@@ -349,6 +351,108 @@ function MyComponent() {
 }
 ```
 
+## Customization
+
+Frame provides full control over layout structure through render props, allowing you to completely customize the appearance while maintaining all built-in functionality.
+
+### Default Layout
+
+By default, FrameContainer uses a built-in layout:
+
+```tsx
+<FrameContainer debug={false} />
+```
+
+### Custom Layout with Render Props
+
+Pass a render function to fully customize the layout:
+
+```tsx
+<FrameContainer debug={false}>
+  {({ refs, handlers, state, Frame }) => (
+    <Frame>
+      {state.showOverlay && (
+        <Frame.Overlay ref={refs.overlay} onClick={handlers.handleOverlayClick} />
+      )}
+      <Frame.Content
+        ref={refs.content}
+        onClick={handlers.stopPropagation}
+        variant={state.variant}
+      >
+        <div className="my-custom-layout">
+          <Frame.Close />
+
+          {/* Your custom structure */}
+          <Frame.Main ref={refs.stepWrapper}>
+            {state.currentStep && (
+              <>
+                {state.currentStep.heading && (
+                  <Frame.Heading>{state.currentStep.heading}</Frame.Heading>
+                )}
+                <Frame.Step step={state.currentStep} />
+              </>
+            )}
+          </Frame.Main>
+
+          {/* Navigation can be anywhere */}
+          <div className="custom-nav">
+            <Frame.Back />
+            <Frame.Next />
+          </div>
+        </div>
+      </Frame.Content>
+    </Frame>
+  )}
+</FrameContainer>
+```
+
+### Render Props API
+
+The render function receives:
+
+**`refs`** - Required element references:
+- `refs.overlay` - Attach to `Frame.Overlay` (modal variant)
+- `refs.content` - Attach to `Frame.Content` (required)
+- `refs.stepWrapper` - Attach to `Frame.Main` (required for transitions)
+
+**`handlers`** - Pre-configured event handlers:
+- `handlers.closeFrame()` - Close with animation
+- `handlers.stopPropagation(event)` - Prevent event bubbling
+- `handlers.handleOverlayClick()` - Close on overlay click
+
+**`state`** - Current frame state:
+- `state.isOpen` - Whether frame is open
+- `state.currentFlow` - Current flow name
+- `state.currentStepKey` - Current step key
+- `state.renderedStepKey` - Rendered step key (for transitions)
+- `state.currentStep` - Current step definition
+- `state.variant` - Frame variant (`'modal'` or `'fullscreen'`)
+- `state.showOverlay` - Whether to show overlay
+- `state.showSidebar` - Whether to show sidebar
+
+**`Frame`** - The Frame component with all sub-components
+
+### Required Elements
+
+Custom layouts must include:
+- `<Frame>` - Root container
+- `<Frame.Content ref={refs.content}>` - Content container
+- `<Frame.Main ref={refs.stepWrapper}>` - Step wrapper
+- `<Frame.Step step={state.currentStep} />` - Step renderer
+- `<Frame.Overlay ref={refs.overlay} />` - Only if `state.variant === 'modal'`
+
+### Optional Elements
+
+Replace or omit as needed:
+- `<Frame.Grid>` - Default grid layout
+- `<Frame.Navigation>` - Navigation container
+- `<Frame.Back>` / `<Frame.Next>` - Navigation buttons
+- `<Frame.Close>` - Close button
+- `<Frame.Heading>` / `<Frame.Subheading>` - Text elements
+- `<Frame.Sidebar>` - Sidebar container
+
+For detailed examples and advanced patterns, see [CUSTOMIZATION.md](./CUSTOMIZATION.md).
+
 ## Configuration
 
 ### FrameContainer Props
@@ -356,6 +460,7 @@ function MyComponent() {
 ```tsx
 interface FrameContainerProps {
   debug?: boolean  // Enable debug logging (default: false)
+  children?: FrameRenderFunction  // Optional render function for custom layouts
 }
 ```
 
@@ -519,6 +624,12 @@ import type {
   FlowRegistry,
   FlowRegistryEntry,
   FlowStep,
+  // Customization types
+  FrameRenderProps,
+  FrameRenderFunction,
+  FrameRefs,
+  FrameHandlers,
+  FrameState,
 } from '@bkincz/frame'
 
 const createMyFlow: FlowFactory = () => {
@@ -529,6 +640,13 @@ const createMyFlow: FlowFactory = () => {
       },
     },
   }
+}
+
+// Create typed custom layout
+function CustomLayout(props: FrameRenderProps) {
+  const { refs, handlers, state, Frame } = props
+  // Your custom layout
+  return <Frame>...</Frame>
 }
 ```
 

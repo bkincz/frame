@@ -104,7 +104,11 @@ export const mockTablerIcons = () => {
 /**
  * Mock useTooltip hook
  */
-export const mockUseTooltip = () => {
+export const mockUseTooltip = (): {
+	showTooltip: ReturnType<typeof vi.fn>
+	hideTooltip: ReturnType<typeof vi.fn>
+	Tooltip: null
+} => {
 	return {
 		showTooltip: vi.fn(),
 		hideTooltip: vi.fn(),

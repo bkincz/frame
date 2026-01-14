@@ -1,10 +1,9 @@
 /*
  *   IMPORTS
  **********************************************************************************************************/
-@use 'palette' as *;
-@use 'sass:math';
+@use 'variables' as *;
+@use 'utilities/functions' as *;
 @use 'sass:map';
-@use 'sass:string';
 
 /*
  *   STYLES
@@ -221,14 +220,6 @@
             padding: 0;
         }
     }
-}
-
-@function capitalize($string) {
-    @return string.to-upper-case(string.slice($string, 1, 1))+string.slice($string, 2);
-}
-
-@function em($pixels) {
-    @return math.div($pixels, 16) * 1em;
 }
 
 @each $colorName, $variants in $colorConfigs {

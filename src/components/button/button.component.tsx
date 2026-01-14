@@ -2,7 +2,6 @@
  *   IMPORTS
  **********************************************************************************************************/
 import clsx from 'clsx'
-import * as TablerIcons from '@tabler/icons-react'
 import { useTooltip } from '@/components/tooltip'
 
 /*
@@ -24,13 +23,6 @@ import type {
 
 type Adornment = ReactNode | ReactNode[]
 
-export interface IconAdornment {
-	position: 'start' | 'end'
-	name: string
-	size?: number
-	stroke?: number
-}
-
 export interface ButtonProps extends BaseInterface {
 	type?: 'button' | 'submit'
 	onClick?: (e: MouseEvent<HTMLButtonElement>) => void
@@ -42,7 +34,6 @@ export interface ButtonProps extends BaseInterface {
 	disabled?: boolean
 	startAdornment?: Adornment
 	endAdornment?: Adornment
-	adornment?: IconAdornment
 	tooltip?: string | ReactNode
 }
 
@@ -60,7 +51,6 @@ export const Button: FC<ButtonProps> = ({
 	variant = 'solid',
 	startAdornment,
 	endAdornment,
-	adornment,
 	label,
 	onClick,
 	type = 'button',
@@ -96,25 +86,6 @@ export const Button: FC<ButtonProps> = ({
 		onClick?.(e)
 	}
 
-	const iconAdornment = adornment
-		? (() => {
-				const IconComponent = TablerIcons[
-					adornment.name as keyof typeof TablerIcons
-				] as React.ComponentType<{
-					size?: number
-					stroke?: number
-				}>
-				return IconComponent ? (
-					<IconComponent size={adornment.size ?? 18} stroke={adornment.stroke ?? 2} />
-				) : null
-			})()
-		: null
-
-	const effectiveStartAdornment =
-		adornment && adornment.position === 'start' ? iconAdornment : startAdornment
-	const effectiveEndAdornment =
-		adornment && adornment.position === 'end' ? iconAdornment : endAdornment
-
 	const variantClass = styles[`${variant.charAt(0) + variant.slice(1)}`]
 	const colorVariantClass =
 		disabled || loading
@@ -128,13 +99,12 @@ export const Button: FC<ButtonProps> = ({
 		styles[`size${size.charAt(0).toUpperCase() + size.slice(1)}`],
 		colorVariantClass,
 		variantClass,
-		effectiveStartAdornment && styles.hasStartAdornment,
-		effectiveEndAdornment && styles.hasEndAdornment,
+		startAdornment && styles.hasStartAdornment,
+		endAdornment && styles.hasEndAdornment,
 		className
 	)
 
 	const isIconVariant = variant === 'iconSolid' || variant === 'iconOutlined'
-	const iconContent = isIconVariant && adornment ? iconAdornment : children
 
 	return (
 		<>
@@ -152,13 +122,13 @@ export const Button: FC<ButtonProps> = ({
 				}
 				onMouseLeave={tooltip ? tooltipHook.hideTooltip : undefined}
 			>
-				{!isIconVariant && renderAdornments(effectiveStartAdornment)}
-				{(label || iconContent) && !isIconVariant ? (
-					<span className={styles.buttonLabel}>{label || iconContent}</span>
+				{!isIconVariant && renderAdornments(startAdornment)}
+				{(label || children) && !isIconVariant ? (
+					<span className={styles.buttonLabel}>{label || children}</span>
 				) : (
-					isIconVariant && iconContent
+					isIconVariant && children
 				)}
-				{!isIconVariant && renderAdornments(effectiveEndAdornment)}
+				{!isIconVariant && renderAdornments(endAdornment)}
 			</button>
 			{tooltip && tooltipHook.Tooltip}
 		</>

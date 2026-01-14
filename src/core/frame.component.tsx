@@ -11,7 +11,7 @@ import type { FrameVariant } from '@/flows/flow.types'
 /*
  *   SHARED COMPONENTS
  ***************************************************************************************************/
-import { Icon } from '@/components/icon'
+import { IconArrowLeft, IconArrowRight, IconX } from '@/components/icons'
 import { Button } from '@/components/button'
 
 /*
@@ -228,7 +228,7 @@ Frame.Back = ({ className, loading }: FrameNavigationProps) => {
 			loading={loading}
 			variant={'iconSolid'}
 		>
-			<Icon icon="IconArrowLeft" size={24} />
+			<IconArrowLeft size={24} />
 		</Button>
 	)
 }
@@ -261,7 +261,7 @@ Frame.Next = ({
 	if (isHidden) return null
 
 	const resolvedLabel = label ?? (typeof children === 'string' ? children : 'Next')
-	const defaultEndAdornment = endAdornment ?? <Icon icon="IconArrowRight" size={24} />
+	const defaultEndAdornment = endAdornment ?? <IconArrowRight size={24} />
 
 	// Icon-only variant for no label
 	if (!resolvedLabel && (variant === 'iconSolid' || variant === 'iconOutlined')) {
@@ -276,7 +276,7 @@ Frame.Next = ({
 				color={color}
 				{...rest}
 			>
-				<Icon icon="IconArrowRight" size={24} />
+				<IconArrowRight size={24} />
 			</Button>
 		)
 	}
@@ -331,7 +331,7 @@ Frame.Close = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
 
 	return (
 		<div className={clsx(closeClassName, className)} {...rest} onClick={closeFrame}>
-			<Icon icon="IconX" />
+			<IconX />
 		</div>
 	)
 }

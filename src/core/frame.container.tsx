@@ -8,6 +8,7 @@ import { useStateMachine } from '@bkincz/clutch'
  *   SHARED
  ***************************************************************************************************/
 import { Frame } from './frame.component'
+import { DefaultFrameLayout } from './frame.layout'
 import { useFrameRouter } from '@/hooks/useFrameRouter'
 import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import { useFlowLifecycle } from '@/hooks/useFlowLifecycle'
@@ -18,9 +19,36 @@ import { customEventManager } from '@/lib/event'
 /*
  *   TYPES
  ***************************************************************************************************/
+import type { FrameRenderFunction, FrameRenderProps } from './frame.types'
+
 export interface FrameContainerProps {
 	/** Enable debug logging to console (default: false) */
 	debug?: boolean
+	/**
+	 * Optional render function for custom layouts.
+	 * When provided, gives full control over the Frame layout structure.
+	 * When omitted, uses the default layout.
+	 *
+	 * The render function receives refs, handlers, state, and the Frame component.
+	 * Required elements: Frame, Frame.Overlay (modal only), Frame.Content, Frame.Main, Frame.Step
+	 *
+	 * @example
+	 * ```tsx
+	 * <FrameContainer>
+	 *   {({ refs, handlers, state, Frame }) => (
+	 *     <Frame>
+	 *       {state.showOverlay && <Frame.Overlay ref={refs.overlay} onClick={handlers.handleOverlayClick} />}
+	 *       <Frame.Content ref={refs.content} onClick={handlers.stopPropagation} variant={state.variant}>
+	 *         <Frame.Main ref={refs.stepWrapper}>
+	 *           <Frame.Step step={state.currentStep} />
+	 *         </Frame.Main>
+	 *       </Frame.Content>
+	 *     </Frame>
+	 *   )}
+	 * </FrameContainer>
+	 * ```
+	 */
+	children?: FrameRenderFunction
 }
 
 /*
@@ -34,8 +62,10 @@ export interface FrameContainerProps {
  *
  * @param props - Component props
  * @param props.debug - Enable debug logging to console (default: false)
+ * @param props.children - Optional render function for custom layouts
  *
  * @example
+ * Default usage:
  * ```tsx
  * import { FrameContainer } from '@bkincz/frame'
  *
@@ -48,8 +78,33 @@ export interface FrameContainerProps {
  *   )
  * }
  * ```
+ *
+ * @example
+ * Custom layout with render prop:
+ * ```tsx
+ * <FrameContainer debug={false}>
+ *   {({ refs, handlers, state, Frame }) => (
+ *     <Frame>
+ *       {state.showOverlay && (
+ *         <Frame.Overlay ref={refs.overlay} onClick={handlers.handleOverlayClick} />
+ *       )}
+ *       <Frame.Content ref={refs.content} onClick={handlers.stopPropagation} variant={state.variant}>
+ *         <div className="custom-layout">
+ *           <Frame.Main ref={refs.stepWrapper}>
+ *             {state.currentStep && <Frame.Step step={state.currentStep} />}
+ *           </Frame.Main>
+ *           <div className="custom-nav">
+ *             <Frame.Back />
+ *             <Frame.Next />
+ *           </div>
+ *         </div>
+ *       </Frame.Content>
+ *     </Frame>
+ *   )}
+ * </FrameContainer>
+ * ```
  */
-export function FrameContainer({ debug = false }: FrameContainerProps) {
+export function FrameContainer({ debug = false, children }: FrameContainerProps) {
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
 	})
@@ -228,36 +283,35 @@ export function FrameContainer({ debug = false }: FrameContainerProps) {
 		return null
 	}
 
-	return (
-		<Frame>
-			{showOverlay && <Frame.Overlay ref={overlayRef} onClick={handleOverlayClick} />}
-			<Frame.Content
-				ref={contentRef}
-				onClick={handleContentClick}
-				data-step-key={renderedStepKey || ''}
-				variant={variant}
-			>
-				<Frame.Close />
-				<Frame.Grid className={!showSidebar ? 'noSidebar' : undefined}>
-					<Frame.Main ref={stepWrapperRef}>
-						{currentStep ? (
-							<>
-								{currentStep.heading && (
-									<Frame.Heading>{currentStep.heading}</Frame.Heading>
-								)}
-								{currentStep.subheading && (
-									<Frame.Subheading>{currentStep.subheading}</Frame.Subheading>
-								)}
-								<Frame.Step step={currentStep} />
-							</>
-						) : (
-							<Frame.NotFound stepKey={renderedStepKey || ''} />
-						)}
-					</Frame.Main>
-					{showSidebar && <Frame.Sidebar />}
-					<Frame.Navigation />
-				</Frame.Grid>
-			</Frame.Content>
-		</Frame>
-	)
+	// Prepare props for render function
+	const renderProps: FrameRenderProps = {
+		refs: {
+			overlay: overlayRef,
+			content: contentRef,
+			stepWrapper: stepWrapperRef,
+		},
+		handlers: {
+			closeFrame: triggerClose,
+			stopPropagation: handleContentClick,
+			handleOverlayClick: handleOverlayClick,
+		},
+		state: {
+			isOpen,
+			currentFlow,
+			currentStepKey,
+			renderedStepKey,
+			currentStep,
+			variant,
+			showOverlay,
+			showSidebar,
+		},
+		Frame,
+	}
+
+	// Use custom layout if provided, otherwise use default
+	if (children) {
+		return children(renderProps)
+	}
+
+	return <DefaultFrameLayout {...renderProps} />
 }
