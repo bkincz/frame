@@ -35,11 +35,6 @@ class UIStateMachine extends StateMachine<UIStateData> {
 	}
 
 	/**
-	 * Validate user session
-	 */
-	public async validateSession(): Promise<void> {}
-
-	/**
 	 * Set loading state
 	 */
 	public setLoading(loading: boolean | string): void {
