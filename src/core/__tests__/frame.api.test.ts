@@ -13,6 +13,10 @@ import {
 	nextStep,
 	previousStep,
 	clearHistory,
+	goToStep,
+	goBackInStepHistory,
+	hasStepHistory,
+	clearStepHistory,
 } from '../frame.api'
 
 /*
@@ -28,6 +32,9 @@ vi.mock('@/state/frame.state', () => ({
 	default: {
 		selectHasHistory: vi.fn(),
 		clearFlowHistory: vi.fn(),
+		goBackInStepHistory: vi.fn(),
+		selectHasStepHistory: vi.fn(),
+		clearStepHistory: vi.fn(),
 	},
 }))
 
@@ -138,6 +145,64 @@ describe('Frame API', () => {
 			clearHistory()
 
 			expect(FrameState.clearFlowHistory).toHaveBeenCalled()
+		})
+	})
+
+	describe('goToStep', () => {
+		it('should emit frame:request:go-to-step event with step key', () => {
+			goToStep('payment')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:go-to-step', {
+				stepKey: 'payment',
+			})
+		})
+	})
+
+	describe('goBackInStepHistory', () => {
+		it('should return true when step history back succeeds', () => {
+			vi.mocked(FrameState.goBackInStepHistory).mockReturnValue(true)
+
+			const result = goBackInStepHistory()
+
+			expect(result).toBe(true)
+			expect(FrameState.goBackInStepHistory).toHaveBeenCalled()
+		})
+
+		it('should return false when no step history exists', () => {
+			vi.mocked(FrameState.goBackInStepHistory).mockReturnValue(false)
+
+			const result = goBackInStepHistory()
+
+			expect(result).toBe(false)
+			expect(FrameState.goBackInStepHistory).toHaveBeenCalled()
+		})
+	})
+
+	describe('hasStepHistory', () => {
+		it('should return true when there is step history', () => {
+			vi.mocked(FrameState.selectHasStepHistory).mockReturnValue(true)
+
+			const result = hasStepHistory()
+
+			expect(result).toBe(true)
+			expect(FrameState.selectHasStepHistory).toHaveBeenCalled()
+		})
+
+		it('should return false when there is no step history', () => {
+			vi.mocked(FrameState.selectHasStepHistory).mockReturnValue(false)
+
+			const result = hasStepHistory()
+
+			expect(result).toBe(false)
+			expect(FrameState.selectHasStepHistory).toHaveBeenCalled()
+		})
+	})
+
+	describe('clearStepHistory', () => {
+		it('should call FrameState.clearStepHistory', () => {
+			clearStepHistory()
+
+			expect(FrameState.clearStepHistory).toHaveBeenCalled()
 		})
 	})
 })

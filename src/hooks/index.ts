@@ -18,3 +18,5 @@ export { useStepLifecycle } from './useStepLifecycle'
 
 export { useFrameAnimations } from './useFrameAnimations'
 export type { UseFrameAnimationsConfig, UseFrameAnimationsReturn } from './useFrameAnimations'
+
+export { useInertManagement } from './useInertManagement'

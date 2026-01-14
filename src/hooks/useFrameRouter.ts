@@ -29,12 +29,15 @@ interface FrameRouterReturn {
 	currentFlow: string | null
 	currentStepKey: string | null
 	hasHistory: boolean
+	hasStepHistory: boolean
 	openFlow: (flow: string, stepKey?: string) => void
 	closeFlow: () => void
 	goBackInHistory: () => boolean
+	goBackInStepHistory: () => boolean
 	setStep: (stepKey: string) => void
 	nextStep: () => void
 	previousStep: () => void
+	goToStep: (stepKey: string) => void
 }
 
 /*
@@ -62,6 +65,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	const nextStepRef = useRef<() => void>(() => {})
 	const previousStepRef = useRef<() => void>(() => {})
 	const goBackRef = useRef<() => void>(() => {})
+	const goToStepRef = useRef<(stepKey: string) => void>(() => {})
 
 	const log = useCallback(
 		(message: string, data?: unknown) => {
@@ -258,12 +262,66 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		return didGoBack
 	}, [updateUrl, router, flowParam, stepParam])
 
+	const goToStep = useCallback(
+		(stepKey: string) => {
+			// Check if frame is currently animating
+			if (AnimationState.selectIsAnimating()) {
+				if (debug) console.log('[FrameRouter] Skipping go to step - frame is animating')
+				return
+			}
+
+			const { currentFlow } = FrameState.getState()
+			const stepKeys = FrameState.selectStepKeys()
+
+			if (!currentFlow) {
+				console.warn('[FrameRouter] Cannot go to step: no flow is currently active')
+				return
+			}
+
+			if (!stepKeys.includes(stepKey)) {
+				console.warn(
+					`[FrameRouter] Invalid step key "${stepKey}" for flow "${currentFlow}". Ignoring.`
+				)
+				return
+			}
+
+			log('Going to step', { stepKey })
+
+			// goToStep handles history tracking internally
+			FrameState.goToStep(stepKey)
+
+			// Update URL if enabled
+			if (updateUrl) {
+				const stepIndex = stepKeys.indexOf(stepKey)
+				router.setParam(stepParam, String(stepIndex + 1))
+			}
+		},
+		[stepParam, updateUrl, router, log, debug]
+	)
+
+	const goBackInStepHistory = useCallback(() => {
+		const didGoBack = FrameState.goBackInStepHistory()
+
+		if (didGoBack && updateUrl) {
+			// Update URL to reflect the step we went back to
+			const { currentStepKey } = FrameState.getState()
+			const stepKeys = FrameState.selectStepKeys()
+			if (currentStepKey) {
+				const stepIndex = stepKeys.indexOf(currentStepKey)
+				router.setParam(stepParam, String(stepIndex + 1))
+			}
+		}
+
+		return didGoBack
+	}, [updateUrl, router, stepParam])
+
 	// Update refs with latest callbacks
 	openFlowRef.current = openFlow
 	closeFlowRef.current = closeFlow
 	nextStepRef.current = nextStep
 	previousStepRef.current = previousStep
 	goBackRef.current = goBackInHistory
+	goToStepRef.current = goToStep
 
 	useEffect(() => {
 		const flowValue = router.params[flowParam] || null
@@ -359,11 +417,19 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			goBackRef.current()
 		})
 
+		const goToStepSubscription = customEventManager.subscribe<{ stepKey: string }>(
+			'frame:request:go-to-step',
+			(data: { stepKey: string }) => {
+				goToStepRef.current(data.stepKey)
+			}
+		)
+
 		return () => {
 			openSubscription.unsubscribe()
 			nextSubscription.unsubscribe()
 			previousSubscription.unsubscribe()
 			backSubscription.unsubscribe()
+			goToStepSubscription.unsubscribe()
 		}
 	}, [])
 
@@ -372,11 +438,14 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		currentFlow: frameState.currentFlow,
 		currentStepKey: frameState.currentStepKey,
 		hasHistory: frameState.flowHistory.length > 0,
+		hasStepHistory: frameState.stepHistory.length > 0,
 		openFlow,
 		closeFlow,
 		goBackInHistory,
+		goBackInStepHistory,
 		setStep,
 		nextStep,
 		previousStep,
+		goToStep,
 	}
 }

@@ -35,6 +35,7 @@ export interface FrameStateData {
 	previousFlow: string | null
 	previousStepKey: string | null
 	flowHistory: FlowHistoryEntry[]
+	stepHistory: string[]
 	flowLifecycle: FlowLifecycleState
 	flowDefinitionCache: Record<string, FlowDefinition>
 }
@@ -47,6 +48,9 @@ interface FrameActions {
 	setStepKey: (stepKey: string) => void
 	nextStep: () => void
 	previousStep: () => void
+	goToStep: (stepKey: string) => void
+	goBackInStepHistory: () => boolean
+	clearStepHistory: () => void
 	resetFrame: () => void
 	setAnimating: (isAnimating: boolean) => void
 	cacheFlowDefinition: (flowName: string, definition: FlowDefinition) => void
@@ -60,6 +64,7 @@ interface FrameActions {
 	selectStepKeys: () => string[]
 	selectIsFlowEntered: (flowName: string) => boolean
 	selectHasHistory: () => boolean
+	selectHasStepHistory: () => boolean
 	selectVariant: () => FrameVariant
 }
 
@@ -98,6 +103,8 @@ export type FrameFlowEnterEventData = EventDataMap['frame:flow:enter']
 export type FrameFlowExitEventData = EventDataMap['frame:flow:exit']
 export type FrameNextStepEventData = EventDataMap['frame:navigation:next']
 export type FramePreviousStepEventData = EventDataMap['frame:navigation:previous']
+export type FrameSkipStepEventData = EventDataMap['frame:navigation:skip']
+export type FrameStepHistoryBackEventData = EventDataMap['frame:navigation:step-history-back']
 export type FrameHistoryBackEventData = EventDataMap['frame:navigation:history-back']
 
 /*
@@ -114,6 +121,7 @@ const initialState: FrameStateProps = {
 	previousFlow: null,
 	previousStepKey: null,
 	flowHistory: [],
+	stepHistory: [],
 	flowLifecycle: {
 		enteredFlows: [],
 		currentStepEntered: false,
@@ -126,6 +134,9 @@ const initialState: FrameStateProps = {
 	setStepKey: () => void 0,
 	nextStep: () => void 0,
 	previousStep: () => void 0,
+	goToStep: () => void 0,
+	goBackInStepHistory: () => false,
+	clearStepHistory: () => void 0,
 	resetFrame: () => void 0,
 	setAnimating: () => void 0,
 	cacheFlowDefinition: () => void 0,
@@ -139,6 +150,7 @@ const initialState: FrameStateProps = {
 	selectStepKeys: () => [],
 	selectIsFlowEntered: () => false,
 	selectHasHistory: () => false,
+	selectHasStepHistory: () => false,
 	selectVariant: () => 'fullscreen',
 }
 
@@ -174,6 +186,10 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 	public selectHasHistory(): boolean {
 		return this.state.flowHistory.length > 0
+	}
+
+	public selectHasStepHistory(): boolean {
+		return this.state.stepHistory.length > 0
 	}
 
 	public selectVariant(): FrameVariant {
@@ -327,11 +343,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			// Don't increment for step navigation within same flow
 			if (currentFlow !== flow) {
 				draft.flowOpenCount = 1
+				// Clear step history when switching to a different flow
+				draft.stepHistory = []
 			} else if (!isOpen) {
 				// Same flow, but frame was closed - this is a reopen
 				draft.flowOpenCount += 1
+				draft.stepHistory = []
 			}
-			// else: same flow, frame already open (step navigation) - don't change count
+			// else: same flow, frame already open (step navigation) - don't change count or step history
 		}, 'Open Frame')
 
 		// Update variant based on new flow/step
@@ -450,6 +469,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentFlow = null
 			draft.currentStepKey = null
 			draft.flowHistory = []
+			draft.stepHistory = []
 			draft.flowLifecycle.currentStepEntered = false
 			draft.variant = 'fullscreen' // Reset to default
 		}, 'Close Frame')
@@ -519,6 +539,112 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}
 	}
 
+	/**
+	 * Navigate to any step in the current flow, tracking history for accurate back navigation.
+	 * This allows skipping steps in any direction while maintaining the navigation path.
+	 */
+	public goToStep(stepKey: string): void {
+		const stepKeys = this.selectStepKeys()
+		const { currentFlow, currentStepKey } = this.state
+
+		if (!currentFlow || !currentStepKey) {
+			console.warn('[FrameState] Cannot go to step: no flow is currently active')
+			return
+		}
+
+		if (!stepKeys.includes(stepKey)) {
+			console.warn(`[FrameState] Step key "${stepKey}" not found in current flow`)
+			return
+		}
+
+		if (stepKey === currentStepKey) {
+			return // Already at this step
+		}
+
+		const fromIndex = stepKeys.indexOf(currentStepKey)
+		const toIndex = stepKeys.indexOf(stepKey)
+		const direction = toIndex > fromIndex ? 'forward' : 'backward'
+
+		// Push current step to history before navigating
+		this.mutate(draft => {
+			draft.stepHistory.push(currentStepKey)
+		}, 'Push Step History')
+
+		// Emit skip navigation event for animations
+		customEventManager.emit<FrameSkipStepEventData>('frame:navigation:skip', {
+			flow: currentFlow,
+			fromStepKey: currentStepKey,
+			toStepKey: stepKey,
+			direction,
+		})
+
+		// Update the step
+		this.mutate(draft => {
+			draft.previousStepKey = currentStepKey
+			draft.currentStepKey = stepKey
+			draft.flowLifecycle.currentStepEntered = false
+		}, 'Go To Step')
+
+		// Update variant based on new step
+		this.updateVariant()
+
+		customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
+			stepKey,
+			previousStepKey: currentStepKey,
+		})
+	}
+
+	/**
+	 * Navigate back through step history.
+	 * Returns true if navigation occurred, false if no history exists.
+	 */
+	public goBackInStepHistory(): boolean {
+		const { stepHistory, currentFlow, currentStepKey } = this.state
+
+		if (stepHistory.length === 0 || !currentFlow || !currentStepKey) {
+			return false
+		}
+
+		// Pop the last step from history
+		const previousStepKey = stepHistory[stepHistory.length - 1]
+
+		// Emit step history back event
+		customEventManager.emit<FrameStepHistoryBackEventData>(
+			'frame:navigation:step-history-back',
+			{
+				flow: currentFlow,
+				fromStepKey: currentStepKey,
+				toStepKey: previousStepKey,
+			}
+		)
+
+		this.mutate(draft => {
+			draft.stepHistory.pop()
+			draft.previousStepKey = currentStepKey
+			draft.currentStepKey = previousStepKey
+			draft.flowLifecycle.currentStepEntered = false
+		}, 'Go Back In Step History')
+
+		// Update variant based on new step
+		this.updateVariant()
+
+		customEventManager.emit<FrameStepChangeEventData>('frame:step:change', {
+			stepKey: previousStepKey,
+			previousStepKey: currentStepKey,
+		})
+
+		return true
+	}
+
+	/**
+	 * Clear the step navigation history.
+	 */
+	public clearStepHistory(): void {
+		this.mutate(draft => {
+			draft.stepHistory = []
+		}, 'Clear Step History')
+	}
+
 	public setAnimating(isAnimating: boolean): void {
 		this.mutate(draft => {
 			draft.isAnimating = isAnimating
@@ -540,6 +666,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.previousFlow = null
 			draft.previousStepKey = null
 			draft.flowHistory = []
+			draft.stepHistory = []
 			draft.flowLifecycle = {
 				enteredFlows: [],
 				currentStepEntered: false,

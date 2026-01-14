@@ -144,3 +144,78 @@ export function previousStep(): void {
 export function clearHistory(): void {
 	FrameState.clearFlowHistory()
 }
+
+/**
+ * Navigates to any step in the current flow, allowing step skipping in any direction.
+ * This maintains an accurate history of visited steps for proper back navigation.
+ *
+ * @param stepKey - The key of the step to navigate to
+ *
+ * @example
+ * ```tsx
+ * import { FrameAPI } from '@bkincz/frame'
+ *
+ * // Skip from step 1 to step 4
+ * FrameAPI.goToStep('payment')
+ *
+ * // Jump back from step 4 to step 2
+ * FrameAPI.goToStep('details')
+ * ```
+ */
+export function goToStep(stepKey: string): void {
+	customEventManager.emit('frame:request:go-to-step', { stepKey })
+}
+
+/**
+ * Navigates back through the step history.
+ * This retraces the exact path taken when skipping between steps.
+ *
+ * @returns True if navigation occurred, false if no step history exists
+ *
+ * @example
+ * ```tsx
+ * import { FrameAPI } from '@bkincz/frame'
+ *
+ * // If user went: step1 -> step3 -> step5
+ * // goBackInStepHistory() goes: step5 -> step3
+ * // goBackInStepHistory() again goes: step3 -> step1
+ * FrameAPI.goBackInStepHistory()
+ * ```
+ */
+export function goBackInStepHistory(): boolean {
+	return FrameState.goBackInStepHistory()
+}
+
+/**
+ * Checks if there is step navigation history available.
+ * Returns true if the user has navigated between steps using goToStep.
+ *
+ * @returns True if step history exists, false otherwise
+ *
+ * @example
+ * ```tsx
+ * import { FrameAPI } from '@bkincz/frame'
+ *
+ * if (FrameAPI.hasStepHistory()) {
+ *   // Show step history back button
+ * }
+ * ```
+ */
+export function hasStepHistory(): boolean {
+	return FrameState.selectHasStepHistory()
+}
+
+/**
+ * Clears the step navigation history.
+ * This removes all previous step navigation history within the current flow.
+ *
+ * @example
+ * ```tsx
+ * import { FrameAPI } from '@bkincz/frame'
+ *
+ * FrameAPI.clearStepHistory()
+ * ```
+ */
+export function clearStepHistory(): void {
+	FrameState.clearStepHistory()
+}

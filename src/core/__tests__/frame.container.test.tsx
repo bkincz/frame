@@ -316,4 +316,231 @@ describe('FrameContainer', () => {
 			expect(screen.getByTestId('frame-step')).toBeInTheDocument()
 		})
 	})
+
+	describe('Layout Configuration', () => {
+		beforeEach(() => {
+			mockUseFrameRouter.mockReturnValue({
+				isOpen: true,
+				currentFlow: 'test-flow',
+				currentStepKey: 'step-1',
+				closeFlow: mockCloseFlow,
+			})
+
+			mockUseStateMachine.mockReturnValue({
+				state: {
+					hasFrameInit: true,
+					flowOpenCount: 1,
+				},
+			})
+		})
+
+		it('should use default layout when no layout is configured', () => {
+			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
+
+			render(<FrameContainer />)
+
+			// Default layout renders the standard frame components
+			expect(screen.getByTestId('frame-content')).toBeInTheDocument()
+			expect(screen.getByTestId('frame-main')).toBeInTheDocument()
+		})
+
+		it('should use children render function when provided', () => {
+			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
+
+			render(
+				<FrameContainer>
+					{({ Frame }) => (
+						<Frame>
+							<div data-testid="custom-children-layout">Custom Children Layout</div>
+						</Frame>
+					)}
+				</FrameContainer>
+			)
+
+			expect(screen.getByTestId('custom-children-layout')).toBeInTheDocument()
+			expect(screen.getByText('Custom Children Layout')).toBeInTheDocument()
+		})
+
+		it('should use flow-level layout when configured', () => {
+			const CustomFlowLayout = () => <div data-testid="custom-flow-layout">Flow Layout</div>
+
+			const flowWithLayout: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+					},
+				},
+				config: {
+					layout: CustomFlowLayout,
+				},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithLayout)
+
+			render(<FrameContainer />)
+
+			expect(screen.getByTestId('custom-flow-layout')).toBeInTheDocument()
+			expect(screen.getByText('Flow Layout')).toBeInTheDocument()
+		})
+
+		it('should use step-level layout when configured', () => {
+			const CustomStepLayout = () => <div data-testid="custom-step-layout">Step Layout</div>
+
+			const flowWithStepLayout: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+						config: {
+							layout: CustomStepLayout,
+						},
+					},
+				},
+				config: {},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithStepLayout)
+
+			render(<FrameContainer />)
+
+			expect(screen.getByTestId('custom-step-layout')).toBeInTheDocument()
+			expect(screen.getByText('Step Layout')).toBeInTheDocument()
+		})
+
+		it('should prioritize step layout over flow layout', () => {
+			const FlowLayout = () => <div data-testid="flow-layout">Flow Layout</div>
+			const StepLayout = () => <div data-testid="step-layout">Step Layout</div>
+
+			const flowWithBothLayouts: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+						config: {
+							layout: StepLayout,
+						},
+					},
+				},
+				config: {
+					layout: FlowLayout,
+				},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithBothLayouts)
+
+			render(<FrameContainer />)
+
+			expect(screen.getByTestId('step-layout')).toBeInTheDocument()
+			expect(screen.queryByTestId('flow-layout')).not.toBeInTheDocument()
+		})
+
+		it('should prioritize step layout over children prop', () => {
+			const StepLayout = () => <div data-testid="step-layout">Step Layout</div>
+
+			const flowWithStepLayout: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+						config: {
+							layout: StepLayout,
+						},
+					},
+				},
+				config: {},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithStepLayout)
+
+			render(
+				<FrameContainer>
+					{() => <div data-testid="children-layout">Children Layout</div>}
+				</FrameContainer>
+			)
+
+			expect(screen.getByTestId('step-layout')).toBeInTheDocument()
+			expect(screen.queryByTestId('children-layout')).not.toBeInTheDocument()
+		})
+
+		it('should prioritize flow layout over children prop', () => {
+			const FlowLayout = () => <div data-testid="flow-layout">Flow Layout</div>
+
+			const flowWithLayout: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+					},
+				},
+				config: {
+					layout: FlowLayout,
+				},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithLayout)
+
+			render(
+				<FrameContainer>
+					{() => <div data-testid="children-layout">Children Layout</div>}
+				</FrameContainer>
+			)
+
+			expect(screen.getByTestId('flow-layout')).toBeInTheDocument()
+			expect(screen.queryByTestId('children-layout')).not.toBeInTheDocument()
+		})
+
+		it('should fall back to children prop when no step or flow layout is configured', () => {
+			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
+
+			render(
+				<FrameContainer>
+					{({ Frame }) => (
+						<Frame>
+							<div data-testid="fallback-children">Fallback to Children</div>
+						</Frame>
+					)}
+				</FrameContainer>
+			)
+
+			expect(screen.getByTestId('fallback-children')).toBeInTheDocument()
+		})
+
+		it('should pass render props to custom layouts', () => {
+			const CustomLayout = vi.fn(({ state, Frame }) => (
+				<Frame>
+					<div data-testid="custom-with-props">
+						Flow: {state.currentFlow}, Step: {state.currentStepKey}
+					</div>
+				</Frame>
+			))
+
+			const flowWithLayout: FlowDefinition = {
+				flow: {
+					'step-1': {
+						heading: 'Step 1',
+						subheading: 'First step',
+						components: [() => <div>Step 1 Content</div>],
+					},
+				},
+				config: {
+					layout: CustomLayout,
+				},
+			}
+
+			mockGetFlowDefinition.mockReturnValue(flowWithLayout)
+
+			render(<FrameContainer />)
+
+			expect(CustomLayout).toHaveBeenCalled()
+			expect(screen.getByTestId('custom-with-props')).toBeInTheDocument()
+			expect(screen.getByText(/Flow: test-flow/)).toBeInTheDocument()
+			expect(screen.getByText(/Step: step-1/)).toBeInTheDocument()
+		})
+	})
 })

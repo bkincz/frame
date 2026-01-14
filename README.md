@@ -13,6 +13,7 @@ A production-ready, TypeScript-first React multi-step flow system with animation
 - **Animations** - Smooth GSAP-powered transitions between steps and flows
 - **Customizable Layouts** - Full control via render props or use the built-in responsive grid
 - **Modal & Fullscreen** - Switch between centered modals and fullscreen layouts per flow or step
+- **Inert Management** - Automatically makes background non-interactive in modal mode with exclusion list support
 - **Navigation Management** - Intelligent back/next buttons with flow chaining support
 - **Type Safety** - Full TypeScript support with comprehensive type definitions
 - **Framework Agnostic** - Works with Next.js, Vite, Create React App, and more
@@ -123,10 +124,130 @@ FrameAPI.previousStep()
 FrameAPI.goBack() // Smart back (previous step or close)
 FrameAPI.closeFlow()
 
-// Manage history
+// Manage flow history
 FrameAPI.clearHistory()
-const hasHistory = FrameAPI.hasHistory()
+const hasFlowHistory = FrameAPI.hasHistory()
 ```
+
+### Step Skipping
+
+Navigate directly to any step while maintaining accurate history:
+
+```tsx
+import { FrameAPI } from '@bkincz/frame'
+
+// Skip to any step in the current flow
+FrameAPI.goToStep('payment')     // Jump from step 1 to payment
+FrameAPI.goToStep('confirmation') // Skip ahead
+FrameAPI.goToStep('cart')        // Jump backward
+
+// Navigate back through your exact path
+FrameAPI.goBackInStepHistory()  // Returns to previous step in history
+
+// Check and manage step history
+if (FrameAPI.hasStepHistory()) {
+  // Show "undo" or step history back button
+}
+FrameAPI.clearStepHistory()
+```
+
+**How Step History Works:**
+
+When you skip steps using `goToStep()`, each visited step is recorded. This allows users to retrace their exact navigation path:
+
+```tsx
+// User's navigation: cart → payment → confirmation → cart
+FrameAPI.openFlow('checkout', 'cart')
+FrameAPI.goToStep('payment')      // History: [cart]
+FrameAPI.goToStep('confirmation') // History: [cart, payment]
+FrameAPI.goToStep('cart')         // History: [cart, payment, confirmation]
+
+// Going back retraces the path:
+FrameAPI.goBackInStepHistory()    // → confirmation
+FrameAPI.goBackInStepHistory()    // → payment
+FrameAPI.goBackInStepHistory()    // → cart
+```
+
+Step history is automatically cleared when:
+- Switching to a different flow
+- Closing the frame
+- Reopening a closed flow
+
+### Custom Layouts per Flow/Step
+
+Define custom layouts directly in your flow or step configuration. This is useful when different flows or steps require completely different visual structures:
+
+```tsx
+import type { FlowDefinition, FrameRenderProps } from '@bkincz/frame'
+import { DefaultFrameLayout } from '@bkincz/frame'
+
+// Custom layout for a specific flow
+const WizardLayout = ({ refs, handlers, state, Frame }: FrameRenderProps) => (
+  <Frame>
+    <Frame.Content ref={refs.content} variant={state.variant}>
+      <div className="wizard-layout">
+        <aside className="wizard-sidebar">
+          {/* Custom step indicator */}
+        </aside>
+        <Frame.Main ref={refs.stepWrapper}>
+          {state.currentStep && <Frame.Step step={state.currentStep} />}
+        </Frame.Main>
+      </div>
+    </Frame.Content>
+  </Frame>
+)
+
+// Minimal layout for confirmation steps
+const MinimalLayout = ({ refs, state, Frame }: FrameRenderProps) => (
+  <Frame>
+    <Frame.Content ref={refs.content} variant={state.variant}>
+      <Frame.Main ref={refs.stepWrapper}>
+        {state.currentStep && <Frame.Step step={state.currentStep} />}
+      </Frame.Main>
+    </Frame.Content>
+  </Frame>
+)
+
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    cart: {
+      components: [CartStep],
+      heading: 'Your Cart',
+      subheading: 'Review your items',
+      // This step uses the flow-level layout
+    },
+    payment: {
+      components: [PaymentStep],
+      heading: 'Payment',
+      // This step uses the flow-level layout
+    },
+    confirmation: {
+      components: [ConfirmationStep],
+      heading: 'Order Complete',
+      config: {
+        layout: MinimalLayout, // Step-specific layout override
+      },
+    },
+  },
+  config: {
+    variant: 'modal',
+    layout: WizardLayout, // Flow-level layout (default for all steps)
+  },
+})
+```
+
+**Layout Priority:**
+
+Layouts are resolved in this order (first match wins):
+1. Step-level layout (`step.config.layout`)
+2. Flow-level layout (`flow.config.layout`)
+3. FrameContainer children render prop
+4. DefaultFrameLayout (built-in)
+
+This allows you to:
+- Set a default layout for an entire flow
+- Override specific steps with custom layouts
+- Fall back to the FrameContainer's render prop or default layout
 
 ### Step Components
 
@@ -180,6 +301,84 @@ function LoginStep() {
   )
 }
 ```
+
+### Inert Management
+
+When using modal variant, Frame automatically makes background content non-interactive and hidden from screen readers using the `inert` attribute and `aria-hidden`. This ensures proper accessibility and prevents focus from escaping the modal.
+
+**Automatic Behavior:**
+- In modal mode: Background elements become inert (enabled by default)
+- In fullscreen mode: No inert management applied
+- Frame container is always excluded from inert state
+
+**Configuration:**
+
+```tsx
+// Flow-level configuration
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    // ... steps
+  },
+  config: {
+    variant: 'modal',
+    inert: {
+      enabled: true,  // Default: true (only applies in modal mode)
+      excludeSelectors: [
+        '#persistent-header',    // Keep header interactive
+        '.always-accessible',    // Keep certain elements accessible
+        '[data-persistent]',     // Custom data attributes
+      ],
+    },
+  },
+})
+
+// Step-level override
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    payment: {
+      heading: 'Payment',
+      components: [PaymentStep],
+      config: {
+        variant: 'modal',
+        inert: {
+          enabled: true,
+          excludeSelectors: ['#chat-widget'],  // Keep chat widget accessible
+        },
+      },
+    },
+  },
+  config: {
+    variant: 'modal',
+  },
+})
+
+// Disable inert management for a specific step
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    'special-step': {
+      heading: 'Special Step',
+      components: [SpecialStep],
+      config: {
+        variant: 'modal',
+        inert: {
+          enabled: false,  // Disable inert management for this step
+        },
+      },
+    },
+  },
+})
+```
+
+**Browser Support:**
+- The `inert` attribute is natively supported in modern browsers
+- For older browsers, consider using a polyfill like [wicg-inert](https://github.com/WICG/inert)
+
+**How It Works:**
+1. When a modal opens, all direct children of `<body>` (except the frame) are marked as inert
+2. Elements matching `excludeSelectors` are skipped
+3. Script and style elements are automatically excluded
+4. When the modal closes or switches to fullscreen, inert state is restored
+5. Original `inert`, `aria-hidden`, and `tabindex` values are preserved and restored
 
 ## Frame Components
 
@@ -386,6 +585,11 @@ interface FlowDefinition {
 interface FlowConfig {
   variant?: 'modal' | 'fullscreen'  // Default: 'fullscreen'
   sidebar?: boolean  // Default: true (auto-hidden in modal)
+  layout?: FrameRenderFunction  // Custom layout for all steps in flow
+  inert?: {
+    enabled?: boolean  // Default: true in modal mode
+    excludeSelectors?: string[]  // CSS selectors to exclude from inert
+  }
 }
 
 interface FlowStep {
@@ -395,6 +599,11 @@ interface FlowStep {
   config?: {
     variant?: 'modal' | 'fullscreen'
     sidebar?: boolean
+    layout?: FrameRenderFunction  // Custom layout for this step only
+    inert?: {
+      enabled?: boolean  // Default: true in modal mode
+      excludeSelectors?: string[]  // CSS selectors to exclude from inert
+    }
   }
   onEnter?: (stepKey: string) => void
   onExit?: (stepKey: string) => void
@@ -612,14 +821,23 @@ function CustomLayout(props: FrameRenderProps) {
 
 ### FrameAPI
 
+**Flow Navigation:**
 - `openFlow(flowName, stepKey?)` - Open flow (chains to history)
 - `replaceFlow(flowName, stepKey?)` - Replace flow (clears history)
+- `closeFlow()` - Close current flow
+- `goBack()` - Smart back navigation
+
+**Step Navigation:**
 - `nextStep()` - Navigate to next step
 - `previousStep()` - Navigate to previous step
-- `goBack()` - Smart back navigation
-- `closeFlow()` - Close current flow
-- `clearHistory()` - Clear navigation history
-- `hasHistory()` - Check if history exists
+- `goToStep(stepKey)` - Skip to any step (tracks history)
+- `goBackInStepHistory()` - Go back through step history
+
+**History Management:**
+- `hasHistory()` - Check if flow history exists
+- `clearHistory()` - Clear flow navigation history
+- `hasStepHistory()` - Check if step history exists
+- `clearStepHistory()` - Clear step navigation history
 
 ### Flow Registry
 

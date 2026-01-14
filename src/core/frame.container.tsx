@@ -13,6 +13,7 @@ import { useFrameRouter } from '@/hooks/useFrameRouter'
 import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import { useFlowLifecycle } from '@/hooks/useFlowLifecycle'
 import { useStepLifecycle } from '@/hooks/useStepLifecycle'
+import { useInertManagement } from '@/hooks/useInertManagement'
 import FrameState from '@/state/frame.state'
 import { customEventManager } from '@/lib/event'
 
@@ -154,14 +155,20 @@ export function FrameContainer({ debug = false, children }: FrameContainerProps)
 	const variant = currentStep?.config?.variant || flowDefinition?.config?.variant || 'fullscreen'
 	const showOverlay = variant === 'modal'
 
-	// Determine if sidebar should be shown (step config > flow config > default true)
-	// Always hide sidebar in modal variant
 	const sidebarConfig = currentStep?.config?.sidebar ?? flowDefinition?.config?.sidebar ?? true
 	const showSidebar = variant === 'modal' ? false : sidebarConfig !== false
 
-	// Handle flow and step lifecycle with custom hooks
+	const inertConfig = currentStep?.config?.inert ?? flowDefinition?.config?.inert ?? {}
+
 	useFlowLifecycle(isOpen, currentFlow, flowDefinition)
 	useStepLifecycle(currentStepKey, flowDefinition)
+
+	useInertManagement({
+		isOpen,
+		isModal: showOverlay,
+		config: inertConfig,
+		debug,
+	})
 
 	// This handles cases where animations don't run (e.g., frame not initialized yet, browser navigation)
 	useEffect(() => {
@@ -309,10 +316,9 @@ export function FrameContainer({ debug = false, children }: FrameContainerProps)
 		Frame,
 	}
 
-	// Use custom layout if provided, otherwise use default
-	if (children) {
-		return children(renderProps)
-	}
+	const stepLayout = currentStep?.config?.layout
+	const flowLayout = flowDefinition?.config?.layout
+	const Layout = stepLayout || flowLayout || children || DefaultFrameLayout
 
-	return <DefaultFrameLayout {...renderProps} />
+	return <Layout {...renderProps} />
 }

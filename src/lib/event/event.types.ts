@@ -14,6 +14,7 @@ export interface EventDataMap {
 	'frame:request:next': void
 	'frame:request:previous': void
 	'frame:request:back': void
+	'frame:request:go-to-step': { stepKey: string }
 
 	// Lifecycle Events (state changes)
 	'frame:open': { flow: string; stepKey: string }
@@ -32,6 +33,13 @@ export interface EventDataMap {
 	// Navigation Events
 	'frame:navigation:next': { flow: string; fromStepKey: string; toStepKey: string }
 	'frame:navigation:previous': { flow: string; fromStepKey: string; toStepKey: string }
+	'frame:navigation:skip': {
+		flow: string
+		fromStepKey: string
+		toStepKey: string
+		direction: 'forward' | 'backward'
+	}
+	'frame:navigation:step-history-back': { flow: string; fromStepKey: string; toStepKey: string }
 	'frame:navigation:history-back': { fromFlow: string; toFlow: string; toStepKey: string }
 }
 

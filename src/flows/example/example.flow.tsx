@@ -6,6 +6,7 @@ import { StepTwoA, StepTwoB } from './components/step.two'
 import { StepThree } from './components/step.three'
 import { StepFour } from './components/step.four'
 import { FlowChainingDemo } from './components/flow.chaining.demo'
+import { DefaultFrameLayout } from '@/core'
 
 /*
  *   TYPES
@@ -46,14 +47,10 @@ const handleFlowExit = () => {
 export const createExampleFlow = (): FlowDefinition => {
 	// Flow-level config
 	const config = {
-		footer: {
-			hidePricing: true,
-			hideStepIndicator: true,
-		},
-		sidebar: false,
 		animations: {
 			animateSidebar: false,
 		},
+		layout: DefaultFrameLayout,
 		// There can be any number of config options in the future...
 	}
 
@@ -63,9 +60,6 @@ export const createExampleFlow = (): FlowDefinition => {
 			subheading: 'This is a subheading for step one.',
 			components: [StepOne],
 			config: {
-				// We can override any of the config that was defined above but at a step level instead.
-				// Step configs will always override the flow level config.
-				// In this case, the sidebar will be hidden for this step
 				sidebar: false,
 			},
 		},
@@ -82,10 +76,7 @@ export const createExampleFlow = (): FlowDefinition => {
 			components: [StepThree],
 			onExit: handleStepThreeExit,
 			config: {
-				animations: {
-					// We can disable/manage the animations for when we enter, or leave this step specifically.
-					animateSteps: false,
-				},
+				layout: DefaultFrameLayout,
 			},
 		},
 		'step-four': {
@@ -94,6 +85,11 @@ export const createExampleFlow = (): FlowDefinition => {
 			components: [StepFour, FlowChainingDemo],
 			config: {
 				sidebar: true,
+				variant: 'modal' as const,
+				inert: {
+					enabled: true,
+					excludeSelectors: ['#persistent-header', '.always-accessible'],
+				},
 			},
 		},
 	}

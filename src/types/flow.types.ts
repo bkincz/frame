@@ -3,6 +3,8 @@
  *   Type definitions for the factory-based flow system
  **********************************************************************************************************/
 
+import type { FrameRenderFunction } from '@/core/frame.types'
+
 /**
  * Configuration for footer component
  */
@@ -35,6 +37,16 @@ export interface AnimationConfig {
 export interface MainConfig {}
 
 /**
+ * Configuration for inert management (modal mode only)
+ */
+export interface InertConfig {
+	/** Enable/disable inert management (default: true in modal mode) */
+	enabled?: boolean
+	/** CSS selectors for elements to exclude from being made inert */
+	excludeSelectors?: string[]
+}
+
+/**
  * Frame variant types
  */
 export type FrameVariant = 'modal' | 'fullscreen'
@@ -45,44 +57,30 @@ export type FrameVariant = 'modal' | 'fullscreen'
  */
 export interface StepConfig {
 	footer?: Partial<FooterConfig>
-	sidebar?: Partial<SidebarConfig> | boolean // false = completely hide sidebar, true = show with defaults
+	sidebar?: Partial<SidebarConfig> | boolean
 	animations?: Partial<AnimationConfig>
 	main?: Partial<MainConfig>
-	variant?: FrameVariant // 'modal' = centered modal with overlay, 'fullscreen' = full viewport
-	// Extensible for future config options
+	variant?: FrameVariant
+	layout?: FrameRenderFunction
+	inert?: Partial<InertConfig>
 	[key: string]: unknown
 }
 
 /**
  * Flow-level configuration
  */
-export interface FlowConfig extends StepConfig {
-	// Flow config is the same as step config, but provides defaults
-}
+export interface FlowConfig extends StepConfig {}
 
 /**
  * Individual step definition
  */
 export interface Step {
-	/** Step heading (displayed at top) */
 	heading: string
-
-	/** Step subheading - string only for simplicity and performance */
 	subheading: string
-
-	/** Array of component types to render for this step (use component references, not JSX elements) */
 	components: Array<React.ComponentType>
-
-	/** Step-level config overrides */
 	config?: StepConfig
-
-	/** Called when entering this step (before mount) */
 	onEnter?: () => void | Promise<void>
-
-	/** Called when exiting this step (before unmount) */
 	onExit?: () => void | Promise<void>
-
-	/** Any additional custom properties */
 	[key: string]: unknown
 }
 
@@ -97,16 +95,9 @@ export interface Flow {
  * Return type from flow factory function
  */
 export interface FlowDefinition {
-	/** The flow steps definition */
 	flow: Flow
-
-	/** Flow-level configuration */
 	config: FlowConfig
-
-	/** Called when flow is entered (before any step) */
 	onEnter?: () => void | Promise<void>
-
-	/** Called when flow is exited */
 	onExit?: () => void | Promise<void>
 }
 
