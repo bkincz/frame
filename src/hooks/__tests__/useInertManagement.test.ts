@@ -271,6 +271,74 @@ describe('useInertManagement', () => {
 		consoleSpy.mockRestore()
 	})
 
+	test('should log when excluding element in debug mode', () => {
+		const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+		renderHook(() =>
+			useInertManagement({
+				isOpen: true,
+				isModal: true,
+				config: {
+					enabled: true,
+					excludeSelectors: ['#header'],
+				},
+				debug: true,
+			})
+		)
+
+		expect(consoleSpy).toHaveBeenCalledWith(
+			expect.stringContaining('[useInertManagement] Excluding'),
+			expect.any(HTMLElement)
+		)
+
+		consoleSpy.mockRestore()
+	})
+
+	test('should log when restoring elements in debug mode', () => {
+		const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+		const { unmount } = renderHook(() =>
+			useInertManagement({
+				isOpen: true,
+				isModal: true,
+				config: { enabled: true },
+				debug: true,
+			})
+		)
+
+		consoleSpy.mockClear()
+
+		unmount()
+
+		expect(consoleSpy).toHaveBeenCalledWith(
+			expect.stringContaining('[useInertManagement] Restored'),
+			expect.any(HTMLElement)
+		)
+
+		consoleSpy.mockRestore()
+	})
+
+	test('should skip elements removed from DOM before restore', () => {
+		const appElement = document.getElementById('app')!
+
+		const { unmount } = renderHook(() =>
+			useInertManagement({
+				isOpen: true,
+				isModal: true,
+				config: { enabled: true },
+				debug: false,
+			})
+		)
+
+		expect(appElement.inert).toBe(true)
+
+		// Remove element from DOM before restoring inert state
+		appElement.remove()
+
+		// Should not throw when restoring a removed element
+		expect(() => unmount()).not.toThrow()
+	})
+
 	test('should not apply inert to frame container element', () => {
 		const frameElement = document.querySelector('.frame_frame') as HTMLElement
 

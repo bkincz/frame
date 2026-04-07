@@ -14,6 +14,7 @@ import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import { useFlowLifecycle } from '@/hooks/useFlowLifecycle'
 import { useStepLifecycle } from '@/hooks/useStepLifecycle'
 import { useInertManagement } from '@/hooks/useInertManagement'
+import { useHistoryLock } from '@/hooks/useHistoryLock'
 import FrameState from '@/state/frame.state'
 import { customEventManager } from '@/lib/event'
 
@@ -109,6 +110,8 @@ export function FrameContainer({ debug = false, children }: FrameContainerProps)
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
 	})
+
+	useHistoryLock(isOpen)
 
 	// Subscribe to frame state
 	const { state: frameState } = useStateMachine(FrameState)

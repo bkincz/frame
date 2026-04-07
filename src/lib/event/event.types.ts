@@ -10,7 +10,12 @@
 export interface EventDataMap {
 	// Request Events (user actions)
 	'frame:request:close': { source?: string }
-	'frame:request:open': { flow: string; stepKey?: string; chain?: boolean }
+	'frame:request:open': {
+		flow: string
+		stepKey?: string
+		chain?: boolean
+		params?: Record<string, unknown>
+	}
 	'frame:request:next': void
 	'frame:request:previous': void
 	'frame:request:back': void

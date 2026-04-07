@@ -8,6 +8,7 @@ import { useEffect } from 'react'
  ***************************************************************************************************/
 import FrameState from '@/state/frame.state'
 import StepState from '@/state/step.state'
+import { customEventManager } from '@/lib/event'
 
 /*
  *   TYPES
@@ -26,6 +27,12 @@ export function useStepLifecycle(
 
 		const step = flowDefinition?.flow[currentStepKey]
 		if (!step) return
+
+		// Skip this step if skipIf returns true
+		if (step.skipIf && step.skipIf()) {
+			customEventManager.emit('frame:request:next', {})
+			return
+		}
 
 		const runStepEnter = async () => {
 			if (step.onEnter) {

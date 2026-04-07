@@ -53,6 +53,7 @@ describe('Frame API', () => {
 			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:open', {
 				flow: 'test-flow',
 				stepKey: undefined,
+				params: undefined,
 			})
 		})
 
@@ -62,6 +63,27 @@ describe('Frame API', () => {
 			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:open', {
 				flow: 'test-flow',
 				stepKey: 'step-1',
+				params: undefined,
+			})
+		})
+
+		it('should emit frame:request:open event with params', () => {
+			openFlow('test-flow', 'step-1', { userId: '123', redirect: '/dashboard' })
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:open', {
+				flow: 'test-flow',
+				stepKey: 'step-1',
+				params: { userId: '123', redirect: '/dashboard' },
+			})
+		})
+
+		it('should emit frame:request:open event with params but no step key', () => {
+			openFlow('test-flow', undefined, { source: 'header' })
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:open', {
+				flow: 'test-flow',
+				stepKey: undefined,
+				params: { source: 'header' },
 			})
 		})
 	})
@@ -74,6 +96,7 @@ describe('Frame API', () => {
 				flow: 'test-flow',
 				stepKey: undefined,
 				chain: false,
+				params: undefined,
 			})
 		})
 
@@ -84,6 +107,18 @@ describe('Frame API', () => {
 				flow: 'test-flow',
 				stepKey: 'step-2',
 				chain: false,
+				params: undefined,
+			})
+		})
+
+		it('should emit frame:request:open event with params', () => {
+			replaceFlow('test-flow', 'step-2', { instanceId: 'abc' })
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:open', {
+				flow: 'test-flow',
+				stepKey: 'step-2',
+				chain: false,
+				params: { instanceId: 'abc' },
 			})
 		})
 	})

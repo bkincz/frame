@@ -1,6 +1,6 @@
 {
   "name": "@bkincz/frame",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A production-ready, TypeScript-first React multi-step flow system with animations, navigation history, and customizable layouts",
   "type": "module",
   "main": "./dist/frame.cjs",

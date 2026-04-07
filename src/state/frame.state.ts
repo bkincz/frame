@@ -38,10 +38,17 @@ export interface FrameStateData {
 	stepHistory: string[]
 	flowLifecycle: FlowLifecycleState
 	flowDefinitionCache: Record<string, FlowDefinition>
+	flowParams: Record<string, unknown>
 }
 
 interface FrameActions {
-	openFrame: (flow: string, stepKey?: string, chain?: boolean) => void
+	openFrame: (
+		flow: string,
+		stepKey?: string,
+		chain?: boolean,
+		skipAnimation?: boolean,
+		params?: Record<string, unknown>
+	) => void
 	closeFrame: () => void
 	goBackInHistory: () => boolean
 	clearFlowHistory: () => void
@@ -127,6 +134,8 @@ const initialState: FrameStateProps = {
 		currentStepEntered: false,
 	},
 	flowDefinitionCache: {},
+	flowParams: {},
+	/* v8 ignore start */
 	openFrame: () => void 0,
 	closeFrame: () => void 0,
 	goBackInHistory: () => false,
@@ -152,6 +161,7 @@ const initialState: FrameStateProps = {
 	selectHasHistory: () => false,
 	selectHasStepHistory: () => false,
 	selectVariant: () => 'fullscreen',
+	/* v8 ignore end */
 }
 
 class FrameStateMachine extends StateMachine<FrameStateProps> {
@@ -301,7 +311,8 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		flow: string,
 		stepKey?: string,
 		chain?: boolean,
-		skipAnimation?: boolean
+		skipAnimation?: boolean,
+		params?: Record<string, unknown>
 	): void {
 		const { currentFlow, currentStepKey, isOpen } = this.state
 		const flowDef = this.getFlowDefinition(flow)
@@ -351,6 +362,13 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 				draft.stepHistory = []
 			}
 			// else: same flow, frame already open (step navigation) - don't change count or step history
+
+			// Merge or replace flow params
+			if (shouldChain) {
+				draft.flowParams = { ...draft.flowParams, ...(params ?? {}) }
+			} else {
+				draft.flowParams = params ?? {}
+			}
 		}, 'Open Frame')
 
 		// Update variant based on new flow/step
@@ -470,6 +488,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.currentStepKey = null
 			draft.flowHistory = []
 			draft.stepHistory = []
+			draft.flowParams = {}
 			draft.flowLifecycle.currentStepEntered = false
 			draft.variant = 'fullscreen' // Reset to default
 		}, 'Close Frame')
@@ -667,6 +686,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			draft.previousStepKey = null
 			draft.flowHistory = []
 			draft.stepHistory = []
+			draft.flowParams = {}
 			draft.flowLifecycle = {
 				enteredFlows: [],
 				currentStepEntered: false,

@@ -83,6 +83,16 @@ export class RouteManager {
 		return searchParams.get(name)
 	}
 
+	private pushHistory(url: string, replace: boolean): void {
+		const next = (window as any).next?.router
+		if (next) {
+			next[replace ? 'replace' : 'push'](url, undefined, { shallow: true })
+		} else {
+			window.history[replace ? 'replaceState' : 'pushState']({}, '', url)
+		}
+		this.notifyListeners()
+	}
+
 	public updateParams(params: RouteParams): void {
 		const newParams = new URLSearchParams(window.location.search)
 
@@ -101,8 +111,7 @@ export class RouteManager {
 
 		this.log('Updating route', { url: newUrl, params })
 
-		window.history.pushState({}, '', newUrl)
-		this.notifyListeners()
+		this.pushHistory(newUrl, false)
 	}
 
 	public replaceParams(params: RouteParams): void {
@@ -123,8 +132,7 @@ export class RouteManager {
 
 		this.log('Replacing route', { url: newUrl, params })
 
-		window.history.replaceState({}, '', newUrl)
-		this.notifyListeners()
+		this.pushHistory(newUrl, true)
 	}
 
 	public setParam(name: string, value: string | null): void {

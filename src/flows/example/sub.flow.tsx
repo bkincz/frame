@@ -6,7 +6,7 @@ import { StepSub } from './components/step.sub'
 /*
  *   STEPS
  **********************************************************************************************************/
-const useExampleSubFlow = () => {
+const createExampleSubFlow = () => {
 	const config = {
 		footer: {
 			hidePricing: true,
@@ -24,4 +24,4 @@ const useExampleSubFlow = () => {
 	return { flow, config }
 }
 
-export default useExampleSubFlow
+export default createExampleSubFlow

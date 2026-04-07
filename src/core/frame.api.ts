@@ -27,8 +27,8 @@ import FrameState from '@/state/frame.state'
  * FrameAPI.openFlow('checkout', 'payment')
  * ```
  */
-export function openFlow(flow: string, stepKey?: string): void {
-	customEventManager.emit('frame:request:open', { flow, stepKey })
+export function openFlow(flow: string, stepKey?: string, params?: Record<string, unknown>): void {
+	customEventManager.emit('frame:request:open', { flow, stepKey, params })
 }
 
 /**
@@ -46,8 +46,12 @@ export function openFlow(flow: string, stepKey?: string): void {
  * FrameAPI.replaceFlow('login')
  * ```
  */
-export function replaceFlow(flow: string, stepKey?: string): void {
-	customEventManager.emit('frame:request:open', { flow, stepKey, chain: false })
+export function replaceFlow(
+	flow: string,
+	stepKey?: string,
+	params?: Record<string, unknown>
+): void {
+	customEventManager.emit('frame:request:open', { flow, stepKey, chain: false, params })
 }
 
 /**

@@ -30,7 +30,7 @@ interface FrameRouterReturn {
 	currentStepKey: string | null
 	hasHistory: boolean
 	hasStepHistory: boolean
-	openFlow: (flow: string, stepKey?: string) => void
+	openFlow: (flow: string, stepKey?: string, params?: Record<string, unknown>) => void
 	closeFlow: () => void
 	goBackInHistory: () => boolean
 	goBackInStepHistory: () => boolean
@@ -60,7 +60,9 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	})
 
 	// Refs to store latest callbacks for event listeners
-	const openFlowRef = useRef<(flow: string, stepKey?: string) => void>(() => {})
+	const openFlowRef = useRef<
+		(flow: string, stepKey?: string, params?: Record<string, unknown>) => void
+	>(() => {})
 	const closeFlowRef = useRef<() => void>(() => {})
 	const nextStepRef = useRef<() => void>(() => {})
 	const previousStepRef = useRef<() => void>(() => {})
@@ -98,7 +100,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	)
 
 	const openFlow = useCallback(
-		(flow: string, stepKey?: string) => {
+		(flow: string, stepKey?: string, params?: Record<string, unknown>) => {
 			if (!flowExists(flow)) {
 				console.error(`[FrameRouter] Flow "${flow}" does not exist in registry`)
 				return
@@ -127,7 +129,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				})
 			} else {
 				// If not syncing URL, update state directly
-				FrameState.openFrame(flow, targetStepKey)
+				FrameState.openFrame(flow, targetStepKey, undefined, undefined, params)
 			}
 		},
 		[flowParam, stepParam, updateUrl, router, log, ensureFlowCached]
@@ -401,9 +403,17 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			flow: string
 			stepKey?: string
 			chain?: boolean
-		}>('frame:request:open', (data: { flow: string; stepKey?: string; chain?: boolean }) => {
-			openFlowRef.current(data.flow, data.stepKey)
-		})
+		}>(
+			'frame:request:open',
+			(data: {
+				flow: string
+				stepKey?: string
+				chain?: boolean
+				params?: Record<string, unknown>
+			}) => {
+				openFlowRef.current(data.flow, data.stepKey, data.params)
+			}
+		)
 
 		const nextSubscription = customEventManager.subscribe('frame:request:next', () => {
 			nextStepRef.current()

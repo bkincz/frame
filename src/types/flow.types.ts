@@ -3,6 +3,7 @@
  *   Type definitions for the factory-based flow system
  **********************************************************************************************************/
 
+import type { ReactNode } from 'react'
 import type { FrameRenderFunction } from '@/core/frame.types'
 
 /**
@@ -75,8 +76,9 @@ export interface FlowConfig extends StepConfig {}
  * Individual step definition
  */
 export interface Step {
-	heading: string
-	subheading: string
+	heading?: string | ReactNode
+	subheading?: string | ReactNode
+	skipIf?: () => boolean
 	components: Array<React.ComponentType>
 	config?: StepConfig
 	onEnter?: () => void | Promise<void>
@@ -96,7 +98,7 @@ export interface Flow {
  */
 export interface FlowDefinition {
 	flow: Flow
-	config: FlowConfig
+	config?: FlowConfig
 	onEnter?: () => void | Promise<void>
 	onExit?: () => void | Promise<void>
 }

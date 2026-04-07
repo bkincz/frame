@@ -20,3 +20,7 @@ export { useFrameAnimations } from './useFrameAnimations'
 export type { UseFrameAnimationsConfig, UseFrameAnimationsReturn } from './useFrameAnimations'
 
 export { useInertManagement } from './useInertManagement'
+
+export { useHistoryLock } from './useHistoryLock'
+
+export { useFrameParams } from './useFrameParams'

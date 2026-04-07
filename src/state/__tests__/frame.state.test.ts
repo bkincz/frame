@@ -86,6 +86,7 @@ describe('FrameState', () => {
 			expect(FrameState.state.stepHistory).toEqual([])
 			expect(FrameState.state.flowLifecycle.enteredFlows).toEqual([])
 			expect(FrameState.state.flowLifecycle.currentStepEntered).toBe(false)
+			expect(FrameState.state.flowParams).toEqual({})
 		})
 	})
 
@@ -221,6 +222,61 @@ describe('FrameState', () => {
 			FrameState.openFrame('test-flow', 'step1')
 
 			expect(FrameState.state.variant).toBe('drawer')
+		})
+
+		it('should emit frame:navigation:next when navigating forward within same flow', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			vi.clearAllMocks()
+
+			FrameState.openFrame('test-flow', 'step2')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:next', {
+				flow: 'test-flow',
+				fromStepKey: 'step1',
+				toStepKey: 'step2',
+			})
+		})
+
+		it('should emit frame:navigation:previous when navigating backward within same flow', () => {
+			FrameState.openFrame('test-flow', 'step3')
+			vi.clearAllMocks()
+
+			FrameState.openFrame('test-flow', 'step1')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:navigation:previous', {
+				flow: 'test-flow',
+				fromStepKey: 'step3',
+				toStepKey: 'step1',
+			})
+		})
+
+		it('should emit frame:step:change when step changes within same flow', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			vi.clearAllMocks()
+
+			FrameState.openFrame('test-flow', 'step2')
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:step:change', {
+				stepKey: 'step2',
+				previousStepKey: 'step1',
+				skipAnimation: undefined,
+			})
+		})
+
+		it('should not emit navigation events when skipAnimation is true', () => {
+			FrameState.openFrame('test-flow', 'step1')
+			vi.clearAllMocks()
+
+			FrameState.openFrame('test-flow', 'step2', undefined, true)
+
+			expect(customEventManager.emit).not.toHaveBeenCalledWith(
+				'frame:navigation:next',
+				expect.any(Object)
+			)
+			expect(customEventManager.emit).not.toHaveBeenCalledWith(
+				'frame:navigation:previous',
+				expect.any(Object)
+			)
 		})
 
 		it('should increment flowOpenCount only on flow change', () => {
@@ -848,6 +904,20 @@ describe('FrameState', () => {
 			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
 		})
 
+		it('selectCurrentStepIndex should return 0 when flow is open but definition is evicted from cache', () => {
+			FrameState.openFrame('test-flow', 'step2')
+			FrameState.clearFlowCache('test-flow')
+
+			expect(FrameState.selectCurrentStepIndex()).toBe(0)
+		})
+
+		it('selectVariant should return fullscreen when flow definition is evicted from cache', () => {
+			FrameState.openFrame('test-flow', 'step2')
+			FrameState.clearFlowCache('test-flow')
+
+			expect(FrameState.selectVariant()).toBe('fullscreen')
+		})
+
 		it('selectCurrentStepIndex should return current step index', () => {
 			FrameState.openFrame('test-flow', 'step1')
 			expect(FrameState.selectCurrentStepIndex()).toBe(0)
@@ -915,6 +985,70 @@ describe('FrameState', () => {
 
 			FrameState.markFrameInit()
 			expect(FrameState.selectHasFrameInit()).toBe(true)
+		})
+
+		it('selectCurrentStepIndex should return 0 when no flow is open', () => {
+			expect(FrameState.selectCurrentStepIndex()).toBe(0)
+		})
+
+		it('selectVariant should return fullscreen when no flow is open', () => {
+			expect(FrameState.selectVariant()).toBe('fullscreen')
+		})
+	})
+
+	describe('flowParams', () => {
+		beforeEach(() => {
+			FrameState.cacheFlowDefinition('test-flow', mockFlowDefinition)
+			FrameState.cacheFlowDefinition('flow-2', mockFlowDefinition2)
+		})
+
+		it('should set flowParams when opening with params', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+
+			expect(FrameState.state.flowParams).toEqual({ userId: '123' })
+		})
+
+		it('should clear flowParams when opening without params', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+			FrameState.closeFrame()
+			FrameState.openFrame('test-flow', 'step1')
+
+			expect(FrameState.state.flowParams).toEqual({})
+		})
+
+		it('should merge params when chaining flows', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+			FrameState.openFrame('flow-2', undefined, true, undefined, { source: 'header' })
+
+			expect(FrameState.state.flowParams).toEqual({ userId: '123', source: 'header' })
+		})
+
+		it('should let new params win on conflict when chaining', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123', source: 'footer' })
+			FrameState.openFrame('flow-2', undefined, true, undefined, { source: 'header' })
+
+			expect(FrameState.state.flowParams).toEqual({ userId: '123', source: 'header' })
+		})
+
+		it('should replace params when chain is false', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+			FrameState.openFrame('flow-2', undefined, false, undefined, { source: 'header' })
+
+			expect(FrameState.state.flowParams).toEqual({ source: 'header' })
+		})
+
+		it('should clear flowParams on closeFrame', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+			FrameState.closeFrame()
+
+			expect(FrameState.state.flowParams).toEqual({})
+		})
+
+		it('should clear flowParams on resetFrame', () => {
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123' })
+			FrameState.resetFrame()
+
+			expect(FrameState.state.flowParams).toEqual({})
 		})
 	})
 
