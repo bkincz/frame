@@ -47,7 +47,9 @@ const {
 		closeFlow: mockCloseFlow,
 	}))
 	const mockContainerState = { hasFrameInit: false as boolean, flowOpenCount: 0 as number }
-	const mockUseStateSlice = vi.fn((_machine: any, selector: (s: any) => any) => selector(mockContainerState))
+	const mockUseStateSlice = vi.fn((_machine: any, selector: (s: any) => any) =>
+		selector(mockContainerState)
+	)
 	const mockGetFlowDefinition = vi.fn()
 
 	return {
@@ -699,7 +701,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-				Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
@@ -722,7 +724,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-				Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 		})
 
 		it('should use default layout when no layout is configured', () => {
