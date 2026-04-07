@@ -32,7 +32,8 @@ const {
 	mockAnimateFrameExit,
 	mockAnimateFlowTransition,
 	mockUseFrameRouter,
-	mockUseStateMachine,
+	mockContainerState,
+	mockUseStateSlice,
 	mockGetFlowDefinition,
 } = vi.hoisted(() => {
 	const mockCloseFlow = vi.fn()
@@ -45,12 +46,8 @@ const {
 		currentStepKey: null as string | null,
 		closeFlow: mockCloseFlow,
 	}))
-	const mockUseStateMachine = vi.fn(() => ({
-		state: {
-			hasFrameInit: false,
-			flowOpenCount: 0,
-		},
-	}))
+	const mockContainerState = { hasFrameInit: false as boolean, flowOpenCount: 0 as number }
+	const mockUseStateSlice = vi.fn((_machine: any, selector: (s: any) => any) => selector(mockContainerState))
 	const mockGetFlowDefinition = vi.fn()
 
 	return {
@@ -59,7 +56,8 @@ const {
 		mockAnimateFrameExit,
 		mockAnimateFlowTransition,
 		mockUseFrameRouter,
-		mockUseStateMachine,
+		mockContainerState,
+		mockUseStateSlice,
 		mockGetFlowDefinition,
 	}
 })
@@ -85,7 +83,7 @@ vi.mock('@/hooks/useStepLifecycle', () => ({
 }))
 
 vi.mock('@bkincz/clutch', () => ({
-	useStateMachine: mockUseStateMachine,
+	useStateSlice: mockUseStateSlice,
 }))
 
 vi.mock('@/state/frame.state', () => ({
@@ -139,6 +137,8 @@ vi.mock('../frame.component', () => {
 describe('FrameContainer', () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
+		mockContainerState.hasFrameInit = false
+		mockContainerState.flowOpenCount = 0
 	})
 
 	describe('Closed State', () => {
@@ -165,12 +165,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-			mockUseStateMachine.mockReturnValue({
-				state: {
-					hasFrameInit: true,
-					flowOpenCount: 1,
-				},
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
@@ -264,12 +259,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-			mockUseStateMachine.mockReturnValue({
-				state: {
-					hasFrameInit: true,
-					flowOpenCount: 1,
-				},
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
@@ -299,9 +289,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
 
@@ -336,9 +324,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			const { rerender } = render(<FrameContainer />)
@@ -364,9 +350,7 @@ describe('FrameContainer', () => {
 				currentStepKey: null,
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: false, flowOpenCount: 0 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: false, flowOpenCount: 0 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			const { rerender } = render(<FrameContainer />)
@@ -394,9 +378,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 		})
 
 		it('should trigger close when overlay is clicked in modal variant', async () => {
@@ -425,9 +407,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
 
@@ -477,9 +457,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 		})
 
 		it('should render nothing when flow definition is not found', () => {
@@ -539,9 +517,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: false, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: false, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
 
@@ -592,9 +568,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
 
@@ -626,9 +600,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: false, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: false, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			let stepChangeCallback: ((...args: any[]) => void) | undefined
@@ -661,9 +633,7 @@ describe('FrameContainer', () => {
 				currentStepKey: null,
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: false, flowOpenCount: 0 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: false, flowOpenCount: 0 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			const { rerender } = render(<FrameContainer debug={true} />)
@@ -696,9 +666,7 @@ describe('FrameContainer', () => {
 				currentStepKey: 'step-1',
 				closeFlow: mockCloseFlow,
 			})
-			mockUseStateMachine.mockReturnValue({
-				state: { hasFrameInit: true, flowOpenCount: 1 },
-			})
+			Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			const { rerender } = render(<FrameContainer debug={true} />)
@@ -731,12 +699,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-			mockUseStateMachine.mockReturnValue({
-				state: {
-					hasFrameInit: true,
-					flowOpenCount: 1,
-				},
-			})
+				Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 		})
@@ -759,12 +722,7 @@ describe('FrameContainer', () => {
 				closeFlow: mockCloseFlow,
 			})
 
-			mockUseStateMachine.mockReturnValue({
-				state: {
-					hasFrameInit: true,
-					flowOpenCount: 1,
-				},
-			})
+				Object.assign(mockContainerState, { hasFrameInit: true, flowOpenCount: 1 })
 		})
 
 		it('should use default layout when no layout is configured', () => {
