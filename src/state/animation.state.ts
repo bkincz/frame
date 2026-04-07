@@ -26,6 +26,8 @@ class AnimationStateMachine extends StateMachine<AnimationStateData> {
 				animationType: null,
 				direction: undefined,
 			},
+			enableDevTools:
+				process.env.NODE_ENV !== 'production' ? { name: 'FrameState/Animation' } : false,
 		})
 	}
 

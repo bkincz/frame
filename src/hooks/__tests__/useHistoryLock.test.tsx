@@ -45,7 +45,11 @@ describe('useHistoryLock', () => {
 		it('should push sentinel when frame opens', () => {
 			renderHook(() => useHistoryLock(true))
 
-			expect(pushStateSpy).toHaveBeenCalledWith({ __frameLock: true }, '', window.location.href)
+			expect(pushStateSpy).toHaveBeenCalledWith(
+				{ __frameLock: true },
+				'',
+				window.location.href
+			)
 		})
 
 		it('should not push sentinel when frame is closed', () => {
@@ -72,18 +76,20 @@ describe('useHistoryLock', () => {
 
 			renderHook(() => useHistoryLock(true))
 
-			expect(mockNextRouter.push).toHaveBeenCalledWith(
-				window.location.href,
-				undefined,
-				{ shallow: true }
-			)
+			expect(mockNextRouter.push).toHaveBeenCalledWith(window.location.href, undefined, {
+				shallow: true,
+			})
 			expect(pushStateSpy).not.toHaveBeenCalled()
 		})
 
 		it('should fall back to history.pushState without NextJS', () => {
 			renderHook(() => useHistoryLock(true))
 
-			expect(pushStateSpy).toHaveBeenCalledWith({ __frameLock: true }, '', window.location.href)
+			expect(pushStateSpy).toHaveBeenCalledWith(
+				{ __frameLock: true },
+				'',
+				window.location.href
+			)
 		})
 
 		it('should use next.router.replace on user-initiated close', () => {
@@ -96,11 +102,9 @@ describe('useHistoryLock', () => {
 
 			rerender({ isOpen: false })
 
-			expect(mockNextRouter.replace).toHaveBeenCalledWith(
-				window.location.href,
-				undefined,
-				{ shallow: true }
-			)
+			expect(mockNextRouter.replace).toHaveBeenCalledWith(window.location.href, undefined, {
+				shallow: true,
+			})
 		})
 
 		it('should use history.replaceState on user-initiated close without NextJS', () => {
@@ -147,7 +151,11 @@ describe('useHistoryLock', () => {
 			})
 
 			// Sentinel should have been re-pushed after popstate when frame stays open
-			expect(pushStateSpy).toHaveBeenCalledWith({ __frameLock: true }, '', window.location.href)
+			expect(pushStateSpy).toHaveBeenCalledWith(
+				{ __frameLock: true },
+				'',
+				window.location.href
+			)
 		})
 
 		it('should not re-push sentinel if frame closes after popstate', async () => {
@@ -189,11 +197,9 @@ describe('useHistoryLock', () => {
 
 			unmount()
 
-			expect(removeEventListenerSpy).toHaveBeenCalledWith(
-				'popstate',
-				expect.any(Function),
-				{ capture: true }
-			)
+			expect(removeEventListenerSpy).toHaveBeenCalledWith('popstate', expect.any(Function), {
+				capture: true,
+			})
 
 			removeEventListenerSpy.mockRestore()
 		})

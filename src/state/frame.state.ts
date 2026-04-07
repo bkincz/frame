@@ -168,6 +168,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 	constructor() {
 		super({
 			initialState,
+			enableDevTools: process.env.NODE_ENV !== 'production' ? { name: 'FrameState' } : false,
 		})
 	}
 

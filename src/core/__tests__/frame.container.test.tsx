@@ -106,8 +106,16 @@ vi.mock('@/lib/event', () => ({
 
 vi.mock('../frame.component', () => {
 	const Frame = ({ children }: any) => <div data-testid="frame">{children}</div>
-	Frame.Overlay = ({ children, onClick }: any) => <div data-testid="frame-overlay" onClick={onClick}>{children}</div>
-	Frame.Content = ({ children, onClick }: any) => <div data-testid="frame-content" onClick={onClick}>{children}</div>
+	Frame.Overlay = ({ children, onClick }: any) => (
+		<div data-testid="frame-overlay" onClick={onClick}>
+			{children}
+		</div>
+	)
+	Frame.Content = ({ children, onClick }: any) => (
+		<div data-testid="frame-content" onClick={onClick}>
+			{children}
+		</div>
+	)
 	Frame.Grid = ({ children }: any) => <div data-testid="frame-grid">{children}</div>
 	Frame.Main = ({ children }: any) => <div data-testid="frame-main">{children}</div>
 	Frame.Sidebar = ({ children }: any) => <div data-testid="frame-sidebar">{children}</div>
@@ -444,10 +452,12 @@ describe('FrameContainer', () => {
 		it('should trigger close when frame:request:close event is received', async () => {
 			let closeCallback: ((...args: any[]) => void) | undefined
 
-			vi.mocked(customEventManager.subscribe).mockImplementation((event: string, callback: any) => {
-				if (event === 'frame:request:close') closeCallback = callback
-				return { unsubscribe: vi.fn() }
-			})
+			vi.mocked(customEventManager.subscribe).mockImplementation(
+				(event: string, callback: any) => {
+					if (event === 'frame:request:close') closeCallback = callback
+					return { unsubscribe: vi.fn() }
+				}
+			)
 
 			render(<FrameContainer />)
 
@@ -538,10 +548,12 @@ describe('FrameContainer', () => {
 		it('should sync step immediately when skipAnimation is true', async () => {
 			let stepChangeCallback: ((...args: any[]) => void) | undefined
 
-			vi.mocked(customEventManager.subscribe).mockImplementation((event: string, callback: any) => {
-				if (event === 'frame:step:change') stepChangeCallback = callback
-				return { unsubscribe: vi.fn() }
-			})
+			vi.mocked(customEventManager.subscribe).mockImplementation(
+				(event: string, callback: any) => {
+					if (event === 'frame:step:change') stepChangeCallback = callback
+					return { unsubscribe: vi.fn() }
+				}
+			)
 
 			render(<FrameContainer />)
 
@@ -555,10 +567,12 @@ describe('FrameContainer', () => {
 		it('should sync step immediately when frame has not initialized', async () => {
 			let stepChangeCallback: ((...args: any[]) => void) | undefined
 
-			vi.mocked(customEventManager.subscribe).mockImplementation((event: string, callback: any) => {
-				if (event === 'frame:step:change') stepChangeCallback = callback
-				return { unsubscribe: vi.fn() }
-			})
+			vi.mocked(customEventManager.subscribe).mockImplementation(
+				(event: string, callback: any) => {
+					if (event === 'frame:step:change') stepChangeCallback = callback
+					return { unsubscribe: vi.fn() }
+				}
+			)
 
 			render(<FrameContainer />)
 
@@ -618,10 +632,12 @@ describe('FrameContainer', () => {
 			mockGetFlowDefinition.mockReturnValue(mockFlowDefinition)
 
 			let stepChangeCallback: ((...args: any[]) => void) | undefined
-			vi.mocked(customEventManager.subscribe).mockImplementation((event: string, callback: any) => {
-				if (event === 'frame:step:change') stepChangeCallback = callback
-				return { unsubscribe: vi.fn() }
-			})
+			vi.mocked(customEventManager.subscribe).mockImplementation(
+				(event: string, callback: any) => {
+					if (event === 'frame:step:change') stepChangeCallback = callback
+					return { unsubscribe: vi.fn() }
+				}
+			)
 
 			render(<FrameContainer debug={true} />)
 			stepChangeCallback?.({ stepKey: 'step-2', skipAnimation: false })

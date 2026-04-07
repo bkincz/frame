@@ -1024,7 +1024,10 @@ describe('FrameState', () => {
 		})
 
 		it('should let new params win on conflict when chaining', () => {
-			FrameState.openFrame('test-flow', 'step1', undefined, undefined, { userId: '123', source: 'footer' })
+			FrameState.openFrame('test-flow', 'step1', undefined, undefined, {
+				userId: '123',
+				source: 'footer',
+			})
 			FrameState.openFrame('flow-2', undefined, true, undefined, { source: 'header' })
 
 			expect(FrameState.state.flowParams).toEqual({ userId: '123', source: 'header' })
