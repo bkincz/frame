@@ -2,7 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef, useState } from 'react'
-import { useStateMachine } from '@bkincz/clutch'
+import { useStateSlice } from '@bkincz/clutch'
 
 /*
  *   SHARED
@@ -14,6 +14,7 @@ import { useFrameAnimations } from '@/hooks/useFrameAnimations'
 import { useFlowLifecycle } from '@/hooks/useFlowLifecycle'
 import { useStepLifecycle } from '@/hooks/useStepLifecycle'
 import { useInertManagement } from '@/hooks/useInertManagement'
+import { useHistoryLock } from '@/hooks/useHistoryLock'
 import FrameState from '@/state/frame.state'
 import { customEventManager } from '@/lib/event'
 
@@ -105,14 +106,18 @@ export interface FrameContainerProps {
  * </FrameContainer>
  * ```
  */
+const selectHasFrameInit = (s: { hasFrameInit: boolean }) => s.hasFrameInit
+const selectFlowOpenCount = (s: { flowOpenCount: number }) => s.flowOpenCount
+
 export function FrameContainer({ debug = false, children }: FrameContainerProps) {
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
 	})
 
-	// Subscribe to frame state
-	const { state: frameState } = useStateMachine(FrameState)
-	const { hasFrameInit, flowOpenCount } = frameState || {}
+	useHistoryLock(isOpen)
+
+	const hasFrameInit = useStateSlice(FrameState, selectHasFrameInit)
+	const flowOpenCount = useStateSlice(FrameState, selectFlowOpenCount)
 
 	// Refs for animation
 	const overlayRef = useRef<HTMLDivElement | null>(null)

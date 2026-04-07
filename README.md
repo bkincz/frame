@@ -15,6 +15,9 @@ A production-ready, TypeScript-first React multi-step flow system with animation
 - **Modal & Fullscreen** - Switch between centered modals and fullscreen layouts per flow or step
 - **Inert Management** - Automatically makes background non-interactive in modal mode with exclusion list support
 - **Navigation Management** - Intelligent back/next buttons with flow chaining support
+- **Flow Params** - Pass typed data when opening a flow, accessible anywhere via `useFrameParams<T>()`
+- **Conditional Step Skipping** - Declaratively skip steps based on runtime conditions with `skipIf`
+- **Next.js Compatible** - Built-in browser back interception that hands off cleanly to Next.js router
 - **Type Safety** - Full TypeScript support with comprehensive type definitions
 - **Framework Agnostic** - Works with Next.js, Vite, Create React App, and more
 - **Lifecycle Hooks** - React to flow and step events for analytics, data fetching, etc.
@@ -114,9 +117,11 @@ import { FrameAPI } from '@bkincz/frame'
 // Open a flow (chains to history)
 FrameAPI.openFlow('checkout')
 FrameAPI.openFlow('checkout', 'payment') // Open at specific step
+FrameAPI.openFlow('checkout', 'payment', { instanceId: '123' }) // With params
 
 // Replace current flow (clears history)
 FrameAPI.replaceFlow('login')
+FrameAPI.replaceFlow('login', undefined, { redirect: '/dashboard' }) // With params
 
 // Navigate within flow
 FrameAPI.nextStep()
@@ -128,6 +133,32 @@ FrameAPI.closeFlow()
 FrameAPI.clearHistory()
 const hasFlowHistory = FrameAPI.hasHistory()
 ```
+
+### Flow Params
+
+Pass arbitrary data when opening a flow. Params are accessible in any step component via `useFrameParams<T>()`, persist across chained flows (new params merge over existing), and are cleared when the frame closes.
+
+```tsx
+import { FrameAPI, useFrameParams } from '@bkincz/frame'
+
+// Pass params when opening
+FrameAPI.openFlow('checkout', 'payment', {
+  instanceId: '123',
+  redirect: '/dashboard',
+})
+
+// Read params in any step component
+function PaymentStep() {
+  const { instanceId, redirect } = useFrameParams<{
+    instanceId: string
+    redirect: string
+  }>()
+
+  return <div>Processing order {instanceId}</div>
+}
+```
+
+When flows chain, params merge and new params take priority over existing ones. Use `replaceFlow` to start fresh with only the new params.
 
 ### Step Skipping
 
@@ -172,6 +203,33 @@ Step history is automatically cleared when:
 - Switching to a different flow
 - Closing the frame
 - Reopening a closed flow
+
+### Conditional Step Skipping
+
+Use `skipIf` on a step to skip it declaratively based on a runtime condition. The step is skipped before it renders.
+
+```tsx
+export const createCheckoutFlow = (): FlowDefinition => ({
+  flow: {
+    'address': {
+      components: [AddressStep],
+      heading: 'Shipping Address',
+    },
+    'shipping-options': {
+      components: [ShippingStep],
+      heading: 'Shipping Options',
+      // Skip if user only has digital items
+      skipIf: () => cartStore.isDigitalOnly(),
+    },
+    'payment': {
+      components: [PaymentStep],
+      heading: 'Payment',
+    },
+  },
+})
+```
+
+Multiple consecutive steps can have `skipIf`. Frame will advance through them until it finds a step that does not skip.
 
 ### Custom Layouts per Flow/Step
 
@@ -373,13 +431,6 @@ export const createCheckoutFlow = (): FlowDefinition => ({
 - The `inert` attribute is natively supported in modern browsers
 - For older browsers, consider using a polyfill like [wicg-inert](https://github.com/WICG/inert)
 
-**How It Works:**
-1. When a modal opens, all direct children of `<body>` (except the frame) are marked as inert
-2. Elements matching `excludeSelectors` are skipped
-3. Script and style elements are automatically excluded
-4. When the modal closes or switches to fullscreen, inert state is restored
-5. Original `inert`, `aria-hidden`, and `tabindex` values are preserved and restored
-
 ## Frame Components
 
 ### Available Components
@@ -445,6 +496,25 @@ function MyStep() {
 ```
 
 ## React Hooks
+
+### `useFrameParams<T>()`
+
+Access params passed to `FrameAPI.openFlow()` from any step component:
+
+```tsx
+import { useFrameParams } from '@bkincz/frame'
+
+function CheckoutStep() {
+  const { orderId, returnUrl } = useFrameParams<{
+    orderId: string
+    returnUrl: string
+  }>()
+
+  return <div>Order: {orderId}</div>
+}
+```
+
+Returns an empty object `{}` if no params were passed. Params are cleared on frame close.
 
 ### `useNavigationState(options)`
 
@@ -577,9 +647,9 @@ interface FrameContainerProps {
 ```tsx
 interface FlowDefinition {
   flow: Record<string, FlowStep>
-  config?: FlowConfig
-  onEnter?: (flowName: string) => void
-  onExit?: (flowName: string) => void
+  config?: FlowConfig           // Optional
+  onEnter?: () => void | Promise<void>
+  onExit?: () => void | Promise<void>
 }
 
 interface FlowConfig {
@@ -594,8 +664,9 @@ interface FlowConfig {
 
 interface FlowStep {
   components: React.ComponentType[]
-  heading?: string
-  subheading?: string
+  heading?: string | ReactNode   // Optional, supports rich content
+  subheading?: string | ReactNode
+  skipIf?: () => boolean         // Skip this step if returns true
   config?: {
     variant?: 'modal' | 'fullscreen'
     sidebar?: boolean
@@ -605,8 +676,8 @@ interface FlowStep {
       excludeSelectors?: string[]  // CSS selectors to exclude from inert
     }
   }
-  onEnter?: (stepKey: string) => void
-  onExit?: (stepKey: string) => void
+  onEnter?: () => void | Promise<void>
+  onExit?: () => void | Promise<void>
 }
 ```
 
@@ -688,6 +759,12 @@ if (isValidStepKey('checkout', 'payment')) {
 ```
 
 ## Framework Integration
+
+### Next.js Router Compatibility
+
+When Frame is open, browser back navigation is handled by Frame rather than Next.js. When the frame closes, control returns to Next.js automatically.
+
+No configuration required. Works with both the Pages Router and App Router.
 
 ### Next.js App Router
 
@@ -789,6 +866,8 @@ import type {
   FrameState,
 } from '@bkincz/frame'
 
+import { useFrameParams } from '@bkincz/frame'
+
 // Typed flow factory
 const createMyFlow: FlowFactory = () => ({
   flow: {
@@ -822,8 +901,8 @@ function CustomLayout(props: FrameRenderProps) {
 ### FrameAPI
 
 **Flow Navigation:**
-- `openFlow(flowName, stepKey?)` - Open flow (chains to history)
-- `replaceFlow(flowName, stepKey?)` - Replace flow (clears history)
+- `openFlow(flowName, stepKey?, params?)` - Open flow (chains to history)
+- `replaceFlow(flowName, stepKey?, params?)` - Replace flow (clears history)
 - `closeFlow()` - Close current flow
 - `goBack()` - Smart back navigation
 

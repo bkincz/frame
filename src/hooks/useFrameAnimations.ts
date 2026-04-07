@@ -48,6 +48,9 @@ export function useFrameAnimations(
 ): UseFrameAnimationsReturn {
 	const { debug = false, onStepChange, onFlowChange } = config
 
+	const activeTimelinesRef = useRef<gsap.core.Timeline[]>([])
+	const pendingRafsRef = useRef<number[]>([])
+
 	const animateStepTransition = useCallback(
 		(
 			data: FrameNextStepEventData | FramePreviousStepEventData,
@@ -69,15 +72,17 @@ export function useFrameAnimations(
 
 			// Animate current step out
 			const exitTimeline = animateStepOut(stepWrapperRef.current, direction)
+			activeTimelinesRef.current.push(exitTimeline)
 
 			exitTimeline.eventCallback('onComplete', () => {
 				// Update rendered step after exit animation
 				onStepChange(data.toStepKey)
 
 				// Animate new step in on next tick (after DOM updates)
-				requestAnimationFrame(() => {
+				const rafId = requestAnimationFrame(() => {
 					if (stepWrapperRef.current) {
 						const enterTimeline = animateStepIn(stepWrapperRef.current, direction)
+						activeTimelinesRef.current.push(enterTimeline)
 						enterTimeline.eventCallback('onComplete', () => {
 							AnimationState.endAnimation()
 							if (debug)
@@ -87,6 +92,7 @@ export function useFrameAnimations(
 						AnimationState.endAnimation()
 					}
 				})
+				pendingRafsRef.current.push(rafId)
 			})
 		},
 		[stepWrapperRef, onStepChange, debug]
@@ -115,15 +121,17 @@ export function useFrameAnimations(
 
 			// Animate current flow out
 			const exitTimeline = animateFlowOut(stepWrapperRef.current)
+			activeTimelinesRef.current.push(exitTimeline)
 
 			exitTimeline.eventCallback('onComplete', () => {
 				// Update rendered flow and step after exit animation
 				onFlowChange(flowName, stepKey)
 
 				// Animate new flow in on next tick (after DOM updates)
-				requestAnimationFrame(() => {
+				const rafId = requestAnimationFrame(() => {
 					if (stepWrapperRef.current) {
 						const enterTimeline = animateFlowIn(stepWrapperRef.current)
+						activeTimelinesRef.current.push(enterTimeline)
 						enterTimeline.eventCallback('onComplete', () => {
 							AnimationState.endAnimation()
 							if (debug) console.log('[useFrameAnimations] Flow transition complete')
@@ -132,6 +140,7 @@ export function useFrameAnimations(
 						AnimationState.endAnimation()
 					}
 				})
+				pendingRafsRef.current.push(rafId)
 			})
 		},
 		[stepWrapperRef, onFlowChange, debug]
@@ -182,6 +191,7 @@ export function useFrameAnimations(
 			const timeline = overlayRef.current
 				? animateFullFrameOut(overlayRef.current, contentRef.current)
 				: animateFrameOut(contentRef.current)
+			activeTimelinesRef.current.push(timeline)
 
 			timeline.eventCallback('onComplete', () => {
 				AnimationState.endAnimation()
@@ -211,6 +221,18 @@ export function useFrameAnimations(
 			prevSub.unsubscribe()
 		}
 	}, []) // Empty deps - subscribe once
+
+	useEffect(() => {
+		return () => {
+			pendingRafsRef.current.forEach(id => cancelAnimationFrame(id))
+			pendingRafsRef.current = []
+			activeTimelinesRef.current.forEach(tl => tl.kill())
+			activeTimelinesRef.current = []
+			if (AnimationState.selectIsAnimating()) {
+				AnimationState.endAnimation()
+			}
+		}
+	}, [])
 
 	return {
 		isAnimating: AnimationState.selectIsAnimating(),

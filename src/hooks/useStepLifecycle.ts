@@ -8,6 +8,7 @@ import { useEffect } from 'react'
  ***************************************************************************************************/
 import FrameState from '@/state/frame.state'
 import StepState from '@/state/step.state'
+import { customEventManager } from '@/lib/event'
 
 /*
  *   TYPES
@@ -27,14 +28,24 @@ export function useStepLifecycle(
 		const step = flowDefinition?.flow[currentStepKey]
 		if (!step) return
 
+		// Skip this step if skipIf returns true
+		if (step.skipIf && step.skipIf()) {
+			customEventManager.emit('frame:request:next', {})
+			return
+		}
+
+		let isActive = true
+
 		const runStepEnter = async () => {
 			if (step.onEnter) {
 				try {
 					StepState.startEntering()
 					await step.onEnter()
+					if (!isActive) return
 					FrameState.markStepEntered()
 					StepState.endEntering()
 				} catch (error) {
+					if (!isActive) return
 					console.error(`[useStepLifecycle] Error in step onEnter:`, error)
 					StepState.endEntering()
 				}
@@ -44,6 +55,8 @@ export function useStepLifecycle(
 		runStepEnter()
 
 		return () => {
+			isActive = false
+
 			const runStepExit = async () => {
 				if (step.onExit) {
 					try {

@@ -141,22 +141,25 @@ describe('Frame Functions', () => {
 
 			it('should handle factory errors gracefully', () => {
 				const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+				const error = new Error('Factory error')
 
-				// Mock a failing factory
-				vi.doMock('../frame.registry', () => ({
-					FLOW_REGISTRY: {
-						'failing-flow': {
-							factory: () => {
-								throw new Error('Factory error')
-							},
-							title: 'Failing Flow',
+				setFlowRegistry({
+					...testRegistry,
+					'failing-flow': {
+						factory: () => {
+							throw error
 						},
+						title: 'Failing Flow',
 					},
-				}))
+				})
 
 				const flowDef = createFlowDefinition('failing-flow')
 
 				expect(flowDef).toBeNull()
+				expect(consoleSpy).toHaveBeenCalledWith(
+					'[Frame] Error creating flow "failing-flow":',
+					error
+				)
 
 				consoleSpy.mockRestore()
 			})
@@ -366,6 +369,17 @@ describe('Frame Functions', () => {
 
 				expect(isFirstStepOfRootFlow()).toBe(false)
 			})
+
+			it('should return false when flow definition is not cached', () => {
+				vi.mocked(FrameState.getState).mockReturnValue({
+					currentFlow: 'test-flow',
+					currentStepKey: 'step-1',
+					flowHistory: [],
+				} as any)
+				vi.mocked(FrameState.getFlowDefinition).mockReturnValue(null)
+
+				expect(isFirstStepOfRootFlow()).toBe(false)
+			})
 		})
 
 		describe('isLastStepOfLeafFlow', () => {
@@ -404,6 +418,16 @@ describe('Frame Functions', () => {
 					currentFlow: null,
 					currentStepKey: null,
 				} as any)
+
+				expect(isLastStepOfLeafFlow()).toBe(false)
+			})
+
+			it('should return false when flow definition is not cached', () => {
+				vi.mocked(FrameState.getState).mockReturnValue({
+					currentFlow: 'test-flow',
+					currentStepKey: 'step-1',
+				} as any)
+				vi.mocked(FrameState.getFlowDefinition).mockReturnValue(null)
 
 				expect(isLastStepOfLeafFlow()).toBe(false)
 			})

@@ -19,6 +19,7 @@ interface CustomEventSubscriber<T = any> {
 class CustomEventManager {
 	private subscribers: Map<string, Map<string, CustomEventSubscriber>> = new Map()
 	private debug: boolean = process.env.NODE_ENV !== 'production'
+	private readonly MAX_LISTENERS_WARNING = 10
 
 	subscribe<T extends EventType>(
 		eventType: T,
@@ -56,6 +57,16 @@ class CustomEventManager {
 			console.log('%cSubscription ID:', 'color: #64748b;', id)
 			console.log('%cTotal subscribers:', 'color: #64748b;', totalSubscribers)
 			console.groupEnd()
+		}
+
+		if (process.env.NODE_ENV !== 'production') {
+			const count = this.subscribers.get(eventType)?.size || 0
+			if (count > this.MAX_LISTENERS_WARNING) {
+				console.warn(
+					`[CustomEventManager] ${count} subscribers on "${eventType}" — possible leak. ` +
+						`Ensure all subscriptions are unsubscribed on cleanup.`
+				)
+			}
 		}
 
 		return {

@@ -6,6 +6,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { useStepLifecycle } from '../useStepLifecycle'
 import FrameState from '@/state/frame.state'
 import StepState from '@/state/step.state'
+import { customEventManager } from '@/lib/event'
 import type { FlowDefinition } from '@/types/flow.types'
 
 /*
@@ -24,6 +25,12 @@ vi.mock('@/state/step.state', () => ({
 		endEntering: vi.fn(),
 		startExiting: vi.fn(),
 		endExiting: vi.fn(),
+	},
+}))
+
+vi.mock('@/lib/event', () => ({
+	customEventManager: {
+		emit: vi.fn(),
 	},
 }))
 
@@ -458,6 +465,91 @@ describe('useStepLifecycle', () => {
 			})
 
 			consoleSpy.mockRestore()
+		})
+	})
+
+	describe('skipIf', () => {
+		it('should emit frame:request:next and not call onEnter when skipIf returns true', () => {
+			const onEnter = vi.fn()
+			const flowDef: FlowDefinition = {
+				...mockFlowDefinition,
+				flow: {
+					step1: {
+						component: () => null,
+						config: {},
+						skipIf: () => true,
+						onEnter,
+					},
+				},
+			}
+
+			renderHook(() => useStepLifecycle('step1', flowDef))
+
+			expect(customEventManager.emit).toHaveBeenCalledWith('frame:request:next', {})
+			expect(onEnter).not.toHaveBeenCalled()
+		})
+
+		it('should not skip step when skipIf returns false', async () => {
+			const onEnter = vi.fn()
+			const flowDef: FlowDefinition = {
+				...mockFlowDefinition,
+				flow: {
+					step1: {
+						component: () => null,
+						config: {},
+						skipIf: () => false,
+						onEnter,
+					},
+				},
+			}
+
+			renderHook(() => useStepLifecycle('step1', flowDef))
+
+			expect(customEventManager.emit).not.toHaveBeenCalledWith('frame:request:next', {})
+			await waitFor(() => {
+				expect(onEnter).toHaveBeenCalled()
+			})
+		})
+
+		it('should not call state methods when step is skipped', () => {
+			const flowDef: FlowDefinition = {
+				...mockFlowDefinition,
+				flow: {
+					step1: {
+						component: () => null,
+						config: {},
+						skipIf: () => true,
+					},
+				},
+			}
+
+			renderHook(() => useStepLifecycle('step1', flowDef))
+
+			expect(StepState.startEntering).not.toHaveBeenCalled()
+			expect(FrameState.markStepEntered).not.toHaveBeenCalled()
+			expect(StepState.endEntering).not.toHaveBeenCalled()
+		})
+
+		it('should not run onExit when step was skipped', () => {
+			const onExit = vi.fn()
+			const flowDef: FlowDefinition = {
+				...mockFlowDefinition,
+				flow: {
+					step1: {
+						component: () => null,
+						config: {},
+						skipIf: () => true,
+						onExit,
+					},
+				},
+			}
+
+			const { unmount } = renderHook(() => useStepLifecycle('step1', flowDef))
+
+			unmount()
+
+			expect(onExit).not.toHaveBeenCalled()
+			expect(StepState.startExiting).not.toHaveBeenCalled()
 		})
 	})
 
