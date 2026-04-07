@@ -11,10 +11,15 @@ import FrameState from '@/state/frame.state'
 
 /**
  * Opens a flow and optionally navigates to a specific step.
- * If a flow is already open, this will chain the new flow to the history.
+ *
+ * **Chain behavior**: If a flow is already open, the new flow is pushed onto the flow history.
+ * Users can navigate back to the previous flow using `FrameAPI.goBack()`. Use `replaceFlow`
+ * instead if you want to replace the current flow without preserving back-navigation.
  *
  * @param flow - The name of the flow to open (must be registered in the flow registry)
  * @param stepKey - Optional step key to navigate to. If not provided, opens at the first step
+ * @param params - Optional data to pass to the flow. Accessible in any step via `useFrameParams()`.
+ *   When chaining flows, params are merged — new keys override existing ones.
  *
  * @example
  * ```tsx
@@ -25,6 +30,12 @@ import FrameState from '@/state/frame.state'
  *
  * // Open a flow at a specific step
  * FrameAPI.openFlow('checkout', 'payment')
+ *
+ * // Open a flow with params (accessible via useFrameParams in any step)
+ * FrameAPI.openFlow('checkout', 'payment', { instanceId: '123', redirectTo: '/home' })
+ *
+ * // Chain a new flow on top of an existing one (back button returns to previous flow)
+ * FrameAPI.openFlow('upsell') // while 'checkout' is open — pushes 'upsell' onto history
  * ```
  */
 export function openFlow(flow: string, stepKey?: string, params?: Record<string, unknown>): void {

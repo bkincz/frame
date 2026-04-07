@@ -6,6 +6,9 @@
 import { useStateSlice } from '@bkincz/clutch'
 import FrameState from '@/state/frame.state'
 
+// Stable module-level selector — avoids recreating the subscription on every render
+const selectFlowParams = (state: { flowParams: Record<string, unknown> }) => state.flowParams
+
 /**
  * Returns the params passed to FrameAPI.openFlow() for the current flow.
  * Params merge when flows chain — new params override existing keys.
@@ -21,5 +24,5 @@ import FrameState from '@/state/frame.state'
  * ```
  */
 export function useFrameParams<T extends Record<string, unknown> = Record<string, unknown>>(): T {
-	return useStateSlice(FrameState, state => state.flowParams) as T
+	return useStateSlice(FrameState, selectFlowParams) as T
 }

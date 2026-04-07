@@ -34,14 +34,18 @@ export function useStepLifecycle(
 			return
 		}
 
+		let isActive = true
+
 		const runStepEnter = async () => {
 			if (step.onEnter) {
 				try {
 					StepState.startEntering()
 					await step.onEnter()
+					if (!isActive) return
 					FrameState.markStepEntered()
 					StepState.endEntering()
 				} catch (error) {
+					if (!isActive) return
 					console.error(`[useStepLifecycle] Error in step onEnter:`, error)
 					StepState.endEntering()
 				}
@@ -51,6 +55,8 @@ export function useStepLifecycle(
 		runStepEnter()
 
 		return () => {
+			isActive = false
+
 			const runStepExit = async () => {
 				if (step.onExit) {
 					try {
