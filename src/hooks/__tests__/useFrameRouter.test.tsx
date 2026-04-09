@@ -107,12 +107,7 @@ describe('useFrameRouter', () => {
 
 		renderHook(() => useFrameRouter({ stepUrlMode: 'key' }))
 
-		expect(mockFrameApi.openFrame).toHaveBeenCalledWith(
-			'example',
-			'details',
-			undefined,
-			false
-		)
+		expect(mockFrameApi.openFrame).toHaveBeenCalledWith('example', 'details', undefined, false)
 	})
 
 	it('normalizes a missing step to the first key when requested', () => {

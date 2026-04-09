@@ -133,11 +133,7 @@ describe('RouteManager', () => {
 			window.location.search = '?foo=bar'
 			routeManager.updateParams({ foo: 'updated', baz: 'new' })
 
-			expect(pushStateMock).toHaveBeenCalledWith(
-				{},
-				'',
-				'/test?foo=updated&baz=new'
-			)
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?foo=updated&baz=new')
 		})
 
 		it('should notify listeners', () => {
@@ -294,11 +290,7 @@ describe('RouteManager', () => {
 			window.history.replaceState({}, '', '/test?flow=example&step=entry')
 
 			expect(listener).toHaveBeenCalledTimes(1)
-			expect(replaceStateMock).toHaveBeenCalledWith(
-				{},
-				'',
-				'/test?flow=example&step=entry'
-			)
+			expect(replaceStateMock).toHaveBeenCalledWith({}, '', '/test?flow=example&step=entry')
 		})
 	})
 
