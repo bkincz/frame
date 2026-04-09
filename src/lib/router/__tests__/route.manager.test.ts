@@ -10,6 +10,11 @@ import { RouteManager } from '../route.manager'
 describe('RouteManager', () => {
 	let routeManager: RouteManager
 	let originalLocation: Location
+	let pushStateMock: ReturnType<typeof vi.fn>
+	let replaceStateMock: ReturnType<typeof vi.fn>
+	let backMock: ReturnType<typeof vi.fn>
+	let forwardMock: ReturnType<typeof vi.fn>
+	let goMock: ReturnType<typeof vi.fn>
 
 	beforeEach(() => {
 		// Save original location
@@ -26,11 +31,17 @@ describe('RouteManager', () => {
 		} as Location
 
 		// Mock history methods
-		window.history.pushState = vi.fn()
-		window.history.replaceState = vi.fn()
-		window.history.back = vi.fn()
-		window.history.forward = vi.fn()
-		window.history.go = vi.fn()
+		pushStateMock = vi.fn()
+		replaceStateMock = vi.fn()
+		backMock = vi.fn()
+		forwardMock = vi.fn()
+		goMock = vi.fn()
+
+		window.history.pushState = pushStateMock
+		window.history.replaceState = replaceStateMock
+		window.history.back = backMock
+		window.history.forward = forwardMock
+		window.history.go = goMock
 
 		routeManager = new RouteManager()
 	})
@@ -101,28 +112,28 @@ describe('RouteManager', () => {
 			window.location.search = ''
 			routeManager.updateParams({ foo: 'bar' })
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?foo=bar')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?foo=bar')
 		})
 
 		it('should update existing params', () => {
 			window.location.search = '?foo=bar'
 			routeManager.updateParams({ foo: 'updated' })
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?foo=updated')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?foo=updated')
 		})
 
 		it('should remove params when value is null', () => {
 			window.location.search = '?foo=bar&baz=qux'
 			routeManager.updateParams({ foo: null })
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?baz=qux')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?baz=qux')
 		})
 
 		it('should handle multiple param updates', () => {
 			window.location.search = '?foo=bar'
 			routeManager.updateParams({ foo: 'updated', baz: 'new' })
 
-			expect(window.history.pushState).toHaveBeenCalledWith(
+			expect(pushStateMock).toHaveBeenCalledWith(
 				{},
 				'',
 				'/test?foo=updated&baz=new'
@@ -144,15 +155,15 @@ describe('RouteManager', () => {
 			window.location.search = ''
 			routeManager.replaceParams({ foo: 'bar' })
 
-			expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?foo=bar')
-			expect(window.history.pushState).not.toHaveBeenCalled()
+			expect(replaceStateMock).toHaveBeenCalledWith({}, '', '/test?foo=bar')
+			expect(pushStateMock).not.toHaveBeenCalled()
 		})
 
 		it('should remove params when value is null', () => {
 			window.location.search = '?foo=bar&baz=qux'
 			routeManager.replaceParams({ foo: null })
 
-			expect(window.history.replaceState).toHaveBeenCalledWith({}, '', '/test?baz=qux')
+			expect(replaceStateMock).toHaveBeenCalledWith({}, '', '/test?baz=qux')
 		})
 
 		it('should notify listeners', () => {
@@ -170,14 +181,14 @@ describe('RouteManager', () => {
 			window.location.search = ''
 			routeManager.setParam('foo', 'bar')
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?foo=bar')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?foo=bar')
 		})
 
 		it('should remove param when value is null', () => {
 			window.location.search = '?foo=bar'
 			routeManager.setParam('foo', null)
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test')
 		})
 	})
 
@@ -186,14 +197,14 @@ describe('RouteManager', () => {
 			window.location.search = '?foo=bar&baz=qux&test=value'
 			routeManager.clearParams(['foo', 'baz'])
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?test=value')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?test=value')
 		})
 
 		it('should handle empty param names array', () => {
 			window.location.search = '?foo=bar'
 			routeManager.clearParams([])
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test?foo=bar')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?foo=bar')
 		})
 	})
 
@@ -202,7 +213,7 @@ describe('RouteManager', () => {
 			window.location.search = '?foo=bar&baz=qux'
 			routeManager.clearAllParams()
 
-			expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/test')
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test')
 		})
 
 		it('should notify listeners', () => {
@@ -218,17 +229,17 @@ describe('RouteManager', () => {
 	describe('Navigation', () => {
 		it('should navigate back', () => {
 			routeManager.goBack()
-			expect(window.history.back).toHaveBeenCalled()
+			expect(backMock).toHaveBeenCalled()
 		})
 
 		it('should navigate forward', () => {
 			routeManager.goForward()
-			expect(window.history.forward).toHaveBeenCalled()
+			expect(forwardMock).toHaveBeenCalled()
 		})
 
 		it('should navigate to specific position', () => {
 			routeManager.go(-2)
-			expect(window.history.go).toHaveBeenCalledWith(-2)
+			expect(goMock).toHaveBeenCalledWith(-2)
 		})
 	})
 
@@ -264,6 +275,30 @@ describe('RouteManager', () => {
 			window.dispatchEvent(popstateEvent)
 
 			expect(listener).toHaveBeenCalledTimes(1)
+		})
+
+		it('should notify listeners on direct pushState calls', () => {
+			const listener = vi.fn()
+			routeManager.subscribe(listener)
+
+			window.history.pushState({}, '', '/test?flow=example')
+
+			expect(listener).toHaveBeenCalledTimes(1)
+			expect(pushStateMock).toHaveBeenCalledWith({}, '', '/test?flow=example')
+		})
+
+		it('should notify listeners on direct replaceState calls', () => {
+			const listener = vi.fn()
+			routeManager.subscribe(listener)
+
+			window.history.replaceState({}, '', '/test?flow=example&step=entry')
+
+			expect(listener).toHaveBeenCalledTimes(1)
+			expect(replaceStateMock).toHaveBeenCalledWith(
+				{},
+				'',
+				'/test?flow=example&step=entry'
+			)
 		})
 	})
 

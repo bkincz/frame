@@ -156,6 +156,23 @@ describe('FrameContainer', () => {
 
 			expect(container.firstChild).toBeNull()
 		})
+
+		it('passes router config through to useFrameRouter', () => {
+			mockUseFrameRouter.mockReturnValue({
+				isOpen: false,
+				currentFlow: null,
+				currentStepKey: null,
+				closeFlow: mockCloseFlow,
+			})
+
+			render(<FrameContainer router={{ stepUrlMode: 'key', normalizeStepUrl: true }} />)
+
+			expect(mockUseFrameRouter).toHaveBeenCalledWith({
+				debug: false,
+				stepUrlMode: 'key',
+				normalizeStepUrl: true,
+			})
+		})
 	})
 
 	describe('Open State', () => {
