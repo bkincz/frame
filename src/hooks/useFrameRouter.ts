@@ -21,6 +21,8 @@ export interface FrameRouterConfig {
 	flowParam?: string
 	stepParam?: string
 	updateUrl?: boolean
+	stepUrlMode?: 'index' | 'key'
+	normalizeStepUrl?: boolean
 	debug?: boolean
 }
 
@@ -44,7 +46,14 @@ interface FrameRouterReturn {
  *   HOOK
  ***************************************************************************************************/
 export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterReturn {
-	const { flowParam = 'flow', stepParam = 'step', updateUrl = true, debug = false } = config
+	const {
+		flowParam = 'flow',
+		stepParam = 'step',
+		updateUrl = true,
+		stepUrlMode = 'index',
+		normalizeStepUrl = false,
+		debug = false,
+	} = config
 
 	// Use the new router hook
 	const router = useRouter({
@@ -77,6 +86,35 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		},
 		[debug]
 	)
+
+	const serializeStepValue = useCallback(
+		(stepKeys: string[], stepKey: string): string => {
+			if (stepUrlMode === 'key') {
+				return stepKey
+			}
+
+			const stepIndex = stepKeys.indexOf(stepKey)
+			return String(stepIndex + 1)
+		},
+		[stepUrlMode]
+	)
+
+	const resolveStepKey = useCallback((stepKeys: string[], stepValue: string | null): string => {
+		if (!stepValue) {
+			return stepKeys[0]
+		}
+
+		if (stepKeys.includes(stepValue)) {
+			return stepValue
+		}
+
+		const parsedStepIndex = parseInt(stepValue, 10) - 1
+		const stepIndex = Number.isNaN(parsedStepIndex)
+			? 0
+			: Math.max(0, Math.min(parsedStepIndex, stepKeys.length - 1))
+
+		return stepKeys[stepIndex]
+	}, [])
 
 	const ensureFlowCached = useCallback(
 		(flowName: string): boolean => {
@@ -119,20 +157,17 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 
 			const stepKeys = Object.keys(flowDef.flow)
 			const targetStepKey = stepKey || stepKeys[0]
-			const stepIndex = stepKeys.indexOf(targetStepKey)
-
-			// Update URL if enabled - use numeric index for URL compatibility
 			if (updateUrl) {
 				router.updateParams({
 					[flowParam]: flow,
-					[stepParam]: String(stepIndex + 1), // 1-based for URL
+					[stepParam]: serializeStepValue(stepKeys, targetStepKey),
 				})
 			} else {
 				// If not syncing URL, update state directly
 				FrameState.openFrame(flow, targetStepKey, undefined, undefined, params)
 			}
 		},
-		[flowParam, stepParam, updateUrl, router, log, ensureFlowCached]
+		[flowParam, stepParam, updateUrl, router, log, ensureFlowCached, serializeStepValue]
 	)
 
 	const closeFlow = useCallback(() => {
@@ -167,17 +202,14 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 
 			log('Setting step', { stepKey })
 
-			const stepIndex = stepKeys.indexOf(stepKey)
-
-			// Update URL if enabled - use numeric index for URL
 			if (updateUrl) {
-				router.setParam(stepParam, String(stepIndex + 1)) // 1-based for URL
+				router.setParam(stepParam, serializeStepValue(stepKeys, stepKey))
 			} else {
 				// If not syncing URL, update state directly
 				FrameState.setStepKey(stepKey)
 			}
 		},
-		[frameState, stepParam, updateUrl, router, log]
+		[frameState, stepParam, updateUrl, router, log, serializeStepValue]
 	)
 
 	const nextStep = useCallback(() => {
@@ -203,13 +235,13 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 					toStepKey: nextStepKey,
 				})
 
-				router.setParam(stepParam, String(currentStepIndex + 2)) // +2 because 1-based and +1 for next
+				router.setParam(stepParam, serializeStepValue(stepKeys, nextStepKey))
 			}
 		} else {
 			// When URL syncing is disabled, update state directly
 			FrameState.nextStep()
 		}
-	}, [stepParam, updateUrl, router, debug])
+	}, [stepParam, updateUrl, router, debug, serializeStepValue])
 
 	const previousStep = useCallback(() => {
 		// Check if frame is currently animating
@@ -234,13 +266,13 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 					toStepKey: prevStepKey,
 				})
 
-				router.setParam(stepParam, String(currentStepIndex)) // currentStepIndex is already 0-based, so no -1 needed for 1-based URL
+				router.setParam(stepParam, serializeStepValue(stepKeys, prevStepKey))
 			}
 		} else {
 			// When URL syncing is disabled, update state directly
 			FrameState.previousStep()
 		}
-	}, [stepParam, updateUrl, router, debug])
+	}, [stepParam, updateUrl, router, debug, serializeStepValue])
 
 	const goBackInHistory = useCallback(() => {
 		const didGoBack = FrameState.goBackInHistory()
@@ -252,17 +284,16 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 				const flowDef = FrameState.getFlowDefinition(currentFlow)
 				if (flowDef) {
 					const stepKeys = Object.keys(flowDef.flow)
-					const stepIndex = stepKeys.indexOf(currentStepKey)
 					router.updateParams({
 						[flowParam]: currentFlow,
-						[stepParam]: String(stepIndex + 1),
+						[stepParam]: serializeStepValue(stepKeys, currentStepKey),
 					})
 				}
 			}
 		}
 
 		return didGoBack
-	}, [updateUrl, router, flowParam, stepParam])
+	}, [updateUrl, router, flowParam, stepParam, serializeStepValue])
 
 	const goToStep = useCallback(
 		(stepKey: string) => {
@@ -294,11 +325,10 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 
 			// Update URL if enabled
 			if (updateUrl) {
-				const stepIndex = stepKeys.indexOf(stepKey)
-				router.setParam(stepParam, String(stepIndex + 1))
+				router.setParam(stepParam, serializeStepValue(stepKeys, stepKey))
 			}
 		},
-		[stepParam, updateUrl, router, log, debug]
+		[stepParam, updateUrl, router, log, debug, serializeStepValue]
 	)
 
 	const goBackInStepHistory = useCallback(() => {
@@ -309,13 +339,12 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			const { currentStepKey } = FrameState.getState()
 			const stepKeys = FrameState.selectStepKeys()
 			if (currentStepKey) {
-				const stepIndex = stepKeys.indexOf(currentStepKey)
-				router.setParam(stepParam, String(stepIndex + 1))
+				router.setParam(stepParam, serializeStepValue(stepKeys, currentStepKey))
 			}
 		}
 
 		return didGoBack
-	}, [updateUrl, router, stepParam])
+	}, [updateUrl, router, stepParam, serializeStepValue])
 
 	// Update refs with latest callbacks
 	openFlowRef.current = openFlow
@@ -371,13 +400,29 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			if (!flowDef) return
 
 			const stepKeys = Object.keys(flowDef.flow)
-			const parsedStepIndex = stepValue ? parseInt(stepValue, 10) - 1 : 0 // Convert 1-based to 0-based
-			const stepIndex = isNaN(parsedStepIndex)
-				? 0
-				: Math.max(0, Math.min(parsedStepIndex, stepKeys.length - 1))
-			const stepKey = stepKeys[stepIndex]
+			const stepKey = resolveStepKey(stepKeys, stepValue)
+			const serializedStepValue = serializeStepValue(stepKeys, stepKey)
+
+			if (updateUrl && normalizeStepUrl && stepValue !== serializedStepValue) {
+				router.replaceParams({
+					[flowParam]: flowValue,
+					[stepParam]: serializedStepValue,
+				})
+				return
+			}
 
 			log('Opening frame from URL', { flow: flowValue, stepKey, skipAnimation: isBrowserNav })
+
+			if (
+				frameState.currentFlow === flowValue &&
+				frameState.currentStepKey === stepKey &&
+				frameState.isOpen
+			) {
+				if (isBrowserNav) {
+					router.consumeBrowserNavigation()
+				}
+				return
+			}
 
 			// Open the flow with the specified step key
 			// Skip animations for browser navigation for instant updates
@@ -395,7 +440,20 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 			}
 		}
 		// eslint-disable-next-line
-	}, [router.params, flowParam, stepParam, updateUrl, frameState.isOpen, log, ensureFlowCached])
+	}, [
+		router.params,
+		flowParam,
+		stepParam,
+		updateUrl,
+		normalizeStepUrl,
+		frameState.isOpen,
+		frameState.currentFlow,
+		frameState.currentStepKey,
+		log,
+		ensureFlowCached,
+		resolveStepKey,
+		serializeStepValue,
+	])
 
 	// Note: frame:request:close is handled in FrameContainer to trigger exit animation
 	useEffect(() => {

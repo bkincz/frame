@@ -22,10 +22,13 @@ import { customEventManager } from '@/lib/event'
  *   TYPES
  ***************************************************************************************************/
 import type { FrameRenderFunction, FrameRenderProps } from './frame.types'
+import type { FrameRouterConfig } from '@/hooks/useFrameRouter'
 
 export interface FrameContainerProps {
 	/** Enable debug logging to console (default: false) */
 	debug?: boolean
+	/** Optional router configuration passed through to useFrameRouter */
+	router?: Omit<FrameRouterConfig, 'debug'>
 	/**
 	 * Optional render function for custom layouts.
 	 * When provided, gives full control over the Frame layout structure.
@@ -109,9 +112,10 @@ export interface FrameContainerProps {
 const selectHasFrameInit = (s: { hasFrameInit: boolean }) => s.hasFrameInit
 const selectFlowOpenCount = (s: { flowOpenCount: number }) => s.flowOpenCount
 
-export function FrameContainer({ debug = false, children }: FrameContainerProps) {
+export function FrameContainer({ debug = false, router, children }: FrameContainerProps) {
 	const { isOpen, currentFlow, currentStepKey, closeFlow } = useFrameRouter({
 		debug,
+		...router,
 	})
 
 	useHistoryLock(isOpen)

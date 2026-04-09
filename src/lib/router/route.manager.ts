@@ -16,6 +16,8 @@ export class RouteManager {
 	private listeners: Set<() => void> = new Set()
 	private navigationId: number = 0
 	private lastBrowserNavigationId: number = 0
+	private originalPushState: History['pushState'] | null = null
+	private originalReplaceState: History['replaceState'] | null = null
 
 	constructor(config: RouteManagerConfig = {}) {
 		this.debug = config.debug || false
@@ -24,10 +26,14 @@ export class RouteManager {
 
 	private setupListeners(): void {
 		window.addEventListener('popstate', this.handlePopState)
+		window.addEventListener('hashchange', this.handleHashChange)
+		this.patchHistoryMethods()
 	}
 
 	public cleanup(): void {
 		window.removeEventListener('popstate', this.handlePopState)
+		window.removeEventListener('hashchange', this.handleHashChange)
+		this.restoreHistoryMethods()
 		this.listeners.clear()
 	}
 
@@ -35,6 +41,47 @@ export class RouteManager {
 		this.log('Browser navigation detected')
 		this.lastBrowserNavigationId = ++this.navigationId
 		this.notifyListeners()
+	}
+
+	private handleHashChange = (): void => {
+		this.log('Hash navigation detected')
+		this.notifyListeners()
+	}
+
+	private patchHistoryMethods(): void {
+		if (this.originalPushState && this.originalReplaceState) return
+
+		this.originalPushState = window.history.pushState.bind(window.history)
+		this.originalReplaceState = window.history.replaceState.bind(window.history)
+
+		const patchedPushState = ((...args) => {
+			const result = this.originalPushState!(...args)
+			this.log('History pushState detected')
+			this.notifyListeners()
+			return result
+		}) as History['pushState']
+
+		const patchedReplaceState = ((...args) => {
+			const result = this.originalReplaceState!(...args)
+			this.log('History replaceState detected')
+			this.notifyListeners()
+			return result
+		}) as History['replaceState']
+
+		window.history.pushState = patchedPushState
+		window.history.replaceState = patchedReplaceState
+	}
+
+	private restoreHistoryMethods(): void {
+		if (this.originalPushState) {
+			window.history.pushState = this.originalPushState
+			this.originalPushState = null
+		}
+
+		if (this.originalReplaceState) {
+			window.history.replaceState = this.originalReplaceState
+			this.originalReplaceState = null
+		}
 	}
 
 	public subscribe(callback: () => void): () => void {
@@ -87,10 +134,16 @@ export class RouteManager {
 		const next = (window as any).next?.router
 		if (next) {
 			next[replace ? 'replace' : 'push'](url, undefined, { shallow: true })
+			this.notifyListeners()
 		} else {
-			window.history[replace ? 'replaceState' : 'pushState']({}, '', url)
+			const historyMethod = replace ? this.originalReplaceState : this.originalPushState
+			if (historyMethod) {
+				historyMethod({}, '', url)
+				this.notifyListeners()
+			} else {
+				window.history[replace ? 'replaceState' : 'pushState']({}, '', url)
+			}
 		}
-		this.notifyListeners()
 	}
 
 	public updateParams(params: RouteParams): void {
@@ -149,8 +202,13 @@ export class RouteManager {
 
 	public clearAllParams(): void {
 		this.log('Clearing all params')
+		if (this.originalPushState) {
+			this.originalPushState({}, '', window.location.pathname)
+			this.notifyListeners()
+			return
+		}
+
 		window.history.pushState({}, '', window.location.pathname)
-		this.notifyListeners()
 	}
 
 	public goBack(): void {
