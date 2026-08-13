@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { StateMachine } from '@bkincz/clutch'
+import { createMachine } from '@bkincz/clutch'
 
 /*
  *   TYPES
@@ -12,55 +12,52 @@ export interface StepStateData {
 }
 
 /*
- *   STEP STATE MACHINE
- *   Manages step operations (onEnter/onExit) independently
+ *   STEP STATE
  ***************************************************************************************************/
-class StepStateMachine extends StateMachine<StepStateData> {
-	constructor() {
-		super({
-			initialState: {
-				isExiting: false,
-				isEntering: false,
-			},
-		})
-	}
+const machine = createMachine<StepStateData>({
+	initialState: {
+		isExiting: false,
+		isEntering: false,
+	},
+})
 
-	public startEntering(): void {
-		this.mutate(draft => {
+const StepState = Object.assign(machine, {
+	startEntering(): void {
+		machine.mutate(draft => {
 			draft.isEntering = true
 		}, 'Start Step Enter')
-	}
+	},
 
-	public endEntering(): void {
-		this.mutate(draft => {
+	endEntering(): void {
+		machine.mutate(draft => {
 			draft.isEntering = false
 		}, 'End Step Enter')
-	}
+	},
 
-	public startExiting(): void {
-		this.mutate(draft => {
+	startExiting(): void {
+		machine.mutate(draft => {
 			draft.isExiting = true
 		}, 'Start Step Exit')
-	}
+	},
 
-	public endExiting(): void {
-		this.mutate(draft => {
+	endExiting(): void {
+		machine.mutate(draft => {
 			draft.isExiting = false
 		}, 'End Step Exit')
-	}
+	},
 
-	public selectIsExiting(): boolean {
-		return this.state.isExiting
-	}
+	selectIsExiting(): boolean {
+		return machine.getState().isExiting
+	},
 
-	public selectIsEntering(): boolean {
-		return this.state.isEntering
-	}
+	selectIsEntering(): boolean {
+		return machine.getState().isEntering
+	},
 
-	public selectIsInLifecycle(): boolean {
-		return this.state.isExiting || this.state.isEntering
-	}
-}
+	selectIsInLifecycle(): boolean {
+		const { isExiting, isEntering } = machine.getState()
+		return isExiting || isEntering
+	},
+})
 
-const StepState = new StepStateMachine()
 export default StepState

@@ -14,6 +14,9 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		setupFiles: './src/test/setup.ts',
+		include: ['src/**/*.{test,spec}.{ts,tsx}'],
+		clearMocks: true,
+		restoreMocks: true,
 		css: {
 			modules: {
 				classNameStrategy: 'non-scoped',
@@ -21,8 +24,9 @@ export default defineConfig({
 		},
 		coverage: {
 			provider: 'v8',
-			reporter: ['text', 'json', 'html'],
-			exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*', '**/mockData/**'],
+			reporter: ['text', 'json', 'html', 'lcov'],
+			include: ['src/**/*.{ts,tsx}'],
+			exclude: ['src/test/**', '**/*.d.ts', '**/*.config.*', '**/mockData/**'],
 		},
 	},
 	resolve: {

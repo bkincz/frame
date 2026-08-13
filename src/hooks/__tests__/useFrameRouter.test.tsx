@@ -48,8 +48,8 @@ const { mockFrameState, mockRouter, mockFrameApi } = vi.hoisted(() => {
 	}
 })
 
-vi.mock('@bkincz/clutch', () => ({
-	useStateMachine: vi.fn(() => ({ state: mockFrameState })),
+vi.mock('@bkincz/clutch/react', () => ({
+	useMachine: vi.fn(() => ({ state: mockFrameState })),
 }))
 
 vi.mock('@/state/frame.state', () => ({

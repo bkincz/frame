@@ -334,7 +334,7 @@ describe('CustomEventManager', () => {
 
 		it('should handle subscription during emit', () => {
 			const callback = vi.fn()
-			let newSubscription: any
+			let newSubscription: { unsubscribe: () => void } | undefined
 
 			const initialCallback = vi.fn(() => {
 				newSubscription = customEventManager.subscribe('test:event', callback)
@@ -343,12 +343,9 @@ describe('CustomEventManager', () => {
 			customEventManager.subscribe('test:event', initialCallback)
 			customEventManager.emit('test:event', { data: 'test' })
 
-			// Initial callback should have been called
 			expect(initialCallback).toHaveBeenCalled()
-			// The new subscription added during emit may or may not be called in the same emit
-			// This is implementation-dependent, so we'll just verify it works in the next emit
+			expect(newSubscription).toBeDefined()
 
-			// Clear previous calls
 			callback.mockClear()
 
 			// Next emit should definitely call the new subscription
@@ -357,7 +354,7 @@ describe('CustomEventManager', () => {
 		})
 
 		it('should handle unsubscribe during emit', () => {
-			let subscription: any
+			let subscription: { unsubscribe: () => void } | undefined
 			const callback1 = vi.fn(() => {
 				subscription?.unsubscribe()
 			})

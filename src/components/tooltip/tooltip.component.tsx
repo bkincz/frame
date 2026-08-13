@@ -45,7 +45,7 @@ export const Tooltip: FC<TooltipProps> = ({
 	const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
 	const [isPositioned, setIsPositioned] = useState(false)
 	const [showAfterDelay, setShowAfterDelay] = useState(false)
-	const delayTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const delayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	useEffect(() => {
 		let root = document.getElementById('tooltip-portal-root')

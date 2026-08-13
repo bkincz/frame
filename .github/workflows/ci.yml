@@ -1,78 +1,158 @@
 name: CI
 
 on:
-  push:
-    branches: [master, main, develop]
-  pull_request:
-    branches: [master, main, develop]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+permissions:
+    contents: read
 
 jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20, 22]
+    test:
+        name: Test
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+                # 22 is the oldest supported line (engines: >=22.12.0).
+                node-version: [22, 24]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            # TODO: pin to commit SHAs, as release.yml is. Lower stakes here —
+            # no secrets are exposed to this workflow — but a mutable tag is
+            # still someone else's code running on every push.
+            - name: Checkout
+              uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm run lint
+            - name: Type check
+              run: pnpm run type-check
 
-      - name: Format check
-        run: pnpm run format:check
+            - name: Lint
+              run: pnpm run lint
 
-      - name: Test
-        run: pnpm run test
+            - name: Format check
+              run: pnpm run format:check
 
-      - name: Test coverage
-        run: pnpm run test:coverage
+            # Coverage runs the whole suite; no separate test run needed.
+            - name: Test (with coverage)
+              run: pnpm run test:coverage
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: test
+            - name: Upload coverage to Codecov
+              if: matrix.os == 'ubuntu-latest' && matrix.node-version == 24
+              uses: codecov/codecov-action@v7
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  files: ./coverage/lcov.info
+                  fail_ci_if_error: false
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        needs: test
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "pnpm"
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: 'pnpm'
 
-      - name: Build
-        run: pnpm run build:lib
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          retention-days: 7
+            - name: Build
+              run: pnpm run build:lib
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: dist
+                  path: dist
+                  retention-days: 7
+
+    # Installs the packed tarball the way a consumer would. A green build says
+    # nothing about whether what ships resolves: the exports map, the stylesheet
+    # and the types entry are only exercised from outside the package.
+    smoke:
+        name: Smoke (pack + resolve exports)
+        runs-on: ubuntu-latest
+        needs: test
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: pnpm run build:lib
+
+            - name: Pack the tarball
+              run: pnpm pack --pack-destination "$RUNNER_TEMP"
+
+            # The clutch range here tracks the peer this package declares.
+            - name: Install the tarball into a bare consumer
+              working-directory: ${{ runner.temp }}
+              run: |
+                  mkdir -p consumer && cd consumer
+                  npm init -y > /dev/null
+                  npm pkg set type=module
+                  npm install "$RUNNER_TEMP"/bkincz-frame-*.tgz react react-dom "@bkincz/clutch@^1.0.3"
+
+            - name: Import the package, ESM and CJS
+              working-directory: ${{ runner.temp }}/consumer
+              run: |
+                  node --input-type=module -e '
+                    const frame = await import("@bkincz/frame")
+                    if (Object.keys(frame).length === 0) throw new Error("no exports from ESM entry")
+                  '
+                  node -e '
+                    const frame = require("@bkincz/frame")
+                    if (Object.keys(frame).length === 0) throw new Error("no exports from CJS entry")
+                  '
+
+            - name: Resolve the stylesheet
+              working-directory: ${{ runner.temp }}/consumer
+              run: node -e 'require.resolve("@bkincz/frame/dist/frame.css")'
+
+            - name: Type-check against the tarball
+              working-directory: ${{ runner.temp }}/consumer
+              run: |
+                  npm install typescript@6 @types/react @types/react-dom @types/node
+                  cat > index.ts <<'TS'
+                  import * as frame from '@bkincz/frame'
+
+                  export type Exports = typeof frame
+                  TS
+                  npx tsc --noEmit --strict --module nodenext --moduleResolution nodenext --target es2022 --jsx react-jsx index.ts
