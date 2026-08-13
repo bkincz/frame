@@ -19,7 +19,7 @@ export default defineConfig({
 				'src/main.tsx',
 				'src/flows/**',
 			],
-			rollupTypes: true,
+			bundleTypes: true,
 			insertTypesEntry: true,
 		}),
 	],
@@ -45,10 +45,9 @@ export default defineConfig({
 		rollupOptions: {
 			// Externalize dependencies that shouldn't be bundled
 			external: [
-				'react',
-				'react-dom',
-				'react/jsx-runtime',
-				'@bkincz/clutch',
+				/^react($|\/)/,
+				/^react-dom($|\/)/,
+				/^@bkincz\/clutch($|\/)/,
 				'gsap',
 				'clsx',
 				'@tabler/icons-react',

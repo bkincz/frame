@@ -59,7 +59,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:lib": "vite build",
+    "build:lib": "vite build && node -e \"require('fs').copyFileSync('dist/frame.d.mts', 'dist/frame.d.cts')\"",
     "preview": "vite preview",
     "prepublishOnly": "pnpm run verify",
     "type-check": "tsc --noEmit",
@@ -84,6 +84,7 @@
   "devDependencies": {
     "@bkincz/clutch": "^3.5.0",
     "@eslint/js": "^10.0.1",
+    "@microsoft/api-extractor": "^7.58.12",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.3",

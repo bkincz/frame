@@ -119,7 +119,8 @@ jobs:
                   mkdir -p consumer && cd consumer
                   npm init -y > /dev/null
                   npm pkg set type=module
-                  npm install "$RUNNER_TEMP"/bkincz-frame-*.tgz react react-dom "@bkincz/clutch@^1.0.3"
+                  CLUTCH=$(node -p "require('$GITHUB_WORKSPACE/package.json').peerDependencies['@bkincz/clutch']")
+                  npm install "$RUNNER_TEMP"/bkincz-frame-*.tgz react react-dom "@bkincz/clutch@$CLUTCH"
 
             - name: Import the package, ESM and CJS
               working-directory: ${{ runner.temp }}/consumer
@@ -135,7 +136,7 @@ jobs:
 
             - name: Resolve the stylesheet
               working-directory: ${{ runner.temp }}/consumer
-              run: node -e 'require.resolve("@bkincz/frame/dist/frame.css")'
+              run: node -e 'require.resolve("@bkincz/frame/styles")'
 
             - name: Type-check against the tarball
               working-directory: ${{ runner.temp }}/consumer
@@ -146,4 +147,9 @@ jobs:
 
                   export type Exports = typeof frame
                   TS
-                  npx tsc --noEmit --strict --module nodenext --moduleResolution nodenext --target es2022 --jsx react-jsx index.ts
+                  cat > cjs.cts <<'TS'
+                  import frame = require('@bkincz/frame')
+
+                  export type Exports = typeof frame
+                  TS
+                  npx tsc --noEmit --strict --module nodenext --moduleResolution nodenext --target es2022 --jsx react-jsx index.ts cjs.cts
