@@ -4,14 +4,14 @@
  ***************************************************************************************************/
 import type { EventType, EventData } from './event.types'
 
-export type CustomEventCallback<T = any> = (data: T) => void
+export type CustomEventCallback<T = unknown> = (data: T) => void
 
 export interface CustomEventSubscription {
 	id: string
 	unsubscribe: () => void
 }
 
-interface CustomEventSubscriber<T = any> {
+interface CustomEventSubscriber<T = unknown> {
 	id: string
 	callback: CustomEventCallback<T>
 }
@@ -25,8 +25,11 @@ class CustomEventManager {
 		eventType: T,
 		callback: CustomEventCallback<EventData<T>>
 	): CustomEventSubscription
-	subscribe<T = any>(eventType: string, callback: CustomEventCallback<T>): CustomEventSubscription
-	subscribe<T = any>(
+	subscribe<T = unknown>(
+		eventType: string,
+		callback: CustomEventCallback<T>
+	): CustomEventSubscription
+	subscribe<T = unknown>(
 		eventType: string,
 		callback: CustomEventCallback<T>
 	): CustomEventSubscription {
@@ -37,7 +40,7 @@ class CustomEventManager {
 			this.subscribers.set(eventType, new Map())
 		}
 
-		const subscriber: CustomEventSubscriber<T> = {
+		const subscriber: CustomEventSubscriber = {
 			id,
 			callback: callback as CustomEventCallback,
 		}
@@ -76,8 +79,8 @@ class CustomEventManager {
 	}
 
 	emit<T extends EventType>(eventType: T, data: EventData<T>): void
-	emit<T = any>(eventType: string, data: T): void
-	emit<T = any>(eventType: string, data?: T): void {
+	emit<T = unknown>(eventType: string, data: T): void
+	emit<T = unknown>(eventType: string, data?: T): void {
 		const subscriberMap = this.subscribers.get(eventType)
 
 		if (this.debug) {

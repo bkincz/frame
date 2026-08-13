@@ -2,7 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef } from 'react'
-import { useStateMachine } from '@bkincz/clutch'
+import { useMachine } from '@bkincz/clutch/react'
 
 /*
  *   SHARED
@@ -62,7 +62,7 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 	})
 
 	// Subscribe to frame state
-	const { state: frameState } = useStateMachine(FrameState)
+	const { state: frameState } = useMachine(FrameState)
 	const lastProcessedParams = useRef<{ flow: string | null; step: string | null }>({
 		flow: null,
 		step: null,
@@ -346,13 +346,14 @@ export function useFrameRouter(config: FrameRouterConfig = {}): FrameRouterRetur
 		return didGoBack
 	}, [updateUrl, router, stepParam, serializeStepValue])
 
-	// Update refs with latest callbacks
-	openFlowRef.current = openFlow
-	closeFlowRef.current = closeFlow
-	nextStepRef.current = nextStep
-	previousStepRef.current = previousStep
-	goBackRef.current = goBackInHistory
-	goToStepRef.current = goToStep
+	useEffect(() => {
+		openFlowRef.current = openFlow
+		closeFlowRef.current = closeFlow
+		nextStepRef.current = nextStep
+		previousStepRef.current = previousStep
+		goBackRef.current = goBackInHistory
+		goToStepRef.current = goToStep
+	})
 
 	useEffect(() => {
 		const flowValue = router.params[flowParam] || null

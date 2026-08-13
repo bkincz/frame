@@ -127,13 +127,13 @@ describe('useRouter', () => {
 		it('should watch specific params when provided', () => {
 			;(routeManager as any).__setParams({ foo: 'bar', baz: 'qux' })
 
-			const { result } = renderHook(() => useRouter({ params: ['foo'] }))
+			renderHook(() => useRouter({ params: ['foo'] }))
 
 			expect(routeManager.getParams).toHaveBeenCalledWith(['foo'])
 		})
 
 		it('should watch all params when not specified', () => {
-			const { result } = renderHook(() => useRouter())
+			renderHook(() => useRouter())
 
 			expect(routeManager.getParams).toHaveBeenCalledWith(undefined)
 		})

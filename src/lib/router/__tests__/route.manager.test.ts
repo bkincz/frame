@@ -22,7 +22,7 @@ describe('RouteManager', () => {
 
 		// Mock window.location
 		delete (window as any).location
-		// @ts-ignore
+		// @ts-expect-error test double for a browser global
 		window.location = {
 			...originalLocation,
 			pathname: '/test',
@@ -48,7 +48,7 @@ describe('RouteManager', () => {
 
 	afterEach(() => {
 		routeManager.cleanup()
-		// @ts-ignore
+		// @ts-expect-error test double for a browser global
 		window.location = originalLocation
 		vi.clearAllMocks()
 	})
