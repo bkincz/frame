@@ -11,6 +11,8 @@ export interface RouteManagerConfig {
 	debug?: boolean
 }
 
+const isBrowser = typeof window !== 'undefined'
+
 export class RouteManager {
 	private debug: boolean
 	private listeners: Set<() => void> = new Set()
@@ -25,12 +27,16 @@ export class RouteManager {
 	}
 
 	private setupListeners(): void {
+		if (!isBrowser) return
+
 		window.addEventListener('popstate', this.handlePopState)
 		window.addEventListener('hashchange', this.handleHashChange)
 		this.patchHistoryMethods()
 	}
 
 	public cleanup(): void {
+		if (!isBrowser) return
+
 		window.removeEventListener('popstate', this.handlePopState)
 		window.removeEventListener('hashchange', this.handleHashChange)
 		this.restoreHistoryMethods()
@@ -107,6 +113,8 @@ export class RouteManager {
 	}
 
 	public getParams(paramNames?: string[]): RouteParams {
+		if (!isBrowser) return {}
+
 		const searchParams = new URLSearchParams(window.location.search)
 		const params: RouteParams = {}
 
@@ -126,11 +134,15 @@ export class RouteManager {
 	}
 
 	public getParam(name: string): string | null {
+		if (!isBrowser) return null
+
 		const searchParams = new URLSearchParams(window.location.search)
 		return searchParams.get(name)
 	}
 
 	private pushHistory(url: string, replace: boolean): void {
+		if (!isBrowser) return
+
 		const next = (window as any).next?.router
 		if (next) {
 			next[replace ? 'replace' : 'push'](url, undefined, { shallow: true })
@@ -147,6 +159,8 @@ export class RouteManager {
 	}
 
 	public updateParams(params: RouteParams): void {
+		if (!isBrowser) return
+
 		const newParams = new URLSearchParams(window.location.search)
 
 		// Update params
@@ -168,6 +182,8 @@ export class RouteManager {
 	}
 
 	public replaceParams(params: RouteParams): void {
+		if (!isBrowser) return
+
 		const newParams = new URLSearchParams(window.location.search)
 
 		// Update params
@@ -201,6 +217,8 @@ export class RouteManager {
 	}
 
 	public clearAllParams(): void {
+		if (!isBrowser) return
+
 		this.log('Clearing all params')
 		if (this.originalPushState) {
 			this.originalPushState({}, '', window.location.pathname)
@@ -212,30 +230,36 @@ export class RouteManager {
 	}
 
 	public goBack(): void {
+		if (!isBrowser) return
+
 		this.log('Going back')
 		window.history.back()
 	}
 
 	public goForward(): void {
+		if (!isBrowser) return
+
 		this.log('Going forward')
 		window.history.forward()
 	}
 
 	public go(delta: number): void {
+		if (!isBrowser) return
+
 		this.log('Going to position', { delta })
 		window.history.go(delta)
 	}
 
 	public getCurrentUrl(): string {
-		return window.location.href
+		return isBrowser ? window.location.href : ''
 	}
 
 	public getPathname(): string {
-		return window.location.pathname
+		return isBrowser ? window.location.pathname : ''
 	}
 
 	public getSearch(): string {
-		return window.location.search
+		return isBrowser ? window.location.search : ''
 	}
 
 	private log(message: string, data?: unknown): void {
