@@ -119,7 +119,8 @@ jobs:
                   mkdir -p consumer && cd consumer
                   npm init -y > /dev/null
                   npm pkg set type=module
-                  npm install "$RUNNER_TEMP"/bkincz-frame-*.tgz react react-dom "@bkincz/clutch@^1.0.3"
+                  CLUTCH=$(node -p "require('$GITHUB_WORKSPACE/package.json').peerDependencies['@bkincz/clutch']")
+                  npm install "$RUNNER_TEMP"/bkincz-frame-*.tgz react react-dom "@bkincz/clutch@$CLUTCH"
 
             - name: Import the package, ESM and CJS
               working-directory: ${{ runner.temp }}/consumer
