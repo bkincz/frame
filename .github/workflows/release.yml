@@ -30,7 +30,6 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            # A v1.2.3 tag must publish package version 1.2.3, nothing else.
             - name: Check tag matches package version
               run: |
                   PKG_VERSION=$(node -p "require('./package.json').version")
@@ -40,12 +39,9 @@ jobs:
                       exit 1
                   fi
 
-            # Type check, lint, format, the suite under both DOMs, build, size.
             - name: Verify
               run: pnpm run verify
 
-            # Scripts are skipped because prepublishOnly is verify, which has
-            # just run; provenance needs the id-token permission above.
             - name: Publish to npm
               run: pnpm publish --provenance --access public --no-git-checks --ignore-scripts
               env:

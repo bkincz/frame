@@ -17,13 +17,9 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, windows-latest]
-                # 22 is the oldest supported line (engines: >=22.12.0).
                 node-version: [22, 24]
 
         steps:
-            # TODO: pin to commit SHAs, as release.yml is. Lower stakes here —
-            # no secrets are exposed to this workflow — but a mutable tag is
-            # still someone else's code running on every push.
             - name: Checkout
               uses: actions/checkout@v7
 
@@ -48,7 +44,6 @@ jobs:
             - name: Format check
               run: pnpm run format:check
 
-            # Coverage runs the whole suite; no separate test run needed.
             - name: Test (with coverage)
               run: pnpm run test:coverage
 
@@ -91,9 +86,6 @@ jobs:
                   path: dist
                   retention-days: 7
 
-    # Installs the packed tarball the way a consumer would. A green build says
-    # nothing about whether what ships resolves: the exports map, the stylesheet
-    # and the types entry are only exercised from outside the package.
     smoke:
         name: Smoke (pack + resolve exports)
         runs-on: ubuntu-latest
@@ -121,7 +113,6 @@ jobs:
             - name: Pack the tarball
               run: pnpm pack --pack-destination "$RUNNER_TEMP"
 
-            # The clutch range here tracks the peer this package declares.
             - name: Install the tarball into a bare consumer
               working-directory: ${{ runner.temp }}
               run: |
