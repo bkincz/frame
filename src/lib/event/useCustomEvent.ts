@@ -13,7 +13,7 @@ export interface UseCustomEventOptions {
 	disabled?: boolean
 }
 
-export function useCustomEvent<T = any>(
+export function useCustomEvent<T = unknown>(
 	eventType: string,
 	callback: CustomEventCallback<T>,
 	options?: UseCustomEventOptions
@@ -21,8 +21,9 @@ export function useCustomEvent<T = any>(
 	const callbackRef = useRef(callback)
 	const subscriptionRef = useRef<CustomEventSubscription | null>(null)
 
-	// Update callback ref when it changes
-	callbackRef.current = callback
+	useEffect(() => {
+		callbackRef.current = callback
+	})
 
 	// Stable wrapper that calls the current callback
 	const stableCallback = useCallback((data: T) => {
@@ -44,7 +45,7 @@ export function useCustomEvent<T = any>(
 }
 
 export function useCustomEventEmit() {
-	return useCallback(<T = any>(eventType: string, data: T) => {
+	return useCallback(<T = unknown>(eventType: string, data: T) => {
 		customEventManager.emit(eventType, data)
 	}, [])
 }

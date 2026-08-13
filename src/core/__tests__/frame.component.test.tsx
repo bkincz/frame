@@ -60,7 +60,7 @@ vi.mock('@/components/button', () => ({
 }))
 
 vi.mock('@/hooks/useNavigationState', () => ({
-	useNavigationState: ({ direction }: { direction: 'next' | 'previous' }) => ({
+	useNavigationState: ({ direction: _direction }: { direction: 'next' | 'previous' }) => ({
 		isDisabled: false,
 		isHidden: false,
 	}),
@@ -77,8 +77,8 @@ vi.mock('@/state/frame.state', () => ({
 	},
 }))
 
-vi.mock('@bkincz/clutch', () => ({
-	useStateSlice: vi.fn((state, selector) => {
+vi.mock('@bkincz/clutch/react', () => ({
+	useSlice: vi.fn((state, selector) => {
 		// Mock different return values based on selector
 		const mockState = {
 			hasFrameInit: true,
@@ -367,7 +367,7 @@ describe('Frame Component', () => {
 
 	describe('Frame.Navigation', () => {
 		it('should render navigation container with back and next buttons', () => {
-			const { container } = render(<Frame.Navigation />)
+			render(<Frame.Navigation />)
 
 			const buttons = screen.getAllByTestId('button')
 			expect(buttons).toHaveLength(2) // Back and Next

@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { StateMachine } from '@bkincz/clutch'
+import { createMachine, devtools } from '@bkincz/clutch'
 
 /*
  *   TYPES
@@ -15,57 +15,57 @@ export interface AnimationStateData {
 }
 
 /*
- *   ANIMATION STATE MACHINE
- *   Manages animation state independently from frame business logic
+ *   ANIMATION STATE
  ***************************************************************************************************/
-class AnimationStateMachine extends StateMachine<AnimationStateData> {
-	constructor() {
-		super({
-			initialState: {
-				isAnimating: false,
-				animationType: null,
-				direction: undefined,
-			},
-			enableDevTools:
-				process.env.NODE_ENV !== 'production' ? { name: 'FrameState/Animation' } : false,
-		})
-	}
+const machine = createMachine<AnimationStateData>({
+	initialState: {
+		isAnimating: false,
+		animationType: null,
+		direction: undefined,
+	},
+})
 
-	public startAnimation(type: AnimationType, direction?: 'forward' | 'backward'): boolean {
-		if (this.state.isAnimating) {
-			console.warn(`[AnimationState] Already animating: ${this.state.animationType}`)
+if (process.env.NODE_ENV !== 'production') {
+	machine.with(devtools({ name: 'FrameState/Animation' }))
+}
+
+const AnimationState = Object.assign(machine, {
+	startAnimation(type: AnimationType, direction?: 'forward' | 'backward'): boolean {
+		const { isAnimating, animationType } = machine.getState()
+
+		if (isAnimating) {
+			console.warn(`[AnimationState] Already animating: ${animationType}`)
 			return false
 		}
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.isAnimating = true
 			draft.animationType = type
 			draft.direction = direction
 		}, 'Start Animation')
 
 		return true
-	}
+	},
 
-	public endAnimation(): void {
-		this.mutate(draft => {
+	endAnimation(): void {
+		machine.mutate(draft => {
 			draft.isAnimating = false
 			draft.animationType = null
 			draft.direction = undefined
 		}, 'End Animation')
-	}
+	},
 
-	public selectIsAnimating(): boolean {
-		return this.state.isAnimating
-	}
+	selectIsAnimating(): boolean {
+		return machine.getState().isAnimating
+	},
 
-	public selectAnimationType(): AnimationType {
-		return this.state.animationType
-	}
+	selectAnimationType(): AnimationType {
+		return machine.getState().animationType
+	},
 
-	public selectDirection(): 'forward' | 'backward' | undefined {
-		return this.state.direction
-	}
-}
+	selectDirection(): 'forward' | 'backward' | undefined {
+		return machine.getState().direction
+	},
+})
 
-const AnimationState = new AnimationStateMachine()
 export default AnimationState
