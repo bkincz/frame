@@ -1,13 +1,12 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { StateMachine } from '@bkincz/clutch'
+import { createMachine, devtools, type Machine } from '@bkincz/clutch'
 
 /*
  *   SHARED
  ***************************************************************************************************/
-import { customEventManager } from '@/lib/event'
-import type { EventDataMap } from '@/lib/event'
+import { customEventManager, type EventDataMap } from '@/lib/event'
 
 /*
  *   TYPES
@@ -75,7 +74,7 @@ interface FrameActions {
 	selectVariant: () => FrameVariant
 }
 
-export interface FrameStateProps extends FrameActions, FrameStateData {}
+export type FrameStateProps = Machine<FrameStateData> & FrameActions
 
 /*
  *   EVENT DATA TYPES
@@ -117,7 +116,7 @@ export type FrameHistoryBackEventData = EventDataMap['frame:navigation:history-b
 /*
  *   STATE
  ***************************************************************************************************/
-const initialState: FrameStateProps = {
+const initialState: FrameStateData = {
 	isOpen: false,
 	isAnimating: false,
 	hasFrameInit: false,
@@ -135,45 +134,17 @@ const initialState: FrameStateProps = {
 	},
 	flowDefinitionCache: {},
 	flowParams: {},
-	/* v8 ignore start */
-	openFrame: () => void 0,
-	closeFrame: () => void 0,
-	goBackInHistory: () => false,
-	clearFlowHistory: () => void 0,
-	setStepKey: () => void 0,
-	nextStep: () => void 0,
-	previousStep: () => void 0,
-	goToStep: () => void 0,
-	goBackInStepHistory: () => false,
-	clearStepHistory: () => void 0,
-	resetFrame: () => void 0,
-	setAnimating: () => void 0,
-	cacheFlowDefinition: () => void 0,
-	getFlowDefinition: () => null,
-	clearFlowCache: () => void 0,
-	markFlowEntered: () => void 0,
-	markFlowExited: () => void 0,
-	markStepEntered: () => void 0,
-	markStepExited: () => void 0,
-	selectCurrentStepIndex: () => 0,
-	selectStepKeys: () => [],
-	selectIsFlowEntered: () => false,
-	selectHasHistory: () => false,
-	selectHasStepHistory: () => false,
-	selectVariant: () => 'fullscreen',
-	/* v8 ignore end */
 }
 
-class FrameStateMachine extends StateMachine<FrameStateProps> {
-	constructor() {
-		super({
-			initialState,
-			enableDevTools: process.env.NODE_ENV !== 'production' ? { name: 'FrameState' } : false,
-		})
-	}
+const machine = createMachine<FrameStateData>({ initialState })
 
-	public selectCurrentStepIndex(): number {
-		const { currentFlow, currentStepKey, flowDefinitionCache } = this.state
+if (process.env.NODE_ENV !== 'production') {
+	machine.with(devtools({ name: 'FrameState' }))
+}
+
+const FrameState = Object.assign(machine, {
+	selectCurrentStepIndex(): number {
+		const { currentFlow, currentStepKey, flowDefinitionCache } = machine.getState()
 		if (!currentFlow || !currentStepKey) return 0
 
 		const flowDef = flowDefinitionCache[currentFlow]
@@ -181,30 +152,30 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 		const stepKeys = Object.keys(flowDef.flow)
 		return stepKeys.indexOf(currentStepKey)
-	}
+	},
 
-	public selectStepKeys(): string[] {
-		const { currentFlow, flowDefinitionCache } = this.state
+	selectStepKeys(): string[] {
+		const { currentFlow, flowDefinitionCache } = machine.getState()
 		if (!currentFlow) return []
 
 		const flowDef = flowDefinitionCache[currentFlow]
 		return flowDef ? Object.keys(flowDef.flow) : []
-	}
+	},
 
-	public selectIsFlowEntered(flowName: string): boolean {
-		return this.state.flowLifecycle.enteredFlows.includes(flowName)
-	}
+	selectIsFlowEntered(flowName: string): boolean {
+		return machine.getState().flowLifecycle.enteredFlows.includes(flowName)
+	},
 
-	public selectHasHistory(): boolean {
-		return this.state.flowHistory.length > 0
-	}
+	selectHasHistory(): boolean {
+		return machine.getState().flowHistory.length > 0
+	},
 
-	public selectHasStepHistory(): boolean {
-		return this.state.stepHistory.length > 0
-	}
+	selectHasStepHistory(): boolean {
+		return machine.getState().stepHistory.length > 0
+	},
 
-	public selectVariant(): FrameVariant {
-		const { currentFlow, currentStepKey, flowDefinitionCache } = this.state
+	selectVariant(): FrameVariant {
+		const { currentFlow, currentStepKey, flowDefinitionCache } = machine.getState()
 		if (!currentFlow || !currentStepKey) return 'fullscreen'
 
 		const flowDef = flowDefinitionCache[currentFlow]
@@ -214,43 +185,43 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 		// Priority: step config > flow config > default 'fullscreen'
 		return currentStep?.config?.variant || flowDef.config?.variant || 'fullscreen'
-	}
+	},
 
-	public selectHasFrameInit(): boolean {
-		return this.state.hasFrameInit
-	}
+	selectHasFrameInit(): boolean {
+		return machine.getState().hasFrameInit
+	},
 
-	private updateVariant(): void {
+	updateVariant(): void {
 		const newVariant = this.selectVariant()
-		if (this.state.variant !== newVariant) {
-			this.mutate(draft => {
+		if (machine.getState().variant !== newVariant) {
+			machine.mutate(draft => {
 				draft.variant = newVariant
 			}, 'Update Variant')
 		}
-	}
+	},
 
-	public cacheFlowDefinition(flowName: string, definition: FlowDefinition): void {
-		this.mutate(draft => {
+	cacheFlowDefinition(flowName: string, definition: FlowDefinition): void {
+		machine.mutate(draft => {
 			draft.flowDefinitionCache[flowName] = definition
 		}, 'Cache Flow Definition')
-	}
+	},
 
-	public getFlowDefinition(flowName: string): FlowDefinition | null {
-		return this.state.flowDefinitionCache[flowName] || null
-	}
+	getFlowDefinition(flowName: string): FlowDefinition | null {
+		return machine.getState().flowDefinitionCache[flowName] || null
+	},
 
-	public clearFlowCache(flowName?: string): void {
-		this.mutate(draft => {
+	clearFlowCache(flowName?: string): void {
+		machine.mutate(draft => {
 			if (flowName) {
 				delete draft.flowDefinitionCache[flowName]
 			} else {
 				draft.flowDefinitionCache = {}
 			}
 		}, 'Clear Flow Cache')
-	}
+	},
 
-	public markFlowEntered(flowName: string): void {
-		this.mutate(draft => {
+	markFlowEntered(flowName: string): void {
+		machine.mutate(draft => {
 			if (!draft.flowLifecycle.enteredFlows.includes(flowName)) {
 				draft.flowLifecycle.enteredFlows.push(flowName)
 			}
@@ -259,10 +230,10 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		customEventManager.emit<FrameFlowEnterEventData>('frame:flow:enter', {
 			flow: flowName,
 		})
-	}
+	},
 
-	public markFlowExited(flowName: string): void {
-		this.mutate(draft => {
+	markFlowExited(flowName: string): void {
+		machine.mutate(draft => {
 			const index = draft.flowLifecycle.enteredFlows.indexOf(flowName)
 			if (index > -1) {
 				draft.flowLifecycle.enteredFlows.splice(index, 1)
@@ -272,12 +243,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		customEventManager.emit<FrameFlowExitEventData>('frame:flow:exit', {
 			flow: flowName,
 		})
-	}
+	},
 
-	public markStepEntered(): void {
-		const { currentFlow, currentStepKey } = this.state
+	markStepEntered(): void {
+		const { currentFlow, currentStepKey } = machine.getState()
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.flowLifecycle.currentStepEntered = true
 		}, 'Mark Step Entered')
 
@@ -287,12 +258,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 				stepKey: currentStepKey,
 			})
 		}
-	}
+	},
 
-	public markStepExited(): void {
-		const { currentFlow, currentStepKey } = this.state
+	markStepExited(): void {
+		const { currentFlow, currentStepKey } = machine.getState()
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.flowLifecycle.currentStepEntered = false
 		}, 'Mark Step Exited')
 
@@ -302,20 +273,20 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 				stepKey: currentStepKey,
 			})
 		}
-	}
+	},
 
 	/**
 	 * @param chain - If true, pushes current flow to history before opening new flow (default: true if frame is already open)
 	 * @param skipAnimation - If true, skips emitting navigation events (no animations)
 	 */
-	public openFrame(
+	openFrame(
 		flow: string,
 		stepKey?: string,
 		chain?: boolean,
 		skipAnimation?: boolean,
 		params?: Record<string, unknown>
 	): void {
-		const { currentFlow, currentStepKey, isOpen } = this.state
+		const { currentFlow, currentStepKey, isOpen } = machine.getState()
 		const flowDef = this.getFlowDefinition(flow)
 
 		if (!flowDef) {
@@ -337,7 +308,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		// Auto-chain if frame is already open and chain not explicitly disabled
 		const shouldChain = chain ?? (isOpen && currentFlow !== null)
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			// If chaining and frame is open, push current flow to history
 			if (shouldChain && currentFlow && currentStepKey) {
 				draft.flowHistory.push({
@@ -422,10 +393,10 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 				}
 			}
 		}
-	}
+	},
 
-	public goBackInHistory(): boolean {
-		const { flowHistory, currentFlow } = this.state
+	goBackInHistory(): boolean {
+		const { flowHistory, currentFlow } = machine.getState()
 
 		if (flowHistory.length === 0) {
 			return false
@@ -443,9 +414,9 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			})
 		}
 
-		const previousStepKey = this.state.currentStepKey
+		const previousStepKey = machine.getState().currentStepKey
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.flowHistory.pop()
 			draft.currentFlow = previousEntry.flow
 			draft.currentStepKey = previousEntry.stepKey
@@ -468,18 +439,18 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 
 		return true
-	}
+	},
 
-	public clearFlowHistory(): void {
-		this.mutate(draft => {
+	clearFlowHistory(): void {
+		machine.mutate(draft => {
 			draft.flowHistory = []
 		}, 'Clear Flow History')
-	}
+	},
 
-	public closeFrame(): void {
-		const { currentFlow, currentStepKey } = this.state
+	closeFrame(): void {
+		const { currentFlow, currentStepKey } = machine.getState()
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.isOpen = false
 			draft.hasFrameInit = false
 			draft.flowOpenCount = 0
@@ -495,18 +466,18 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		}, 'Close Frame')
 
 		customEventManager.emit('frame:close', undefined)
-	}
+	},
 
-	public setStepKey(stepKey: string): void {
+	setStepKey(stepKey: string): void {
 		const stepKeys = this.selectStepKeys()
-		const { currentStepKey } = this.state
+		const { currentStepKey } = machine.getState()
 
 		if (!stepKeys.includes(stepKey)) {
 			console.warn(`[FrameState] Step key "${stepKey}" not found in current flow`)
 			return
 		}
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.previousStepKey = currentStepKey
 			draft.currentStepKey = stepKey
 			draft.flowLifecycle.currentStepEntered = false
@@ -519,12 +490,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			stepKey,
 			previousStepKey: currentStepKey,
 		})
-	}
+	},
 
-	public nextStep(): void {
+	nextStep(): void {
 		const currentStepIndex = this.selectCurrentStepIndex()
 		const stepKeys = this.selectStepKeys()
-		const { currentFlow, currentStepKey } = this.state
+		const { currentFlow, currentStepKey } = machine.getState()
 
 		if (currentStepIndex < stepKeys.length - 1 && currentFlow && currentStepKey) {
 			const nextStepKey = stepKeys[currentStepIndex + 1]
@@ -538,12 +509,12 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 			this.setStepKey(nextStepKey)
 		}
-	}
+	},
 
-	public previousStep(): void {
+	previousStep(): void {
 		const currentStepIndex = this.selectCurrentStepIndex()
 		const stepKeys = this.selectStepKeys()
-		const { currentFlow, currentStepKey } = this.state
+		const { currentFlow, currentStepKey } = machine.getState()
 
 		if (currentStepIndex > 0 && currentFlow && currentStepKey) {
 			const prevStepKey = stepKeys[currentStepIndex - 1]
@@ -557,15 +528,15 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 
 			this.setStepKey(prevStepKey)
 		}
-	}
+	},
 
 	/**
 	 * Navigate to any step in the current flow, tracking history for accurate back navigation.
 	 * This allows skipping steps in any direction while maintaining the navigation path.
 	 */
-	public goToStep(stepKey: string): void {
+	goToStep(stepKey: string): void {
 		const stepKeys = this.selectStepKeys()
-		const { currentFlow, currentStepKey } = this.state
+		const { currentFlow, currentStepKey } = machine.getState()
 
 		if (!currentFlow || !currentStepKey) {
 			console.warn('[FrameState] Cannot go to step: no flow is currently active')
@@ -586,7 +557,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		const direction = toIndex > fromIndex ? 'forward' : 'backward'
 
 		// Push current step to history before navigating
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.stepHistory.push(currentStepKey)
 		}, 'Push Step History')
 
@@ -599,7 +570,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 
 		// Update the step
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.previousStepKey = currentStepKey
 			draft.currentStepKey = stepKey
 			draft.flowLifecycle.currentStepEntered = false
@@ -612,14 +583,14 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			stepKey,
 			previousStepKey: currentStepKey,
 		})
-	}
+	},
 
 	/**
 	 * Navigate back through step history.
 	 * Returns true if navigation occurred, false if no history exists.
 	 */
-	public goBackInStepHistory(): boolean {
-		const { stepHistory, currentFlow, currentStepKey } = this.state
+	goBackInStepHistory(): boolean {
+		const { stepHistory, currentFlow, currentStepKey } = machine.getState()
 
 		if (stepHistory.length === 0 || !currentFlow || !currentStepKey) {
 			return false
@@ -638,7 +609,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 			}
 		)
 
-		this.mutate(draft => {
+		machine.mutate(draft => {
 			draft.stepHistory.pop()
 			draft.previousStepKey = currentStepKey
 			draft.currentStepKey = previousStepKey
@@ -654,31 +625,31 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 		})
 
 		return true
-	}
+	},
 
 	/**
 	 * Clear the step navigation history.
 	 */
-	public clearStepHistory(): void {
-		this.mutate(draft => {
+	clearStepHistory(): void {
+		machine.mutate(draft => {
 			draft.stepHistory = []
 		}, 'Clear Step History')
-	}
+	},
 
-	public setAnimating(isAnimating: boolean): void {
-		this.mutate(draft => {
+	setAnimating(isAnimating: boolean): void {
+		machine.mutate(draft => {
 			draft.isAnimating = isAnimating
 		}, 'Set Animating')
-	}
+	},
 
-	public markFrameInit(): void {
-		this.mutate(draft => {
+	markFrameInit(): void {
+		machine.mutate(draft => {
 			draft.hasFrameInit = true
 		}, 'Mark Frame Init')
-	}
+	},
 
-	public resetFrame(): void {
-		this.mutate(draft => {
+	resetFrame(): void {
+		machine.mutate(draft => {
 			draft.isOpen = false
 			draft.isAnimating = false
 			draft.currentFlow = null
@@ -693,8 +664,7 @@ class FrameStateMachine extends StateMachine<FrameStateProps> {
 				currentStepEntered: false,
 			}
 		}, 'Reset Frame')
-	}
-}
+	},
+})
 
-const FrameState = new FrameStateMachine()
 export default FrameState

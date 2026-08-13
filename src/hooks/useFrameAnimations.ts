@@ -17,9 +17,11 @@ import {
 	animateFlowOut,
 } from '@/core/frame.animations'
 import AnimationState from '@/state/animation.state'
-import FrameState from '@/state/frame.state'
+import FrameState, {
+	type FrameNextStepEventData,
+	type FramePreviousStepEventData,
+} from '@/state/frame.state'
 import { customEventManager } from '@/lib/event'
-import type { FrameNextStepEventData, FramePreviousStepEventData } from '@/state/frame.state'
 
 /*
  *   TYPES
@@ -201,9 +203,11 @@ export function useFrameAnimations(
 		[overlayRef, contentRef, debug]
 	)
 
-	// Use ref to avoid recreating subscriptions
 	const animateStepTransitionRef = useRef(animateStepTransition)
-	animateStepTransitionRef.current = animateStepTransition
+
+	useEffect(() => {
+		animateStepTransitionRef.current = animateStepTransition
+	})
 
 	useEffect(() => {
 		const nextSub = customEventManager.subscribe<FrameNextStepEventData>(

@@ -10,8 +10,8 @@ import { useFrameParams } from '../useFrameParams'
  ***************************************************************************************************/
 const mockFlowParams: Record<string, unknown> = {}
 
-vi.mock('@bkincz/clutch', () => ({
-	useStateSlice: vi.fn(
+vi.mock('@bkincz/clutch/react', () => ({
+	useSlice: vi.fn(
 		(_state: unknown, selector: (s: { flowParams: Record<string, unknown> }) => unknown) =>
 			selector({ flowParams: mockFlowParams })
 	),

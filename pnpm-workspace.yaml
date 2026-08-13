@@ -1,0 +1,15 @@
+allowBuilds:
+    esbuild: true
+    '@parcel/watcher': true
+
+overrides:
+    '@microsoft/api-extractor>minimatch': '>=10.2.3'
+    '@microsoft/api-extractor>lodash': '>=4.17.24'
+    '@rushstack/node-core-library>ajv': '>=8.18.0'
+    rollup: '>=4.59.0'
+
+# 3 days, in minutes.
+minimumReleaseAge: 4320
+
+minimumReleaseAgeExclude:
+    - '@bkincz/clutch'

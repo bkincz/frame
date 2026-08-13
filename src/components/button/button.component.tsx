@@ -12,8 +12,7 @@ import styles from './button.module.scss'
 /*
  *   TYPES
  **********************************************************************************************************/
-import type { FC, MouseEvent, ReactNode } from 'react'
-import { useRef } from 'react'
+import { useRef, type FC, type MouseEvent, type ReactNode } from 'react'
 import type {
 	BaseInterface,
 	InteractiveColors,
