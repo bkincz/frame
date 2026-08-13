@@ -35,7 +35,7 @@ export interface AnimationConfig {
 /**
  * Configuration for main content area
  */
-export interface MainConfig {}
+export type MainConfig = Record<string, never>
 
 /**
  * Configuration for inert management (modal mode only)
@@ -70,7 +70,7 @@ export interface StepConfig {
 /**
  * Flow-level configuration
  */
-export interface FlowConfig extends StepConfig {}
+export type FlowConfig = StepConfig
 
 /**
  * Individual step definition

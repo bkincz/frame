@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { useStateSlice } from '@bkincz/clutch'
+import { useSlice } from '@bkincz/clutch/react'
 
 /*
  *   SHARED
@@ -30,10 +30,10 @@ export interface NavigationState {
 export function useNavigationState(config: NavigationStateConfig): NavigationState {
 	const { direction } = config
 
-	const isAnimating = useStateSlice(AnimationState, state => state.isAnimating)
-	const isInLifecycle = useStateSlice(StepState, state => state.isExiting || state.isEntering)
-	const currentFlow = useStateSlice(FrameState, state => state.currentFlow)
-	const currentStepKey = useStateSlice(FrameState, state => state.currentStepKey)
+	const isAnimating = useSlice(AnimationState, state => state.isAnimating)
+	const isInLifecycle = useSlice(StepState, state => state.isExiting || state.isEntering)
+	const currentFlow = useSlice(FrameState, state => state.currentFlow)
+	const currentStepKey = useSlice(FrameState, state => state.currentStepKey)
 
 	// Get current flow and step configuration
 	const flowDefinition = currentFlow ? FrameState.getFlowDefinition(currentFlow) : null

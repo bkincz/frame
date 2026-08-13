@@ -1,7 +1,7 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { StateMachine } from '@bkincz/clutch'
+import { createMachine } from '@bkincz/clutch'
 
 /*
  *   TYPES
@@ -12,26 +12,21 @@ export interface UIStateData {
 }
 
 /*
- *   STATE
+ *   UI STATE
  ***************************************************************************************************/
-const initialState: UIStateData = {
-	loading: false,
-	authenticated: false,
-}
+const machine = createMachine<UIStateData>({
+	initialState: {
+		loading: false,
+		authenticated: false,
+	},
+})
 
-class UIStateMachine extends StateMachine<UIStateData> {
-	constructor() {
-		super({
-			initialState,
-		})
-	}
-
-	public setLoading(loading: boolean | string): void {
-		this.mutate(draft => {
+const UIState = Object.assign(machine, {
+	setLoading(loading: boolean | string): void {
+		machine.mutate(draft => {
 			draft.loading = loading
 		}, 'Set Loading')
-	}
-}
+	},
+})
 
-const UIState = new UIStateMachine()
 export default UIState

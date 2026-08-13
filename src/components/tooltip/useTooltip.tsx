@@ -3,12 +3,11 @@
  *   React hook for managing tooltip state and rendering
  ***************************************************************************************************/
 import { type ReactNode, useState, useCallback } from 'react'
-import { Tooltip } from './tooltip.component'
+import { Tooltip, type TooltipProps } from './tooltip.component'
 
 /*
  *   TYPES
  **********************************************************************************************************/
-import type { TooltipProps } from './tooltip.component'
 
 export interface UseTooltipOptions {
 	placement?: TooltipProps['placement']
@@ -20,17 +19,17 @@ export interface UseTooltipOptions {
 	anchorElement?: HTMLElement | null
 }
 
-export interface TooltipState {
+export interface TooltipState<T = ReactNode> {
 	visible: boolean
-	content: any
+	content: T | null
 	anchorElement?: HTMLElement | null
 }
 
 /*
  *   HOOK
  **********************************************************************************************************/
-export function useTooltip<T = ReactNode>(options?: UseTooltipOptions) {
-	const [tooltipState, setTooltipState] = useState<TooltipState>({
+export function useTooltip<T extends ReactNode = ReactNode>(options?: UseTooltipOptions) {
+	const [tooltipState, setTooltipState] = useState<TooltipState<T>>({
 		visible: false,
 		content: null,
 		anchorElement: options?.anchorElement || null,
