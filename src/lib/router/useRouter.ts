@@ -4,8 +4,7 @@
  ***************************************************************************************************/
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { RouteParams } from './route.manager'
-import routeManager from './route.manager'
+import routeManager, { type RouteParams } from './route.manager'
 
 export interface UseRouterConfig {
 	/**

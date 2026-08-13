@@ -3,7 +3,7 @@
  *   Access flow params set when opening a flow via FrameAPI.openFlow(flow, step, params).
  *   Params are available in any step component within the current flow.
  ***************************************************************************************************/
-import { useStateSlice } from '@bkincz/clutch'
+import { useSlice } from '@bkincz/clutch/react'
 import FrameState from '@/state/frame.state'
 
 // Stable module-level selector — avoids recreating the subscription on every render
@@ -24,5 +24,5 @@ const selectFlowParams = (state: { flowParams: Record<string, unknown> }) => sta
  * ```
  */
 export function useFrameParams<T extends Record<string, unknown> = Record<string, unknown>>(): T {
-	return useStateSlice(FrameState, selectFlowParams) as T
+	return useSlice(FrameState, selectFlowParams) as T
 }

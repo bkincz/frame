@@ -1,12 +1,12 @@
 /*
  *   IMPORTS
  ***************************************************************************************************/
-import { isValidElement, forwardRef, type ReactNode } from 'react'
+import { isValidElement, forwardRef, type ReactNode, type MouseEvent } from 'react'
 import clsx from 'clsx'
 import { customEventManager } from '@/lib/event'
-import { useStateSlice } from '@bkincz/clutch'
+import { useSlice } from '@bkincz/clutch/react'
 
-import type { FrameVariant } from '@/types/flow.types'
+import type { FrameVariant, Step } from '@/types/flow.types'
 
 /*
  *   SHARED COMPONENTS
@@ -38,11 +38,9 @@ import type {
 	InteractiveColors,
 	InteractiveSizes,
 } from '@/types/generic'
-import type { MouseEvent } from 'react'
-import type { Step } from '@/types/flow.types'
 import { isFirstStepOfRootFlow, isLastStepOfLeafFlow } from './frame.functions'
 
-export interface FrameProps extends BaseInterface {}
+export type FrameProps = BaseInterface
 
 export interface FrameOverlayProps extends BaseInterface {
 	onClick?: () => void
@@ -204,9 +202,9 @@ Frame.NotFound = ({
 	)
 }
 
-Frame.Back = ({ className, loading }: FrameNavigationProps) => {
+Frame.Back = function FrameBack({ className, loading }: FrameNavigationProps) {
 	const { isDisabled, isHidden } = useNavigationState({ direction: 'previous' })
-	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
+	const hasFrameInit = useSlice(FrameState, state => state.hasFrameInit)
 
 	function handleBack() {
 		if (isDisabled || !hasFrameInit) return
@@ -233,7 +231,7 @@ Frame.Back = ({ className, loading }: FrameNavigationProps) => {
 	)
 }
 
-Frame.Next = ({
+Frame.Next = function FrameNext({
 	className,
 	children,
 	label,
@@ -245,9 +243,9 @@ Frame.Next = ({
 	endAdornment,
 	style,
 	...rest
-}: FrameNavigationProps) => {
+}: FrameNavigationProps) {
 	const { isDisabled, isHidden } = useNavigationState({ direction: 'next' })
-	const hasFrameInit = useStateSlice(FrameState, state => state.hasFrameInit)
+	const hasFrameInit = useSlice(FrameState, state => state.hasFrameInit)
 
 	function handleNext() {
 		if (isDisabled || !hasFrameInit) return
@@ -301,8 +299,8 @@ Frame.Next = ({
 	)
 }
 
-Frame.Navigation = ({ className, children, ...rest }: BaseInterface) => {
-	const variant = useStateSlice(FrameState, state => state.variant)
+Frame.Navigation = function FrameNavigation({ className, children, ...rest }: BaseInterface) {
+	const variant = useSlice(FrameState, state => state.variant)
 
 	const navClassName = variant === 'modal' ? styles.navigationModal : styles.navigation
 
@@ -320,8 +318,8 @@ Frame.Navigation = ({ className, children, ...rest }: BaseInterface) => {
 	)
 }
 
-Frame.Close = ({ className, ...rest }: Omit<BaseInterface, 'children'>) => {
-	const variant = useStateSlice(FrameState, state => state.variant)
+Frame.Close = function FrameClose({ className, ...rest }: Omit<BaseInterface, 'children'>) {
+	const variant = useSlice(FrameState, state => state.variant)
 
 	function closeFrame() {
 		customEventManager.emit('frame:request:close', { source: 'user' })

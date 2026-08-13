@@ -33,7 +33,7 @@ const {
 	mockAnimateFlowTransition,
 	mockUseFrameRouter,
 	mockContainerState,
-	mockUseStateSlice,
+	mockUseSlice,
 	mockGetFlowDefinition,
 } = vi.hoisted(() => {
 	const mockCloseFlow = vi.fn()
@@ -47,7 +47,7 @@ const {
 		closeFlow: mockCloseFlow,
 	}))
 	const mockContainerState = { hasFrameInit: false as boolean, flowOpenCount: 0 as number }
-	const mockUseStateSlice = vi.fn((_machine: any, selector: (s: any) => any) =>
+	const mockUseSlice = vi.fn((_machine: any, selector: (s: any) => any) =>
 		selector(mockContainerState)
 	)
 	const mockGetFlowDefinition = vi.fn()
@@ -59,7 +59,7 @@ const {
 		mockAnimateFlowTransition,
 		mockUseFrameRouter,
 		mockContainerState,
-		mockUseStateSlice,
+		mockUseSlice,
 		mockGetFlowDefinition,
 	}
 })
@@ -84,8 +84,8 @@ vi.mock('@/hooks/useStepLifecycle', () => ({
 	useStepLifecycle: vi.fn(),
 }))
 
-vi.mock('@bkincz/clutch', () => ({
-	useStateSlice: mockUseStateSlice,
+vi.mock('@bkincz/clutch/react', () => ({
+	useSlice: mockUseSlice,
 }))
 
 vi.mock('@/state/frame.state', () => ({

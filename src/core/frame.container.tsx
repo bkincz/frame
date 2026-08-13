@@ -2,7 +2,7 @@
  *   IMPORTS
  ***************************************************************************************************/
 import { useEffect, useCallback, useRef, useState } from 'react'
-import { useStateSlice } from '@bkincz/clutch'
+import { useSlice } from '@bkincz/clutch/react'
 
 /*
  *   SHARED
@@ -120,8 +120,8 @@ export function FrameContainer({ debug = false, router, children }: FrameContain
 
 	useHistoryLock(isOpen)
 
-	const hasFrameInit = useStateSlice(FrameState, selectHasFrameInit)
-	const flowOpenCount = useStateSlice(FrameState, selectFlowOpenCount)
+	const hasFrameInit = useSlice(FrameState, selectHasFrameInit)
+	const flowOpenCount = useSlice(FrameState, selectFlowOpenCount)
 
 	// Refs for animation
 	const overlayRef = useRef<HTMLDivElement | null>(null)
